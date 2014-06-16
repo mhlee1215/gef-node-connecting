@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<project name="WEPA_PROJECT" default="">    
+	<property name="server.ip"   value="220.70.1.76"/>
+	 <property name="server.port"   value="22"/>	
+	 <property name="ftp.id"   value="mhlee"/>
+	 <property name="ftp.passwd"  value="mkaist2009"/>
+	 <property name="server.java"  value="/home/mhlee/public/ROOT/WEB-INF/classes"/> 
+	 <property name="server.jsp"  value="/home/mhlee/public/ROOT/"/>    
+	 <property name="local.dist"  value="D:/data/workspace/GEF"/>
+  
+ <target name="index_jsp">
+    <ftp server = "${server.ip}" port="${server.port}" remotedir="${server.jsp}" userid="${ftp.id}" password="${ftp.passwd}" binary="false" verbose="yes">  
+     <fileset dir="${local.dist}">
+      <include name="index.jsp"/>
+     </fileset> 
+   </ftp>
+ </target>  
+ 
+</project>
+

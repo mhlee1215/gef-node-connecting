@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="SFTP_TO_108SERVER" default="upload" basedir=".">
+	<property name="ftp.server" value="220.70.1.76" />
+	<property name="ftp.port" value="22" />
+	<property name="ftp.home.dir" value="/home/mhlee/public/server/ROOT/" />
+	<property name="ftp.userid" value="mhlee" />
+	<property name="ftp.pw" value="mkaist2009" />
+	<property name="local.dist"  value="D:/data/workspace/GEF"/>
+	<taskdef name="ssh" classname="com.sshtools.ant.Ssh" />
+
+	<target name="upload">
+		<ssh host="${ftp.server}" port="${ftp.port}"
+             username="${ftp.userid}"
+             password="${ftp.pw}"
+             version="2">
+
+			<sftp action="put" remotedir="${ftp.home.dir}" verbose="true">
+				<fileset dir="${local.dist}" >
+					<include name="*.*" />
+				</fileset>
+			</sftp>
+		</ssh>
+	</target>
+
+	<target name="coordinator">
+		<ssh host="${ftp.server}" port="${ftp.port}"
+	             username="${ftp.userid}"
+	             password="${ftp.pw}"
+	             version="2">
+
+			<sftp action="put" remotedir="${ftp.home.dir}/coordinator" verbose="true">
+				<fileset dir="${local.dist}/coordinator" >
+					<include name="coordinator.*" />
+				</fileset>
+			</sftp>
+		</ssh>
+	</target>
+
+	<target name="statusChecker">
+		<ssh host="${ftp.server}" port="${ftp.port}"
+		             username="${ftp.userid}"
+		             password="${ftp.pw}"
+		             version="2">
+
+			<sftp action="put" remotedir="${ftp.home.dir}/coordinator" verbose="true">
+				<fileset dir="${local.dist}/coordinator" >
+					<include name="statusChecker.jsp" />
+				</fileset>
+			</sftp>
+		</ssh>
+	</target>
+
+</project>
