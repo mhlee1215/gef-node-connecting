@@ -3,23 +3,30 @@
 // Original Author: lawley@dstc.edu.au
 // $Id: CmdZoom.java 1153 2008-11-30 16:14:45Z bobtarling $
 
-package org.tigris.gef.base;
+package org.kaist.ie.base;
 
+import java.util.Formatter;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.kaist.ie.base.UiGlobals;
+import org.kaist.ie.ui.LoadingProgressBarNode;
+import org.tigris.gef.base.Cmd;
+import org.tigris.gef.base.Editor;
+import org.tigris.gef.base.Globals;
+import org.tigris.gef.base.LayerGrid;
 import org.tigris.gef.util.Localizer;
 
 /**
  * Zoom the view. Needs-More-Work:
  * 
- * @deprecated in 0.12.3 use ZoomAction
+ * 
  */
 
 public class CmdZoom extends Cmd {
     private static final long serialVersionUID = 8472508088519383941L;
     protected double _magnitude;
-
+    Logger logger = Logger.getLogger(CmdZoom.class);
     // //////////////////////////////////////////////////////////////
     // constructor
 
@@ -64,9 +71,18 @@ public class CmdZoom extends Cmd {
         Editor ed = (Editor) Globals.curEditor();
         if (ed == null)
             return;
-        System.out.println("ed.getScale() : "+ed.getScale()+", mag : "+_magnitude);
+        logger.debug("ed.getScale() : "+ed.getScale()+", mag : "+_magnitude);
+        
+        double nextScale = ed.getScale() * _magnitude;
+        logger.debug("before format : "+nextScale);
+        int precise = 1;
+        if(nextScale < 0.2)
+        	precise = 2;
+        logger.debug("format : "+String.format("%."+precise+"f", nextScale));
+        nextScale = Double.parseDouble(String.format("%."+precise+"f", nextScale));
+        logger.debug("after format : "+nextScale);
         if (_magnitude > 0.0) {
-            ed.setScale(ed.getScale() * _magnitude);
+            ed.setScale(nextScale);
         } else {
             ed.setScale(1.0);
         }
