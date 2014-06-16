@@ -32,15 +32,14 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-
 import java.util.Enumeration;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdesktop.swingx.JXFrame;
-import org.ssu.ml.base.UiGlobals;
-import org.ssu.ml.presentation.JNodeInfoPanel;
+import org.kaist.ie.base.UiGlobals;
+import org.kaist.ie.presentation.JNodeInfoPanel;
 import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.presentation.FigGroup;
 import org.tigris.gef.presentation.Handle;
