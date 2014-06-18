@@ -68,10 +68,10 @@ import java.util.HashMap;
 import java.util.Random;
 
 
-public class LoadingProgressBarNode extends JPanel
+public class LoadingWorker extends JPanel
                               implements ActionListener, 
                                          PropertyChangeListener {
-	Logger logger = Logger.getLogger(LoadingProgressBarNode.class);
+	Logger logger = Logger.getLogger(LoadingWorker.class);
 	
 	private final static int STATUS_STARTED = 0;
 	private final static int STATUS_STOPPED = 1;
@@ -277,7 +277,7 @@ public class LoadingProgressBarNode extends JPanel
         }
     }
     
-    public LoadingProgressBarNode(JGraph graph) {
+    public LoadingWorker(JGraph graph) {
         super();
         nodeData = new CNodeData();
         edgeData = new CEdgeData();

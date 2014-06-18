@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
-import org.kaist.ie.base.DoublePair;
+import ac.kaist.ccs.base.DoublePair;
 
 public class CNodeData {
 	public static int DEFAULT_SIZE = 5000;

@@ -30,7 +30,6 @@ import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.kaist.ie.base.UiGlobals;
 import org.kaist.ie.ui.NodePaletteFig;
 import org.kaist.ie.ui.NodeRenderManager;
 import org.kaist.ie.ui.ResizerPaletteFig;
@@ -73,6 +72,8 @@ import org.tigris.gef.undo.RedoAction;
 import org.tigris.gef.undo.UndoAction;
 import org.tigris.gef.util.Localizer;
 import org.tigris.gef.util.ResourceLoader;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 
 public class CoordinatorAppletWithMulti extends JApplet implements ModeChangeListener {

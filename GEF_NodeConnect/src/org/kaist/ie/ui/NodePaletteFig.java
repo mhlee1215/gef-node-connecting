@@ -41,13 +41,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import org.kaist.ie.base.CGridHistogramData;
-import org.kaist.ie.base.CmdGridChart;
-import org.kaist.ie.base.CmdShowAbout;
-import org.kaist.ie.base.CmdShowFuncAssociate;
-import org.kaist.ie.base.CmdZoom;
-import org.kaist.ie.base.UiGlobals;
-import org.kaist.ie.presentation.FigCustomNode;
+import org.kaist.ie.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.ModeCreateFigCircle;
 import org.tigris.gef.base.ModeCreateFigLine;
@@ -58,6 +52,13 @@ import org.tigris.gef.base.ModeCreateFigText;
 import org.tigris.gef.base.ModeSelect;
 import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.ui.ToolBar;
+
+import ac.kaist.ccs.base.CGridHistogramData;
+import ac.kaist.ccs.base.CmdGridChart;
+import ac.kaist.ccs.base.CmdShowAbout;
+import ac.kaist.ccs.base.CmdShowFuncAssociate;
+import ac.kaist.ccs.base.CmdZoom;
+import ac.kaist.ccs.base.UiGlobals;
 
 /**
  * A Palette that defines buttons to create lines, rectangles, rounded
@@ -105,57 +106,19 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
         //add(new CmdSetMode(ModeCreateFigText.class, "Text"));
         
         //add(image1, "Image1", "Image1");
-        add(new CmdZoom(2), "", "zoomIn", ToolBar.BUTTON_TYPE_TEXT);
-        add(new CmdZoom(0.5), "", "zoomOut", ToolBar.BUTTON_TYPE_TEXT);
+        add(new CmdZoom(1.5), "", "zoomIn", ToolBar.BUTTON_TYPE_TEXT);
+        add(new CmdZoom(1/1.5), "", "zoomOut", ToolBar.BUTTON_TYPE_TEXT);
         //this.addSeparator();
-        add(new CmdGridChart(), "Geneset size distribution", "siGraph", ToolBar.BUTTON_TYPE_TEXT);
+        //add(new CmdGridChart(), "Geneset size distribution", "siGraph", ToolBar.BUTTON_TYPE_TEXT);
         
-        if(!UiGlobals.isUseTargetConversion())
-        	add(new CmdShowFuncAssociate(), "FuncAssociatie", "funcAssociate", ToolBar.BUTTON_TYPE_TEXT);
+        //if(!UiGlobals.isUseTargetConversion())
+        //	add(new CmdShowFuncAssociate(), "FuncAssociatie", "funcAssociate", ToolBar.BUTTON_TYPE_TEXT);
         //add(new CmdShowAbout(), "Show About", "about1", ToolBar.BUTTON_TYPE_NO_TEXT);
         
         
         
-        Vector<String> annotHeader = UiGlobals.getAnnotationHeader();
-        
-        
-        String[] strScaleItems = new String[annotHeader.size()];
-        annotHeader.toArray(strScaleItems);
-		JComboBox searchCombo = new JComboBox(strScaleItems);
-		searchCombo.setPreferredSize(new Dimension(50, 30));
-		searchCombo.setEnabled(false);
-		searchCombo.addActionListener(this);
-		if(UiGlobals.isUseTargetConversion())
-			searchCombo.setVisible(false);
-		UiGlobals.setPropertySearchCombo(searchCombo);
-		add(searchCombo);
-		
-		JTextField searchField = new JTextField();
-        searchField.setEnabled(false);
-        searchField.setPreferredSize(new Dimension(300, 30));
-        UiGlobals.setPropertySearchField(searchField);
-        searchField.addActionListener(this);
-        if(UiGlobals.isUseTargetConversion())
-        	searchField.setVisible(false);
-		add(searchField);
-		
-		JButton searchButton = new JButton("Search");
-		searchButton.setName("Search");
-		searchButton.setEnabled(false);
-		UiGlobals.setPropertySearchButton(searchButton);
-		searchButton.addActionListener(this);
-		if(UiGlobals.isUseTargetConversion())
-			searchButton.setVisible(false);
-		add(searchButton);
-		
-		JButton resetButton = new JButton("Reset");
-		resetButton.setName("Reset");
-		resetButton.setEnabled(false);
-		UiGlobals.setPropertyResetButton(resetButton);
-		resetButton.addActionListener(this);
-		if(UiGlobals.isUseTargetConversion())
-			resetButton.setVisible(false);
-		add(resetButton);
+       
+		//add(resetButton);
 		
 		
         //add(searchField);

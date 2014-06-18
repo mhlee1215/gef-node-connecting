@@ -52,9 +52,10 @@ import org.jfree.ui.Layer;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.ui.TextAnchor;
-import org.kaist.ie.base.UiGlobals;
 import org.kaist.ie.ui.WestToolBar;
 import org.tigris.gef.ui.*;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 /**
  * A window that displays a toolbar, a connected graph editing pane, and a

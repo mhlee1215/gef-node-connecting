@@ -36,10 +36,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.kaist.ie.base.DoublePair;
-import org.kaist.ie.base.NodeDescriptor;
-import org.kaist.ie.base.UiGlobals;
-import org.kaist.ie.presentation.FigCustomNode;
+import org.kaist.ie.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.demo.SampleNode;
 import org.tigris.gef.graph.presentation.DefaultGraphModel;
@@ -49,6 +46,10 @@ import org.tigris.gef.presentation.FigCircle;
 import org.tigris.gef.presentation.FigLine;
 import org.tigris.gef.presentation.FigNode;
 import org.tigris.gef.presentation.FigRect;
+
+import ac.kaist.ccs.base.DoublePair;
+import ac.kaist.ccs.base.NodeDescriptor;
+import ac.kaist.ccs.base.UiGlobals;
 
 import java.beans.*;
 import java.io.BufferedReader;
@@ -135,7 +136,7 @@ public class LoadingProgressBarEdge extends JPanel
             	NodeDescriptor desc = new NodeDescriptor();
             	desc.setName(data.getPointerName(count));
             	desc.setGroup(data.getGroup(count));
-            	FigCustomNode rect = new FigCustomNode(locx, locy, 1, 1, desc);
+            	FigCCSNode rect = new FigCCSNode(locx, locy, 1, 1, desc);
             	
             	rect.setLineColor(data.getColor(count));
 

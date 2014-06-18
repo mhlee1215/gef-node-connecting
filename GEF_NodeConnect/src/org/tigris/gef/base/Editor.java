@@ -31,7 +31,6 @@ package org.tigris.gef.base;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdesktop.swingx.JXFrame;
-import org.kaist.ie.base.UiGlobals;
 import org.kaist.ie.presentation.JNodeInfoPanel;
 import org.tigris.gef.event.GraphSelectionListener;
 import org.tigris.gef.event.ModeChangeListener;
@@ -42,6 +41,8 @@ import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.presentation.FigText;
 import org.tigris.gef.presentation.FigTextEditor;
 import org.tigris.gef.presentation.TextEditor;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 import javax.swing.*;
 
