@@ -48,7 +48,7 @@ import org.tigris.gef.undo.UndoManager;
  * with FigPoly, FigLine, and FigInk. One handle is drawn over each point on the
  * Fig.
  * 
- * @see FigLine
+ * @see FigCCSLine
  * @see FigPoly
  * @see FigInk
  */

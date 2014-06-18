@@ -851,7 +851,7 @@ public class Editor implements Serializable, MouseListener,
         
         List<Fig> selectList = this.getSelectionManager().getSelectedFigs();
         if(selectList.size() > 0){
-        	UiGlobals.showNodeInfoList(selectList);
+        	//UiGlobals.showNodeInfoList(selectList);
         }else{
         	//UiGlobals.getMsp().getMultiSplitLayout().displayNode("left.middle", false);
         	

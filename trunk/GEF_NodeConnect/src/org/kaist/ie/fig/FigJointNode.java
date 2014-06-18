@@ -83,10 +83,12 @@ import ac.kaist.ccs.base.UiGlobals;
  * @author ics125
  */
 public class FigJointNode extends FigCCSNode {
-	Color borderColor = new Color(186, 186, 186);//Color.black;
+	//Color 
 	
 	public FigJointNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
+		borderColor = new Color(186, 186, 186);//Color.black;
+		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
 		// TODO Auto-generated constructor stub
 	}
 

@@ -286,7 +286,7 @@ public class ModeSelect extends FigModifyingModeImpl {
         
         
         if(selectList.size() > 0){
-        	UiGlobals.showNodeInfoList(selectList);
+        	//UiGlobals.showNodeInfoList(selectList);
         }else{
         	//UiGlobals.getMsp().getMultiSplitLayout().displayNode("left.middle", false);
         	
