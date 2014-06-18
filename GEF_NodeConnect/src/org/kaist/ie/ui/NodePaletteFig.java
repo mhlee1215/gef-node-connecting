@@ -29,19 +29,14 @@
 package org.kaist.ie.ui;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 
-import org.kaist.ie.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.ModeCreateFigCircle;
 import org.tigris.gef.base.ModeCreateFigLine;
@@ -50,13 +45,8 @@ import org.tigris.gef.base.ModeCreateFigRRect;
 import org.tigris.gef.base.ModeCreateFigRect;
 import org.tigris.gef.base.ModeCreateFigText;
 import org.tigris.gef.base.ModeSelect;
-import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.ui.ToolBar;
 
-import ac.kaist.ccs.base.CGridHistogramData;
-import ac.kaist.ccs.base.CmdGridChart;
-import ac.kaist.ccs.base.CmdShowAbout;
-import ac.kaist.ccs.base.CmdShowFuncAssociate;
 import ac.kaist.ccs.base.CmdZoom;
 import ac.kaist.ccs.base.UiGlobals;
 
@@ -131,26 +121,7 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
 		if(s instanceof JButton){
 			JButton button = (JButton)s;
 			Editor editor = UiGlobals.curEditor();
-			if("Search".equals(button.getName())){
-				String selectedProperty = (String)UiGlobals.getPropertySearchCombo().getSelectedItem();
-				System.out.println("searc start: "+selectedProperty);
-				
-				
-				
-				javax.swing.SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// createAndShowGUI();
-						new LoadingProgressBarSearchAndMark(keyword, propertyName);
-					}
-				});
-			}else if("Reset".equals(button.getName())){
-				javax.swing.SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// createAndShowGUI();
-						new LoadingProgressBarSearchAndMark(keyword, propertyName, true);
-					}
-				});
-			}
+			
 			
 		}
 		else if(s instanceof JComboBox){

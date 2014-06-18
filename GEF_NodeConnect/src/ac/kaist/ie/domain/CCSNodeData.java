@@ -33,22 +33,23 @@ public class CCSNodeData {
 		this.y = y;
 		this.type = type;
 		
+		int size = 11;
 		
 		switch (type) {
 		case TYPE_SOURCE:
-			node = new FigCO2SourceNode(x, y, 7, 7);
+			node = new FigCO2SourceNode(x, y, size, size);
 			break;
 		case TYPE_HUB:
-			node = new FigHubNode(x, y, 7, 7);
+			node = new FigHubNode(x, y, size, size);
 			break;
 		case TYPE_JOINT:
-			node = new FigJointNode(x, y, 7, 7);
+			node = new FigJointNode(x, y, size/2, size/2);
 			break;
 		case TYPE_PLANT:
-			node = new FigExcludePlantNode(x, y, 7, 7);
+			node = new FigExcludePlantNode(x, y, size, size);
 			break;
 		default:
-			node = new FigCCSNode(x, y, 7, 7);
+			node = new FigCCSNode(x, y, size, size);
 			break;
 
 		}

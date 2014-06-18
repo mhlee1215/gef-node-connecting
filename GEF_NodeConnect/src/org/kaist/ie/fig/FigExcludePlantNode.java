@@ -84,10 +84,12 @@ import ac.kaist.ccs.base.UiGlobals;
  */
 public class FigExcludePlantNode extends FigCCSNode {
 	
-	Color borderColor = new Color(209, 41, 255);//Color.black;
+	//Color borderColor = new Color(209, 41, 255);//Color.black;
 	
 	public FigExcludePlantNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
+		borderColor = new Color(209, 41, 255);
+		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
 		// TODO Auto-generated constructor stub
 	}
 

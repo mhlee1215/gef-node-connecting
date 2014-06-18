@@ -84,11 +84,17 @@ import ac.kaist.ccs.base.UiGlobals;
  */
 public class FigCO2SourceNode extends FigCCSNode {
 	
-	Color borderColor = new Color(84, 255, 61);//Color.black;
+	//Color borderColor = new Color(84, 255, 61);//Color.black;
 	
 	public FigCO2SourceNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
-		// TODO Auto-generated constructor stub
+		borderColor = new Color(84, 255, 61);
+		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
+	}
+
+	@Override
+	public String toString() {
+		return "FigCO2SourceNode [borderColor=" + borderColor + "]";
 	}
 
 	

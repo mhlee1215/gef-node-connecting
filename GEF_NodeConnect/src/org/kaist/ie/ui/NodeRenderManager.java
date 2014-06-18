@@ -1,9 +1,14 @@
 package org.kaist.ie.ui;
 
+import java.util.List;
+import java.util.Map;
+
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.graph.presentation.JGraph;
 
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ie.domain.CCSEdgeData;
+import ac.kaist.ie.domain.CCSNodeData;
 
 public class NodeRenderManager {
 
@@ -11,9 +16,13 @@ public class NodeRenderManager {
 	private int width = 0;
 	private int height = 0;
 	public static final int _PADDING = 50;
+	Map<Integer, List<CCSNodeData> > ccsData;
+	List<CCSEdgeData> ccsConData;
 	
-	public NodeRenderManager(JGraph graph)
+	public NodeRenderManager(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph)
 	{
+		this.ccsData = ccsData;
+		this.ccsConData = ccsConData;
 		this.graph = graph;
 	}
 	
@@ -23,11 +32,8 @@ public class NodeRenderManager {
 		this.height = height;
 	}
 	
-	public void drawNodes(boolean removeExistedNodes){
-		drawNodes(removeExistedNodes, true);
-	}
-	
-	public void drawNodes(boolean removeExistedNodes, boolean readAnnotation)
+		
+	public void drawNodes(boolean removeExistedNodes)
 	{
 		Editor editor = graph.getEditor();
 		
@@ -37,11 +43,23 @@ public class NodeRenderManager {
 		//Node load
 		//스케일이 바뀔때마다 로드해야 함.
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			Map<Integer, List<CCSNodeData> > ccsData;
+			List<CCSEdgeData> ccsConData;
+			JGraph graph;
+			
 			public void run() {
 				// createAndShowGUI();
-				new LoadingProgressBarNode(graph);
+				//new LoadingProgressBarNode(graph);
+				new LoadingWorker(ccsData, ccsConData, graph, 1);
 			}
-		});
+			
+			public Runnable init(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph){
+				this.ccsData = ccsData;
+				this.ccsConData = ccsConData;
+				this.graph = graph;
+				return this;
+			}
+		}.init(ccsData,  ccsConData, graph));
 		
 		
 	}

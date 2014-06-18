@@ -84,7 +84,9 @@ import ac.kaist.ccs.base.UiGlobals;
  */
 public class FigCCSNode extends FigRect implements MouseListener {
 	
-	Color borderColor = new Color(160, 196, 255);//Color.black;
+	int borderColorDiff = 50;
+	Color borderColor = null;//new Color(160, 196, 255);//Color.black;
+	Color coreColor = null;
 	
 	int selectedCountBySearch = 0;
 	float borderSize = 1.5f;
@@ -163,8 +165,12 @@ public class FigCCSNode extends FigRect implements MouseListener {
 
 	public FigCCSNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
+		borderColor = new Color(160, 196, 255);//Color.black;
+		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
 		// TODO Auto-generated constructor stub
 	}
+	
+	
     
     public FigCCSNode(int x, int y, int w, int h, Object owner) {
 		super(x, y, w, h);
@@ -282,7 +288,7 @@ public class FigCCSNode extends FigRect implements MouseListener {
 		
 		
     	Color old = g2.getColor();
-    	g2.setColor(getLineColor());
+    	g2.setColor(coreColor);
     	g2.fillOval(getX(), getY(), getWidth(), getHeight());
     	
     	g2.setColor(borderColor);
@@ -321,7 +327,13 @@ public class FigCCSNode extends FigRect implements MouseListener {
 		
 	}
     
-    
+    @Override
+	public String toString() {
+		return "FigCCSNode [borderColor=" + borderColor
+				+ ", selectedCountBySearch=" + selectedCountBySearch
+				+ ", borderSize=" + borderSize + ", borderStroke="
+				+ borderStroke + ", increased=" + increased + "]";
+	}
     
     
     

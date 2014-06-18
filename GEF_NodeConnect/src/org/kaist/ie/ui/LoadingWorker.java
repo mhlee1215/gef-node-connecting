@@ -31,10 +31,29 @@
 
 package org.kaist.ie.ui;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
@@ -44,28 +63,19 @@ import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.util.PaintUtils;
+import org.kaist.ie.fig.FigCCSLine;
 import org.kaist.ie.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Layer;
 import org.tigris.gef.base.LayerGrid;
-import org.tigris.gef.demo.SampleNode;
-import org.tigris.gef.graph.presentation.DefaultGraphModel;
 import org.tigris.gef.graph.presentation.JGraph;
 import org.tigris.gef.presentation.Fig;
-import org.tigris.gef.presentation.FigCircle;
-import org.tigris.gef.presentation.FigLine;
-import org.tigris.gef.presentation.FigNode;
-import org.tigris.gef.presentation.FigRect;
 
-import ac.kaist.ccs.base.CmdGridChart;
 import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
-
-import java.beans.*;
-import java.io.BufferedReader;
-import java.util.HashMap;
-import java.util.Random;
+import ac.kaist.ie.domain.CCSEdgeData;
+import ac.kaist.ie.domain.CCSNodeData;
 
 
 public class LoadingWorker extends JPanel
@@ -80,9 +90,6 @@ public class LoadingWorker extends JPanel
 	private int status;
 	private int pre_scaled;
 	
-	private CNodeData nodeData = null;
-	private CEdgeData edgeData = null;
-	
     private JProgressBar progressBar;
     private JButton startButton;
     private JButton stopButton;
@@ -96,207 +103,29 @@ public class LoadingWorker extends JPanel
     private JFrame frame = null;
     private JGraph graph = null;
     
+    private Map<Integer, List<CCSNodeData> > ccsData;
+    private List<CCSEdgeData> ccsConData;
+    
     private HashMap<String, FigCCSNode> nodeHash = new HashMap<String, FigCCSNode>();
     
     JXPanel loadingPanel = null;
     String loadingText = "Now loading node info...";
   
-
-    class NodeTask extends SwingWorker<Void, Void> {
-    	boolean progressFlag = true;
-    	CNodeData nodeData = null;
-    	float minLocx = 0;
-    	float minLocy = 0;
-    	float maxLocx = 0;
-    	float maxLocy = 0;
-    	
-    	JGraph _graph = null;
-    	JPanel panel = null; 
-    	
-
-    	public NodeTask(CNodeData nodeData, JPanel panel, JGraph graph)
-    	{
-    		this.nodeData = nodeData;
-    		this.panel = panel;
-    		this._graph = graph;
-    		
-    		minLocx = nodeData.getMinXValue();
-        	minLocy = nodeData.getMinYValue();
-        	maxLocx = nodeData.getMaxXValue();
-        	maxLocy = nodeData.getMaxYValue();
-    	}
-        /*
-         * Main task. Executed in background thread.
-         */
-        @Override
-        public Void doInBackground() {
-        	 JPanel mainPanel = UiGlobals.getMainPane();
-             mainPanel.remove(UiGlobals.getGraphPane());
-             mainPanel.add(loadingPanel, BorderLayout.CENTER);
-            //Initialize progress property.
-            setProgress(0);
-           
-            Editor editor = _graph.getEditor();
-            
-            float[] locxArry = nodeData.getLocxArry();
-            float[] locyArry = nodeData.getLocyArry();
-            
-            
-            HashMap<String, DoublePair> nodeLocMap = nodeData.getHashMap();
-            String[] srcNames = edgeData.getSrcNameArry();
-        	String[] destNames = edgeData.getDestNameArry();
-        	
-            
-            max_work = nodeData.size();
-            Layer cmp = editor.getLayerManager().getActiveLayer();
-            
-            editor.getLayerManager().setPaintActiveOnly(true);
-            
-            int inserted = 0;
-            double preScale = nodeData.getPre_scale();
-            int padding = nodeData.getPadding();
-            
-            /*for(int count = 0 ; count < srcNames.length ; count++){
-            	DoublePair srcLoc = nodeLocMap.get(srcNames[count]);
-        		DoublePair destLoc = nodeLocMap.get(destNames[count]);
-        		int srcLocx = (int)((srcLoc.x+Math.abs(minLocx))*preScale) + padding/2;
-            	int srcLocy = (int)((srcLoc.y+Math.abs(minLocy))*preScale) + padding/2;
-            	int destLocx = (int)((destLoc.x+Math.abs(minLocx))*preScale) + padding/2;
-            	int destLocy = (int)((destLoc.y+Math.abs(minLocy))*preScale) + padding/2;
-            	
-            	FigLine line = new FigLine(srcLocx, srcLocy, destLocx, destLocy, Color.blue);
-            	line.setLineColor(Color.blue);
-            	editor.add(line);
-            	
-            	if(count % 100 == 0) System.out.println(count+"/"+srcNames.length);
-            }*/
-            
-        	for(int count = cur_work ; count < max_work ; count++){
-        		try{
-	        		inserted++;
-	        		
-	            	int locx = (int)((locxArry[count]+Math.abs(minLocx))*preScale) + padding/2;
-	            	int locy = (int)((locyArry[count]+Math.abs(minLocy))*preScale) + padding/2;
-	            	
-	            	String nodeName = nodeData.getPointerName(count);
-	            	NodeDescriptor desc = new NodeDescriptor();
-	            	desc.setName(nodeName);
-	            	desc.setGroup(nodeData.getGroup(count));
-	            	FigCCSNode rect = new FigCCSNode(locx, locy, 7, 7, desc);
-	            	
-	            	rect.setLineColor(nodeData.getColor(count));
-	
-	            	rect.setLocked(true);
-	
-//	            	if(cmp == null)
-//	            		cmp = editor.getLayerManager().getActiveLayer();
-//	            	else
-//	            	{
-//	            		if(cmp != editor.getLayerManager().getActiveLayer()){
-//	            			System.out.println(cmp);
-//	            			System.out.println(editor.getLayerManager().getActiveLayer());
-//	            			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!");
-//	            			try{ Thread.sleep(3000); }catch(Exception e){}
-//	            			//break;
-//	            		}
-//	            	}
-	            	editor.add(rect);
-	            	nodeHash.put(nodeName, rect);
-	            	cur_work++;
-	            	if(cur_work%1000 == 0){
-	            		UiGlobals.setStatusbarText(" Node Rendering... "+cur_work+"/"+max_work);//System.out.println("cur_work! : "+cur_work);
-	            		
-	            		editor.getLayerManager().setPaintActiveOnly(false);
-	            		
-	            		editor.getLayerManager().setPaintActiveOnly(true);
-	            		
-	            	}
-	            	if(cur_work%100 == 0 ){ 
-	            		
-	            		try{
-	            			Thread.sleep(5);
-	            		}catch(Exception e){}
-	            		changeProgress();
-	            	}
-	                if(!progressFlag) break;
-        		}catch(OutOfMemoryError e){
-        			e.printStackTrace();
-        			JOptionPane.showMessageDialog(UiGlobals.getApplet(),
-        				    "Node loading is fail because your java heap space too small to handle COEX. If you want to increase java heap space, please reference guide in coex website.",
-        				    "Node loading error",
-        				    JOptionPane.ERROR_MESSAGE);
-        		}
-            }
-        	editor.getLayerManager().setPaintActiveOnly(false);
-        	//editor.damageAll();
-        	
-        	
-        	java.util.List<Fig> nodes = editor.getLayerManager().getContents();
-        	System.out.println("inserted : "+inserted+", "+nodes.size());
-        	//for(int i = 0 ;i < nodes.size(); i++){
-        	//	System.out.println((i+1)+", "+nodes.get(i).getOwner());
-        	//}
-        	
-            return null;
-        }
-        public void stop(){
-        	progressFlag = false;
-        }
-        /*
-         * Executed in event dispatch thread
-         */
-        public void done() {
-        	if(UiGlobals.get_scaleSlider()!= null)
-        		UiGlobals.get_scaleSlider().setEnabled(true);
-        	
-            //Toolkit.getDefaultToolkit().beep();
-            startButton.setEnabled(true);
-            //taskOutput.append("Node Rendering Finish!\n");
-            
-            System.out.println("status : "+status);
-            //if(status == STATUS_CANCELED || status == STATUS_STARTED)
-            //	frame.setVisible(false);
-            
-            UiGlobals.getCoordBottomPanel().remove(panel);
-            UiGlobals.setStatusbarText(" Node rendering is completed.");
-            
-            
-            if(UiGlobals.getIsExample().equals("Y")){
-            	if(UiGlobals.getExampleType().equals("2")){
-            		CmdGridChart cmdGridChart = new CmdGridChart();
-            		cmdGridChart.doIt();
-            	}
-            }
-            
-            UiGlobals.setNodeHash(nodeHash);
-            
-            JPanel mainPanel = UiGlobals.getMainPane();
-            mainPanel.remove(loadingPanel);
-            mainPanel.add(UiGlobals.getGraphPane(), BorderLayout.CENTER);
-            
-        }
-    }
+    int scale;
     
-    public LoadingWorker(JGraph graph) {
+    
+    public LoadingWorker(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale) {
         super();
-        nodeData = new CNodeData();
-        edgeData = new CEdgeData();
+        
+        this.ccsData = ccsData;
+        this.ccsConData = ccsConData;
         
         this.graph = graph;
         this.pre_scaled = UiGlobals.getPre_scaled();
       
-       
+        this.scale = scale;
         
-        if(UiGlobals.getcNodeData() == null || (!UiGlobals.getFileName().equals(UiGlobals.getLoadedFileName()))){
-        	int readCount = -1;
-        	readCount = readCoordData();
-        	UiGlobals.setNodeCount(readCount);
-        	int readEdgeCount = -1;
-        	readEdgeCount = readEdgeData();
-        }else{
-        	nodeData = UiGlobals.getcNodeData();
-        }
-        	
+        
         
         
         init();
@@ -359,7 +188,7 @@ public class LoadingWorker extends JPanel
         startButton.setEnabled(false);
         //Instances of javax.swing.SwingWorker are not reusuable, so
         //we create new instances as needed.
-        task = new NodeTask(nodeData, this, this.graph);
+        task = new NodeTask(ccsData, ccsConData, this, this.graph, scale);
         //task.addPropertyChangeListener(this);
         status = STATUS_STARTED;
         task.execute();
@@ -372,7 +201,7 @@ public class LoadingWorker extends JPanel
     	Object s = evt.getSource();
     	
     	if(s == startButton){
-    		task = new NodeTask(nodeData, this, this.graph);
+    		task = new NodeTask(ccsData, ccsConData, this, this.graph, scale);
     		status = STATUS_STARTED;
     		task.execute();
     		System.out.println("execute?");
@@ -409,130 +238,23 @@ public class LoadingWorker extends JPanel
     }
     
     
-    
-    public int readCoordData() {
-		//int totalCount = getFileLineCount(filename);
-		//if(totalCount <= 0) return -1;
-		
-		String filename = UiGlobals.getFileName()+".coord";
-
-		int lineCount = 0;
-		try {
-			BufferedReader br = null;
-			if(UiGlobals.getFileName()!=null){
-				UiGlobals.setLoadedFileName(filename);
-				br = Utils.getInputReader(filename);	
-			}
-			
-			if(br == null){
-				makeRandomData(50, 300, 300);
-				return 0;
-			}
-			
-			String str = null;
-			String sep = "\0";
-			String[] seps = { "\t", ",", ".", " " };
-			while ((str = br.readLine()) != null) {
-				if (lineCount == 0) {
-					// Find Separator
-					for (int count = 0; count < seps.length; count++) {
-						if (str.contains(seps[count])) {
-							sep = seps[count];
-							break;
-						}
-					}
-				}
-
-				String[] subStrs = str.split(sep);
-
-				nodeData.insertItem(subStrs[0], Float.parseFloat(subStrs[1]), Float
-						.parseFloat(subStrs[2]));
-
-				lineCount++;
-
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		UiGlobals.setcNodeData(nodeData);
-		return lineCount;
-	}
-    
-    public int readEdgeData() {
-    	String filename = UiGlobals.getFileName()+".edges";
-		//int totalCount = getFileLineCount(filename);
-		//if(totalCount <= 0) return -1;
-		
-		//edgeData.setPointCount(totalCount);
-		//edgeData.init();
-
-		int lineCount = 0;
-		try {
-			BufferedReader br = Utils.getInputReader(filename);
-			
-			if(br == null) return 0;
-			
-			String str = null;
-			String sep = "\0";
-			String[] seps = { "\t", ",", ".", " " };
-			while ((str = br.readLine()) != null) {
-				if (lineCount == 0) {
-					// Find Separator
-					for (int count = 0; count < seps.length; count++) {
-						if (str.contains(seps[count])) {
-							sep = seps[count];
-							break;
-						}
-					}
-				}
-
-				String[] subStrs = str.split(sep);
-				
-				if(Float.parseFloat(subStrs[2]) < 0.999) continue;
-				edgeData.insertItem(subStrs[0], subStrs[1], Float.parseFloat(subStrs[2]));
-
-				//if(lineCount%100 == 0) System.out.println("read edge.. : "+lineCount);
-				lineCount++;
-				
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return lineCount;
-	}
-    
-    public int makeRandomData(int size, int maxWidth, int maxHeight) {
-		// data.
-		Random random = new Random();
-
-		for (int count = 0; count < size; count++) {
-			nodeData.insertItem("random_" + count, random.nextInt(maxWidth), random
-					.nextInt(maxHeight));
-		}
-		
-		for (int count = 0; count < size; count++) {
-			edgeData.insertItem("random_" + random.nextInt(10), "random_" + random.nextInt(10), random.nextFloat());
-		}
-		
-		return size;
-	}
-    
     public void init()
     {
     	logger.debug("public void init");
     	logger.debug("====[S]======================");
     	Editor editor = graph.getEditor();
-    	
-    	float minLocx = Utils.minValue(nodeData.getLocxArry());
-		float minLocy = Utils.minValue(nodeData.getLocyArry());
-		float maxLocx = Utils.maxValue(nodeData.getLocxArry());
-		float maxLocy = Utils.maxValue(nodeData.getLocyArry());
+//    	
+//    	float minLocx = Utils.minValue(nodeData.getLocxArry());
+//		float minLocy = Utils.minValue(nodeData.getLocyArry());
+//		float maxLocx = Utils.maxValue(nodeData.getLocxArry());
+//		float maxLocy = Utils.maxValue(nodeData.getLocyArry());
 
 		int width, height;
 		
-		width = (int) maxLocx - (int) minLocx + NodeRenderManager._PADDING;
-		height = (int) maxLocy - (int) minLocy + NodeRenderManager._PADDING;
-		
+		width = 500;//graph.getWidth();//(int) maxLocx - (int) minLocx + NodeRenderManager._PADDING;
+		height = 500;//graph.getHeight();// (int) maxLocy - (int) minLocy + NodeRenderManager._PADDING;
+		System.out.println("width: "+width);
+		System.out.println("height: "+height);
 
 		double scale = UiGlobals.getGrid_scale();//Math.pow(2, pre_scaled - 1);
 
@@ -543,8 +265,8 @@ public class LoadingWorker extends JPanel
 		logger.debug("edtor.setScale("+1.0 / scale+")");
 		editor.setScale(1.0 / scale);
 
-		nodeData.setPre_scale(scale);
-		
+		//nodeData.setPre_scale(scale);
+
 		
 		int drawingSizeX = (int)(width*scale);
 		int drawingSizeY = (int)(height*scale);
@@ -566,5 +288,264 @@ public class LoadingWorker extends JPanel
 		
 		UiGlobals.setStatusbarText(" resolution : x "+scale);
 		logger.debug("====[E]======================");
+    }
+    
+    
+    class NodeTask extends SwingWorker<Void, Void> {
+    	boolean progressFlag = true;
+    	Map<Integer, List<CCSNodeData> > ccsData = null;
+    	List<CCSEdgeData> ccsConData = null;
+    	float minLocx = 0;
+    	float minLocy = 0;
+    	float maxLocx = 0;
+    	float maxLocy = 0;
+    	
+    	JGraph _graph = null;
+    	JPanel panel = null; 
+    	int scale;
+    	int padding = 50;
+    	
+
+    	public NodeTask(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JPanel panel, JGraph graph, int scale)
+    	{
+    		this.ccsData = ccsData;
+    		this.ccsConData = ccsConData;
+    		this.panel = panel;
+    		this._graph = graph;
+    		this.scale = scale;
+    	}
+        /*
+         * Main task. Executed in background thread.
+         */
+    	
+    	public void addNode(List<CCSNodeData> nodeData){
+    		System.out.println("nodeData : "+nodeData);
+    		Editor editor = _graph.getEditor();
+    		for(int i = 0 ; i < nodeData.size() ; i++){
+    			
+    			CCSNodeData node = nodeData.get(i);
+    			Fig fig = node.getNode();
+    			Point loc = fig.getLocation();
+    			//loc.x = cvtLoc(loc.x);
+    			//loc.y = cvtLoc(loc.y);
+    			fig.setLocation(loc);
+    			
+    			
+    			//System.out.println(fig);
+    			
+    			if(cur_work%1000 == 0){
+            		UiGlobals.setStatusbarText(" Node Rendering... "+cur_work+"/"+max_work);//System.out.println("cur_work! : "+cur_work);
+            	}
+            	if(cur_work%100 == 0 ){ 
+            		try{
+            			Thread.sleep(5);
+            		}catch(Exception e){}
+            		changeProgress();
+            	}
+                if(!progressFlag) break;
+                editor.add(fig);
+    			cur_work++;
+    		}
+    	}
+    	
+    	public void addEdge(List<CCSEdgeData> ccsConData){
+    		System.out.println("ccsConData : "+ccsConData);
+    		Editor editor = _graph.getEditor();
+    		for(int i = 0 ; i < ccsConData.size() ; i++){
+    			
+    			CCSEdgeData node = ccsConData.get(i);
+    			FigCCSLine fig = node.getEdge();
+    			
+    			
+    			
+    			
+    			//System.out.println(fig);
+    			
+    			if(cur_work%1000 == 0){
+            		UiGlobals.setStatusbarText(" Node Rendering... "+cur_work+"/"+max_work);//System.out.println("cur_work! : "+cur_work);
+            	}
+            	if(cur_work%100 == 0 ){ 
+            		try{
+            			Thread.sleep(5);
+            		}catch(Exception e){}
+            		changeProgress();
+            	}
+                if(!progressFlag) break;
+                editor.add(fig);
+    			cur_work++;
+    		}
+    	}
+    	
+        @Override
+        public Void doInBackground() {
+        	
+        	 JPanel mainPanel = UiGlobals.getMainPane();
+             mainPanel.remove(UiGlobals.getGraphPane());
+             mainPanel.add(loadingPanel, BorderLayout.CENTER);
+            //Initialize progress property.
+            setProgress(0);
+           
+            Editor editor = _graph.getEditor();
+            
+//            float[] locxArry = nodeData.getLocxArry();
+//            float[] locyArry = nodeData.getLocyArry();
+//            
+//            
+//            HashMap<String, DoublePair> nodeLocMap = nodeData.getHashMap();
+//            String[] srcNames = edgeData.getSrcNameArry();
+//        	String[] destNames = edgeData.getDestNameArry();
+        	
+            
+            //max_work = nodeData.size();
+            
+           
+                      
+            
+            Layer cmp = editor.getLayerManager().getActiveLayer();
+            
+            editor.getLayerManager().setPaintActiveOnly(true);
+            
+            int inserted = 0;
+//            double preScale = scale;// nodeData.getPre_scale();
+//            int padding = 50;//nodeData.getPadding();
+            
+            cur_work = 0;
+            max_work = 0;
+            if(ccsConData != null){
+            	max_work += ccsConData.size();
+            	addEdge(ccsConData);
+            }
+            
+            List<CCSNodeData> sourceData = ccsData.get(CCSNodeData.TYPE_SOURCE);
+            if(sourceData != null){
+            	max_work += sourceData.size();
+            	addNode(sourceData);
+            }
+            List<CCSNodeData> hubData = ccsData.get(CCSNodeData.TYPE_HUB);
+            if(hubData != null){
+            	max_work += hubData.size();
+            	addNode(hubData);
+            }
+            List<CCSNodeData> plantData = ccsData.get(CCSNodeData.TYPE_PLANT);
+            if(plantData != null){
+            	max_work += plantData.size();
+            	addNode(plantData);
+            }
+            List<CCSNodeData> jointData = ccsData.get(CCSNodeData.TYPE_JOINT);
+            if(jointData != null){
+            	max_work += jointData.size();
+            	addNode(jointData);
+            }
+            
+            
+            	
+            
+//        	for(int count = cur_work ; count < max_work ; count++){
+//        		
+//        		
+//        		
+//        		
+//        		try{
+//	        		inserted++;
+//	        		
+//	            	int locx = (int)((locxArry[count]+Math.abs(minLocx))*preScale) + padding/2;
+//	            	int locy = (int)((locyArry[count]+Math.abs(minLocy))*preScale) + padding/2;
+//	            	
+//	            	String nodeName = nodeData.getPointerName(count);
+//	            	NodeDescriptor desc = new NodeDescriptor();
+//	            	desc.setName(nodeName);
+//	            	desc.setGroup(nodeData.getGroup(count));
+//	            	FigCCSNode rect = new FigCCSNode(locx, locy, 7, 7, desc);
+//	            	
+//	            	rect.setLineColor(nodeData.getColor(count));
+//	
+//	            	rect.setLocked(true);
+//	
+////	            	if(cmp == null)
+////	            		cmp = editor.getLayerManager().getActiveLayer();
+////	            	else
+////	            	{
+////	            		if(cmp != editor.getLayerManager().getActiveLayer()){
+////	            			System.out.println(cmp);
+////	            			System.out.println(editor.getLayerManager().getActiveLayer());
+////	            			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!");
+////	            			try{ Thread.sleep(3000); }catch(Exception e){}
+////	            			//break;
+////	            		}
+////	            	}
+//	            	editor.add(rect);
+//	            	nodeHash.put(nodeName, rect);
+//	            	cur_work++;
+//	            	if(cur_work%1000 == 0){
+//	            		UiGlobals.setStatusbarText(" Node Rendering... "+cur_work+"/"+max_work);//System.out.println("cur_work! : "+cur_work);
+//	            		
+//	            		editor.getLayerManager().setPaintActiveOnly(false);
+//	            		
+//	            		editor.getLayerManager().setPaintActiveOnly(true);
+//	            		
+//	            	}
+//	            	if(cur_work%100 == 0 ){ 
+//	            		
+//	            		try{
+//	            			Thread.sleep(5);
+//	            		}catch(Exception e){}
+//	            		changeProgress();
+//	            	}
+//	                if(!progressFlag) break;
+//        		}catch(OutOfMemoryError e){
+//        			e.printStackTrace();
+//        			JOptionPane.showMessageDialog(UiGlobals.getApplet(),
+//        				    "Node loading is fail because your java heap space too small to handle CCS. If you want to increase java heap space, please reference guide in CCS website.",
+//        				    "Node loading error",
+//        				    JOptionPane.ERROR_MESSAGE);
+//        		}
+//            }
+        	editor.getLayerManager().setPaintActiveOnly(false);
+        	//editor.damageAll();
+        	
+        	
+        	java.util.List<Fig> nodes = editor.getLayerManager().getContents();
+        	System.out.println("inserted : "+inserted+", "+nodes.size());
+        	//for(int i = 0 ;i < nodes.size(); i++){
+        	//	System.out.println((i+1)+", "+nodes.get(i).getOwner());
+        	//}
+        	
+            return null;
+        }
+        
+        public int cvtLoc(int loc){
+        	return (int)((loc)*scale) + padding/2;
+        }
+        public void stop(){
+        	progressFlag = false;
+        }
+        /*
+         * Executed in event dispatch thread
+         */
+        public void done() {
+        	if(UiGlobals.get_scaleSlider()!= null)
+        		UiGlobals.get_scaleSlider().setEnabled(true);
+        	
+            //Toolkit.getDefaultToolkit().beep();
+            startButton.setEnabled(true);
+            //taskOutput.append("Node Rendering Finish!\n");
+            
+            System.out.println("status : "+status);
+            //if(status == STATUS_CANCELED || status == STATUS_STARTED)
+            //	frame.setVisible(false);
+            
+            UiGlobals.getCoordBottomPanel().remove(panel);
+            UiGlobals.setStatusbarText(" Node rendering is completed.");
+            
+            
+            
+            
+            UiGlobals.setNodeHash(nodeHash);
+            
+            JPanel mainPanel = UiGlobals.getMainPane();
+            mainPanel.remove(loadingPanel);
+            mainPanel.add(UiGlobals.getGraphPane(), BorderLayout.CENTER);
+            
+        }
     }
 }

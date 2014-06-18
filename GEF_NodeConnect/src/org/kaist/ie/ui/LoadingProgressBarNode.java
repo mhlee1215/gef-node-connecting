@@ -31,10 +31,26 @@
 
 package org.kaist.ie.ui;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.util.HashMap;
+import java.util.Random;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
@@ -48,24 +64,12 @@ import org.kaist.ie.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Layer;
 import org.tigris.gef.base.LayerGrid;
-import org.tigris.gef.demo.SampleNode;
-import org.tigris.gef.graph.presentation.DefaultGraphModel;
 import org.tigris.gef.graph.presentation.JGraph;
 import org.tigris.gef.presentation.Fig;
-import org.tigris.gef.presentation.FigCircle;
-import org.tigris.gef.presentation.FigLine;
-import org.tigris.gef.presentation.FigNode;
-import org.tigris.gef.presentation.FigRect;
 
-import ac.kaist.ccs.base.CmdGridChart;
 import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
-
-import java.beans.*;
-import java.io.BufferedReader;
-import java.util.HashMap;
-import java.util.Random;
 
 
 public class LoadingProgressBarNode extends JPanel
@@ -261,12 +265,7 @@ public class LoadingProgressBarNode extends JPanel
             UiGlobals.setStatusbarText(" Node rendering is completed.");
             
             
-            if(UiGlobals.getIsExample().equals("Y")){
-            	if(UiGlobals.getExampleType().equals("2")){
-            		CmdGridChart cmdGridChart = new CmdGridChart();
-            		cmdGridChart.doIt();
-            	}
-            }
+           
             
             UiGlobals.setNodeHash(nodeHash);
             

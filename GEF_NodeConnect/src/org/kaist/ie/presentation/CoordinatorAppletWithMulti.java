@@ -181,7 +181,7 @@ public class CoordinatorAppletWithMulti extends JApplet implements ModeChangeLis
 		//initAnnotation(UiGlobals.getAnnotationFileName());
 		
 		//Start to node rendering
-		NodeRenderManager nodeRenderManager = new NodeRenderManager(_graph);
+		NodeRenderManager nodeRenderManager = null;//new NodeRenderManager(_graph);
 		nodeRenderManager.init(_width, _height);
 		nodeRenderManager.drawNodes(true);
 		UiGlobals.setNodeRenderManager(nodeRenderManager);

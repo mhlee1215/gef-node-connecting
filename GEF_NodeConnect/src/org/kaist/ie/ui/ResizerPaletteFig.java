@@ -100,7 +100,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 	String scaleNamePrefix = "SCALE_PREFIX";
 	String scalePrefix = "x";
 	int scaleMin = 1;
-	int initScale = 4;
+	int initScale = UiGlobals.getPre_scaled();
 	int scaleMax = 9;
 	
 	private final String LAYER_ORIGINAL = "Original";
@@ -519,7 +519,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 						UiGlobals.get_scaleSlider().setEnabled(false);
 						NodeRenderManager manager = UiGlobals.getNodeRenderManager();
 						UiGlobals.setPre_scaled(scaleCurValue);
-						manager.drawNodes(true, false);
+						manager.drawNodes(true);
 					}
 				}
 			}
