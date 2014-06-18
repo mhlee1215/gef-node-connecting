@@ -38,11 +38,12 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdesktop.swingx.JXFrame;
-import org.kaist.ie.base.UiGlobals;
 import org.kaist.ie.presentation.JNodeInfoPanel;
 import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.presentation.FigGroup;
 import org.tigris.gef.presentation.Handle;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 /**
  * This class implements a Mode that interprets user input as selecting one or

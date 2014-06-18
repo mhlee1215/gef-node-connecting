@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.kaist.ie.base.GeneFunctionSet;
-import org.kaist.ie.base.UiGlobals;
 import org.kaist.ie.ui.Utils;
+
+import ac.kaist.ccs.base.GeneFunctionSet;
+import ac.kaist.ccs.base.UiGlobals;
 
 
 public class FunctionPreCalculator {

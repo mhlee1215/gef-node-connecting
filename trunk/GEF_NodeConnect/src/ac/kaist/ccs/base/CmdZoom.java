@@ -3,19 +3,20 @@
 // Original Author: lawley@dstc.edu.au
 // $Id: CmdZoom.java 1153 2008-11-30 16:14:45Z bobtarling $
 
-package org.kaist.ie.base;
+package ac.kaist.ccs.base;
 
 import java.util.Formatter;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.kaist.ie.base.UiGlobals;
 import org.kaist.ie.ui.LoadingProgressBarNode;
 import org.tigris.gef.base.Cmd;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Globals;
 import org.tigris.gef.base.LayerGrid;
 import org.tigris.gef.util.Localizer;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 /**
  * Zoom the view. Needs-More-Work:

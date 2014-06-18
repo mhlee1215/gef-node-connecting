@@ -1,8 +1,9 @@
 package org.kaist.ie.ui;
 
-import org.kaist.ie.base.UiGlobals;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.graph.presentation.JGraph;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 public class NodeRenderManager {
 
@@ -42,16 +43,6 @@ public class NodeRenderManager {
 			}
 		});
 		
-		//annotation load
-		//이미 로드한 경우는 로드하지 않는다.
-		if(UiGlobals.getAnnotationHeader().size() == 0){
-			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					// createAndShowGUI();
-					new LoadingProgressBarAnnotation(UiGlobals.getAnnotationFileName());
-				}
-			});
-		}
 		
 	}
 }

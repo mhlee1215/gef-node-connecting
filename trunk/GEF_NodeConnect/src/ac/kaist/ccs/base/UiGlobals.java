@@ -1,4 +1,4 @@
-package org.kaist.ie.base;
+package ac.kaist.ccs.base;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXPanel;
-import org.kaist.ie.presentation.FigCustomNode;
+import org.kaist.ie.fig.FigCCSNode;
 import org.kaist.ie.presentation.JNodeInfoPanel;
 import org.kaist.ie.ui.CNodeData;
 import org.kaist.ie.ui.NodeRenderManager;
@@ -72,8 +72,8 @@ public class UiGlobals extends Globals{
 	private static HashMap<String, Color> layerColor = new HashMap<String, Color>();
 	private static HashMap<String, List<Fig>> layerData = new HashMap<String, List<Fig>>();
 	
-	private static HashMap<String, FigCustomNode> nodeHash = null;
-	private static Vector<FigCustomNode> infoMarkedNode = new Vector<FigCustomNode>();
+	private static HashMap<String, FigCCSNode> nodeHash = null;
+	private static Vector<FigCCSNode> infoMarkedNode = new Vector<FigCCSNode>();
 	
 	private static JPanel graphPane = null;
 	private static JPanel mainPane = null;
@@ -177,28 +177,28 @@ public class UiGlobals extends Globals{
 	/**
 	 * @return the infoMarkedNode
 	 */
-	public static Vector<FigCustomNode> getInfoMarkedNode() {
+	public static Vector<FigCCSNode> getInfoMarkedNode() {
 		return infoMarkedNode;
 	}
 
 	/**
 	 * @param infoMarkedNode the infoMarkedNode to set
 	 */
-	public static void setInfoMarkedNode(Vector<FigCustomNode> infoMarkedNode) {
+	public static void setInfoMarkedNode(Vector<FigCCSNode> infoMarkedNode) {
 		UiGlobals.infoMarkedNode = infoMarkedNode;
 	}
 
 	/**
 	 * @return the nodeHash
 	 */
-	public static HashMap<String, FigCustomNode> getNodeHash() {
+	public static HashMap<String, FigCCSNode> getNodeHash() {
 		return nodeHash;
 	}
 
 	/**
 	 * @param nodeHash the nodeHash to set
 	 */
-	public static void setNodeHash(HashMap<String, FigCustomNode> nodeHash) {
+	public static void setNodeHash(HashMap<String, FigCCSNode> nodeHash) {
 		UiGlobals.nodeHash = nodeHash;
 	}
 

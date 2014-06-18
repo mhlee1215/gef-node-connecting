@@ -7,8 +7,9 @@ package org.tigris.gef.base;
 
 import java.util.HashMap;
 
-import org.kaist.ie.base.UiGlobals;
 import org.tigris.gef.util.Localizer;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 /**
  * Zoom the view. Needs-More-Work:

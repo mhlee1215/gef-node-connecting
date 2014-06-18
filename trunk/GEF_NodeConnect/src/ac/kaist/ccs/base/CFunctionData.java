@@ -1,4 +1,4 @@
-package org.kaist.ie.base;
+package ac.kaist.ccs.base;
 
 public class CFunctionData {
 	

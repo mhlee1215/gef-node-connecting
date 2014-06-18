@@ -30,7 +30,6 @@ package org.kaist.ie.ui;
 
 import java.awt.Color;
 
-import org.kaist.ie.base.CmdGridChart;
 import org.tigris.gef.base.CmdSetMode;
 import org.tigris.gef.base.CmdZoom;
 import org.tigris.gef.base.ModeBroom;
@@ -44,6 +43,8 @@ import org.tigris.gef.base.ModeCreateFigSpline;
 import org.tigris.gef.base.ModeCreateFigText;
 import org.tigris.gef.base.ModeSelect;
 import org.tigris.gef.ui.ToolBar;
+
+import ac.kaist.ccs.base.CmdGridChart;
 
 /**
  * A Palette that defines buttons to create lines, rectangles, rounded

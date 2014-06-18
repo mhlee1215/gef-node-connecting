@@ -71,12 +71,13 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 import org.jdesktop.swingx.JXTaskPane;
-import org.kaist.ie.base.UiGlobals;
-import org.kaist.ie.presentation.FigCustomNode;
+import org.kaist.ie.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.LayerGrid;
 import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.util.ResourceLoader;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 
 public class ResizerPaletteFig extends WestToolBar implements ChangeListener, ActionListener, ItemListener {
@@ -676,7 +677,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 			for(int count = 0 ; count < nodes.size() ; count++)
 	        {
 	        	Fig node = nodes.get(count);
-	        	FigCustomNode nodeCustom = (FigCustomNode)node;
+	        	FigCCSNode nodeCustom = (FigCCSNode)node;
 	        	nodeCustom.resetFoundMark();
 	        	if(UiGlobals.isShowOnlyFound()){
 	        		nodeCustom.setVisible(false);
@@ -693,7 +694,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 			for(int count = 0 ; count < nodes.size() ; count++)
 	        {
 	        	Fig node = nodes.get(count);
-	        	FigCustomNode nodeCustom = (FigCustomNode)node;
+	        	FigCCSNode nodeCustom = (FigCCSNode)node;
 	        	nodeCustom.resetFoundMark();
 	        	if(UiGlobals.isShowOnlyFound()){
 	        		nodeCustom.setVisible(false);
@@ -715,7 +716,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 					for(int count = 0 ; count < layerNodes.size() ; count++)
 			        {
 			        	Fig node = layerNodes.get(count);
-			        	FigCustomNode nodeCustom = (FigCustomNode)node;
+			        	FigCCSNode nodeCustom = (FigCCSNode)node;
 			        	nodeCustom.setFoundMark(layerColor);
 			        	nodeCustom.setVisible(true);
 			        	nodeCustom.setSelectable(true);
@@ -728,7 +729,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 			for(int count = 0 ; count < nodes.size() ; count++)
 	        {
 	        	Fig node = nodes.get(count);
-	        	FigCustomNode nodeCustom = (FigCustomNode)node;
+	        	FigCCSNode nodeCustom = (FigCCSNode)node;
 	        	nodeCustom.resetFoundMark();
 	        	if(UiGlobals.isShowOnlyFound()){
 	        		nodeCustom.setVisible(false);
@@ -745,7 +746,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 				for(int count = 0 ; count < layerNodes.size() ; count++)
 		        {
 		        	Fig node = layerNodes.get(count);
-		        	FigCustomNode nodeCustom = (FigCustomNode)node;
+		        	FigCCSNode nodeCustom = (FigCCSNode)node;
 		        	nodeCustom.setFoundMark(layerColor);
 		        	nodeCustom.setVisible(true);
 		        	nodeCustom.setSelectable(true);

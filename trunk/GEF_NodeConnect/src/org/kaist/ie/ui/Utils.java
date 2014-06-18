@@ -30,7 +30,8 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.jfree.chart.JFreeChart;
-import org.kaist.ie.base.UiGlobals;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 
 

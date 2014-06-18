@@ -1,4 +1,4 @@
-package org.kaist.ie.base;
+package ac.kaist.ccs.base;
 
 import java.awt.Color;
 

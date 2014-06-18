@@ -44,7 +44,7 @@
 // CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
 // UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
-package org.kaist.ie.presentation;
+package org.kaist.ie.fig;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -67,9 +67,6 @@ import javax.swing.JSeparator;
 
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.graphics.ShadowRenderer;
-import org.kaist.ie.base.CmdGetNodes;
-import org.kaist.ie.base.NodeDescriptor;
-import org.kaist.ie.base.UiGlobals;
 import org.kaist.ie.ui.CNodeData;
 import org.tigris.gef.base.CmdReorder;
 import org.tigris.gef.base.Editor;
@@ -77,11 +74,15 @@ import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.presentation.FigRect;
 import org.tigris.gef.util.Localizer;
 
+import ac.kaist.ccs.base.CmdGetNodes;
+import ac.kaist.ccs.base.NodeDescriptor;
+import ac.kaist.ccs.base.UiGlobals;
+
 /**
  * Primitive Fig for displaying circles and ovals.
  * @author ics125
  */
-public class FigCustomNode extends FigRect implements MouseListener {
+public class FigCCSNode extends FigRect implements MouseListener {
 	
 	Color borderColor = new Color(160, 196, 255);//Color.black;
 	
@@ -160,12 +161,12 @@ public class FigCustomNode extends FigRect implements MouseListener {
 		this.borderColor = borderColor;
 	}
 
-	public FigCustomNode(int x, int y, int w, int h) {
+	public FigCCSNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
 		// TODO Auto-generated constructor stub
 	}
     
-    public FigCustomNode(int x, int y, int w, int h, Object owner) {
+    public FigCCSNode(int x, int y, int w, int h, Object owner) {
 		super(x, y, w, h);
 		setOwner(owner);
 		// TODO Auto-generated constructor stub

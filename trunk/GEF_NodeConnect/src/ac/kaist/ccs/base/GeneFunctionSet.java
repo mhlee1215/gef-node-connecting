@@ -1,4 +1,4 @@
-package org.kaist.ie.base;
+package ac.kaist.ccs.base;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -50,8 +50,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.jdesktop.swingx.JXPanel;
+import org.kaist.ie.fig.FigCCSNode;
 import org.kaist.ie.presentation.CustomCellRenderer1;
-import org.kaist.ie.presentation.FigCustomNode;
 import org.kaist.ie.presentation.JGridChartPanel;
 import org.kaist.ie.presentation.JNodeInfoTableModel;
 import org.kaist.ie.presentation.MultiLineCellRenderer;

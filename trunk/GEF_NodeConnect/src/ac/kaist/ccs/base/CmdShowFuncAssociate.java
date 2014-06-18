@@ -3,7 +3,7 @@
 // Original Author: lawley@dstc.edu.au
 // $Id: CmdZoom.java 1153 2008-11-30 16:14:45Z bobtarling $
 
-package org.kaist.ie.base;
+package ac.kaist.ccs.base;
 
 import org.tigris.gef.base.Cmd;
 

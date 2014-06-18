@@ -3,7 +3,7 @@
 // Original Author: lawley@dstc.edu.au
 // $Id: CmdZoom.java 1153 2008-11-30 16:14:45Z bobtarling $
 
-package org.kaist.ie.base;
+package ac.kaist.ccs.base;
 
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -29,7 +29,6 @@ import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.jfree.chart.JFreeChart;
 import org.jfree.ui.RefineryUtilities;
-import org.kaist.ie.base.UiGlobals;
 import org.kaist.ie.presentation.JGridChartPanel;
 import org.kaist.ie.presentation.JGridHistogramPanel;
 import org.kaist.ie.presentation.JGridPanel;
@@ -41,6 +40,8 @@ import org.tigris.gef.base.LayerGrid;
 import org.tigris.gef.graph.presentation.JGraphFrame;
 import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.util.Localizer;
+
+import ac.kaist.ccs.base.UiGlobals;
 
 
 public class CmdSaveChart extends Cmd {

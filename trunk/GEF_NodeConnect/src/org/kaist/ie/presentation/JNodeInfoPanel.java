@@ -41,11 +41,13 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 import org.jdesktop.swingx.JXTitledPanel;
-import org.kaist.ie.base.NodeDescriptor;
-import org.kaist.ie.base.UiGlobals;
+import org.kaist.ie.fig.FigCCSNode;
 import org.tigris.gef.base.CmdReorder;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.presentation.Fig;
+
+import ac.kaist.ccs.base.NodeDescriptor;
+import ac.kaist.ccs.base.UiGlobals;
 
 public class JNodeInfoPanel extends JXTitledPanel {
 	
@@ -349,13 +351,13 @@ public class JNodeInfoPanel extends JXTitledPanel {
     }
 	
 	private void outputSelection() {
-		for(FigCustomNode node : UiGlobals.getInfoMarkedNode())
+		for(FigCCSNode node : UiGlobals.getInfoMarkedNode())
 			node.resetbyInfoPanel();
 		UiGlobals.getInfoMarkedNode().clear();
         for (int c : nodeTable.getSelectedRows()) {
             System.out.println(nodeTable.getModel().getValueAt(c, 0));
             Fig selectedNode = UiGlobals.getNodeHash().get(nodeTable.getModel().getValueAt(c, 0));
-            FigCustomNode selectedNodeCustom = (FigCustomNode)selectedNode;
+            FigCCSNode selectedNodeCustom = (FigCCSNode)selectedNode;
             selectedNodeCustom.markByInfoPanel();
             UiGlobals.getInfoMarkedNode().add(selectedNodeCustom);
             Editor editor = UiGlobals.curEditor();

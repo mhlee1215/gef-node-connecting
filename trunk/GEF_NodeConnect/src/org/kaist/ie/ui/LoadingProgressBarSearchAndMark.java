@@ -37,11 +37,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.apache.log4j.Logger;
-import org.kaist.ie.base.CmdGridChart;
-import org.kaist.ie.base.DoublePair;
-import org.kaist.ie.base.NodeDescriptor;
-import org.kaist.ie.base.UiGlobals;
-import org.kaist.ie.presentation.FigCustomNode;
+import org.kaist.ie.fig.FigCCSNode;
 import org.kaist.ie.ui.LoadingProgressBarNode.NodeTask;
 import org.tigris.gef.base.CmdReorder;
 import org.tigris.gef.base.Editor;
@@ -54,6 +50,11 @@ import org.tigris.gef.presentation.FigCircle;
 import org.tigris.gef.presentation.FigLine;
 import org.tigris.gef.presentation.FigNode;
 import org.tigris.gef.presentation.FigRect;
+
+import ac.kaist.ccs.base.CmdGridChart;
+import ac.kaist.ccs.base.DoublePair;
+import ac.kaist.ccs.base.NodeDescriptor;
+import ac.kaist.ccs.base.UiGlobals;
 
 import java.beans.*;
 import java.io.BufferedReader;
@@ -119,7 +120,7 @@ public class LoadingProgressBarSearchAndMark extends JPanel
 	        for(int count = 0 ; count < nodes.size() ; count++)
 	        {
 	        	Fig node = nodes.get(count);
-	        	FigCustomNode nodeCustom = (FigCustomNode)node;
+	        	FigCCSNode nodeCustom = (FigCCSNode)node;
 	        	
 	        	if(isReset){
 	        		nodeCustom.resetFoundMark();	
