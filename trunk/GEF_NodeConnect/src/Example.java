@@ -3,6 +3,7 @@ import ilog.cplex.*;
 
 
 //-Djava.library.path="D:\Program Files\IBM\ILOG\CPLEX_Studio_Preview126\cplex\bin\x64_win64"
+//-Djava.library.path=/Users/mhlee1215/Applications/IBM/ILOG/CPLEX_Studio_Preview126/cplex/bin/x86-64_osx
 
 public class Example {
   public static void main(String[] args) {
