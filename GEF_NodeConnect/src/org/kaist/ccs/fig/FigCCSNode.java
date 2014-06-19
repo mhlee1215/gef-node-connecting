@@ -44,7 +44,7 @@
 // CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
 // UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
-package org.kaist.ie.fig;
+package org.kaist.ccs.fig;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -67,7 +67,7 @@ import javax.swing.JSeparator;
 
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.graphics.ShadowRenderer;
-import org.kaist.ie.ui.CNodeData;
+import org.kaist.ccs.ui.CNodeData;
 import org.tigris.gef.base.CmdReorder;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.presentation.Fig;

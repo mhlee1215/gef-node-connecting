@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package org.kaist.ie.ui;
+package org.kaist.ccs.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -60,7 +60,7 @@ import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.util.PaintUtils;
-import org.kaist.ie.fig.FigCCSNode;
+import org.kaist.ccs.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Layer;
 import org.tigris.gef.base.LayerGrid;

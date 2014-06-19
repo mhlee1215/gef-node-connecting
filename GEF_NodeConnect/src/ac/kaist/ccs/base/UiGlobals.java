@@ -17,10 +17,10 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXPanel;
-import org.kaist.ie.fig.FigCCSNode;
+import org.kaist.ccs.fig.FigCCSNode;
+import org.kaist.ccs.ui.CNodeData;
+import org.kaist.ccs.ui.NodeRenderManager;
 import org.kaist.ie.presentation.JNodeInfoPanel;
-import org.kaist.ie.ui.CNodeData;
-import org.kaist.ie.ui.NodeRenderManager;
 import org.tigris.gef.base.Globals;
 import org.tigris.gef.presentation.Fig;
 

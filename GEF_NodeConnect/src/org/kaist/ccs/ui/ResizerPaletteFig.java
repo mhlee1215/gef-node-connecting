@@ -26,7 +26,7 @@
 // Original Author: ics125 spring 1996
 // $Id: PaletteFig.java 1153 2008-11-30 16:14:45Z bobtarling $
 
-package org.kaist.ie.ui;
+package org.kaist.ccs.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -71,7 +71,7 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 import org.jdesktop.swingx.JXTaskPane;
-import org.kaist.ie.fig.FigCCSNode;
+import org.kaist.ccs.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.LayerGrid;
 import org.tigris.gef.presentation.Fig;

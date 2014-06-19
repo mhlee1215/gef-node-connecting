@@ -41,7 +41,7 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 import org.jdesktop.swingx.JXTitledPanel;
-import org.kaist.ie.fig.FigCCSNode;
+import org.kaist.ccs.fig.FigCCSNode;
 import org.tigris.gef.base.CmdReorder;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.presentation.Fig;

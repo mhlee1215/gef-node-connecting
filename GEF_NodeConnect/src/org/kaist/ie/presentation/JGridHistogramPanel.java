@@ -52,7 +52,7 @@ import org.jfree.ui.Layer;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.ui.TextAnchor;
-import org.kaist.ie.ui.WestToolBar;
+import org.kaist.ccs.ui.WestToolBar;
 import org.tigris.gef.ui.*;
 
 import ac.kaist.ccs.base.UiGlobals;

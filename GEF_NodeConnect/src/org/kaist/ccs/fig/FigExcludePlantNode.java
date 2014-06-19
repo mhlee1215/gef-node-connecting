@@ -44,7 +44,7 @@
 // CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
 // UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
-package org.kaist.ie.fig;
+package org.kaist.ccs.fig;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -67,7 +67,7 @@ import javax.swing.JSeparator;
 
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.graphics.ShadowRenderer;
-import org.kaist.ie.ui.CNodeData;
+import org.kaist.ccs.ui.CNodeData;
 import org.tigris.gef.base.CmdReorder;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.presentation.Fig;
@@ -82,19 +82,15 @@ import ac.kaist.ccs.base.UiGlobals;
  * Primitive Fig for displaying circles and ovals.
  * @author ics125
  */
-public class FigCO2SourceNode extends FigCCSNode {
+public class FigExcludePlantNode extends FigCCSNode {
 	
-	//Color borderColor = new Color(84, 255, 61);//Color.black;
+	//Color borderColor = new Color(209, 41, 255);//Color.black;
 	
-	public FigCO2SourceNode(int x, int y, int w, int h) {
+	public FigExcludePlantNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
-		borderColor = new Color(84, 255, 61);
+		borderColor = new Color(209, 41, 255);
 		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
-	}
-
-	@Override
-	public String toString() {
-		return "FigCO2SourceNode [borderColor=" + borderColor + "]";
+		// TODO Auto-generated constructor stub
 	}
 
 	

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package org.kaist.ie.ui;
+package org.kaist.ccs.ui;
 
 import java.awt.*;
 import java.awt.event.*;
