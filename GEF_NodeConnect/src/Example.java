@@ -1,6 +1,9 @@
 import ilog.concert.*;
 import ilog.cplex.*;
 
+
+//-Djava.library.path="D:\Program Files\IBM\ILOG\CPLEX_Studio_Preview126\cplex\bin\x64_win64"
+
 public class Example {
   public static void main(String[] args) {
     try {
