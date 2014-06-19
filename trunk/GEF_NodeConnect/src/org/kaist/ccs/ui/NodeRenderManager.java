@@ -1,4 +1,4 @@
-package org.kaist.ie.ui;
+package org.kaist.ccs.ui;
 
 import java.util.List;
 import java.util.Map;
@@ -7,8 +7,8 @@ import org.tigris.gef.base.Editor;
 import org.tigris.gef.graph.presentation.JGraph;
 
 import ac.kaist.ccs.base.UiGlobals;
-import ac.kaist.ie.domain.CCSEdgeData;
-import ac.kaist.ie.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSEdgeData;
+import ac.kaist.ccs.domain.CCSNodeData;
 
 public class NodeRenderManager {
 

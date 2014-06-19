@@ -44,8 +44,9 @@
 // CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
 // UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
-package org.kaist.ie.fig;
+package org.kaist.ccs.fig;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -67,7 +68,7 @@ import javax.swing.JSeparator;
 
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import org.jdesktop.swingx.graphics.ShadowRenderer;
-import org.kaist.ie.ui.CNodeData;
+import org.kaist.ccs.ui.CNodeData;
 import org.tigris.gef.base.CmdReorder;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.presentation.Fig;
@@ -82,16 +83,58 @@ import ac.kaist.ccs.base.UiGlobals;
  * Primitive Fig for displaying circles and ovals.
  * @author ics125
  */
-public class FigExcludePlantNode extends FigCCSNode {
+public class FigHubNode extends FigCCSNode {
 	
-	//Color borderColor = new Color(209, 41, 255);//Color.black;
+	int hubRange;
 	
-	public FigExcludePlantNode(int x, int y, int w, int h) {
+	//Color borderColor = new Color(255, 176, 41);//Color.black;
+	
+	public FigHubNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
-		borderColor = new Color(209, 41, 255);
+		this.hubRange = 300;
+		this.borderColor = new Color(255, 176, 41);
 		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public String toString() {
+		return "FigHubNode [hubRange=" + hubRange + ", borderColor="
+				+ borderColor + "]";
+	}
 	
+	@Override
+	public void paint(Graphics g) {
+		// TODO Auto-generated method stub
+		
+		
+		if(visible){
+			Graphics2D g2 = (Graphics2D)g.create();
+			g2.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+			
+			Color old = g2.getColor();
+			g2.setComposite(makeComposite(0.3f));
+	    	g2.setColor(borderColor);
+	    	g2.setStroke(borderStroke);
+	    	g2.fillOval(getX()-hubRange/2, getY()-hubRange/2, hubRange, hubRange);
+	    	
+	    	g2.setColor(old);
+		}
+		
+		super.paint(g);
+	}
+	
+	private AlphaComposite makeComposite(float alpha) {
+		  int type = AlphaComposite.SRC_OVER;
+		  return(AlphaComposite.getInstance(type, alpha));
+		 }
+
+	
+	
+	
+    
+    
+    
 } /* end class FigCircle */

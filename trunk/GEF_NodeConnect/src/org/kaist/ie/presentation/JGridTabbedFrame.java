@@ -39,7 +39,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.ui.RefineryUtilities;
-import org.kaist.ie.ui.GridPaletteFig;
+import org.kaist.ccs.ui.GridPaletteFig;
 import org.tigris.gef.ui.*;
 
 /**

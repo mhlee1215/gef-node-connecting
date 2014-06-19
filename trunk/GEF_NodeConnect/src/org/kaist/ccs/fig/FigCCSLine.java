@@ -26,7 +26,7 @@
 // Original Author: ics125 spring 1996
 // $Id: FigLine.java 1153 2008-11-30 16:14:45Z bobtarling $
 
-package org.kaist.ie.fig;
+package org.kaist.ccs.fig;
 
 import java.awt.Color;
 import java.awt.Graphics;

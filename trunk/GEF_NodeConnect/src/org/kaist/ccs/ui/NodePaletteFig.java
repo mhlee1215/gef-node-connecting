@@ -26,7 +26,7 @@
 // Original Author: ics125 spring 1996
 // $Id: PaletteFig.java 1153 2008-11-30 16:14:45Z bobtarling $
 
-package org.kaist.ie.ui;
+package org.kaist.ccs.ui;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;

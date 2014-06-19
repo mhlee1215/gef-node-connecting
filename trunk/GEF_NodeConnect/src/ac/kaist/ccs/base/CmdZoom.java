@@ -9,7 +9,7 @@ import java.util.Formatter;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.kaist.ie.ui.LoadingProgressBarNode;
+import org.kaist.ccs.ui.LoadingProgressBarNode;
 import org.tigris.gef.base.Cmd;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Globals;

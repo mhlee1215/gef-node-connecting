@@ -21,7 +21,7 @@
 // CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
 // UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
-package org.kaist.ie.ui;
+package org.kaist.ccs.ui;
 
 import org.tigris.gef.base.CmdCreateNode;
 import org.tigris.gef.base.CmdSetMode;
@@ -37,7 +37,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Vector;
 
-public class WestToolBar extends JToolBar implements MouseListener {
+public class TopToolBar extends JToolBar implements MouseListener {
 	
 	public static final int BUTTON_TYPE_NO_TEXT = 1;
 	public static final int BUTTON_TYPE_TEXT = 2;
@@ -47,9 +47,13 @@ public class WestToolBar extends JToolBar implements MouseListener {
     private static final Color selectedBack = new Color(153, 153, 153);
     private static final Color buttonBack = new Color(204, 204, 204);
     
-    public WestToolBar() {
+    private JPanel toolbarPanel = new JPanel();
+    public TopToolBar() {
         setFloatable(false);
         setName("toolBar");
+        toolbarPanel.setBackground(Color.white);
+        setLayout(new GridLayout(1, 1));
+        add(toolbarPanel);
     }
 
     /**
@@ -99,16 +103,16 @@ public class WestToolBar extends JToolBar implements MouseListener {
 
         JButton b = super.add(a);
         b.setName(null);
-        if(buttonType == WestToolBar.BUTTON_TYPE_TEXT)
+        if(buttonType == TopToolBar.BUTTON_TYPE_TEXT)
         	b.setText(name);
         b.setIcon(icon);
         b.setVerticalTextPosition(SwingConstants.CENTER);
         b.setHorizontalTextPosition(SwingConstants.RIGHT);
-        b.setMargin(new Insets(1, 3, 1, 3));
+        b.setMargin(new Insets(0, 0, 0, 0));
         //b.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
         b.setFocusable(false);
        
-        //b.setPreferredSize(new Dimension(50, 50));
+        b.setPreferredSize(new Dimension(25, 25));
         //b.setBackground(Color.white);
         b.setToolTipText(name + " ");
         if (a instanceof CmdSetMode || a instanceof CmdCreateNode)
@@ -116,7 +120,7 @@ public class WestToolBar extends JToolBar implements MouseListener {
         if (a instanceof CmdSetMode || a instanceof CmdCreateNode)
             _lockable.addElement(b);
         b.addMouseListener(this);
-        add(b);
+        toolbarPanel.add(b);
         // needs-more-work: should buttons appear stuck down while action
         // executes?
         return b;

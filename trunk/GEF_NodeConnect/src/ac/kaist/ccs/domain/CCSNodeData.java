@@ -1,4 +1,4 @@
-package ac.kaist.ie.domain;
+package ac.kaist.ccs.domain;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
-import org.kaist.ie.fig.FigCCSNode;
-import org.kaist.ie.fig.FigCO2SourceNode;
-import org.kaist.ie.fig.FigExcludePlantNode;
-import org.kaist.ie.fig.FigHubNode;
-import org.kaist.ie.fig.FigJointNode;
+import org.kaist.ccs.fig.FigCCSNode;
+import org.kaist.ccs.fig.FigCO2SourceNode;
+import org.kaist.ccs.fig.FigExcludePlantNode;
+import org.kaist.ccs.fig.FigHubNode;
+import org.kaist.ccs.fig.FigJointNode;
 
 import ac.kaist.ccs.base.DoublePair;
 

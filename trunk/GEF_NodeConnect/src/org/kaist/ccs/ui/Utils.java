@@ -1,4 +1,4 @@
-package org.kaist.ie.ui;
+package org.kaist.ccs.ui;
 
 import java.awt.Graphics2D;
 import java.awt.Image;

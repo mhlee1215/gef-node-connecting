@@ -50,7 +50,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.jdesktop.swingx.JXPanel;
-import org.kaist.ie.fig.FigCCSNode;
+import org.kaist.ccs.fig.FigCCSNode;
 import org.kaist.ie.presentation.CustomCellRenderer1;
 import org.kaist.ie.presentation.JGridChartPanel;
 import org.kaist.ie.presentation.JNodeInfoTableModel;

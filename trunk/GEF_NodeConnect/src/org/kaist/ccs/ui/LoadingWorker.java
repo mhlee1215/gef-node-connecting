@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package org.kaist.ie.ui;
+package org.kaist.ccs.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,8 +63,8 @@ import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.util.PaintUtils;
-import org.kaist.ie.fig.FigCCSLine;
-import org.kaist.ie.fig.FigCCSNode;
+import org.kaist.ccs.fig.FigCCSLine;
+import org.kaist.ccs.fig.FigCCSNode;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Layer;
 import org.tigris.gef.base.LayerGrid;
@@ -74,8 +74,8 @@ import org.tigris.gef.presentation.Fig;
 import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
-import ac.kaist.ie.domain.CCSEdgeData;
-import ac.kaist.ie.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSEdgeData;
+import ac.kaist.ccs.domain.CCSNodeData;
 
 
 public class LoadingWorker extends JPanel

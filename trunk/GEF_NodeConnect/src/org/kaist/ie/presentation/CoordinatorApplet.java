@@ -28,12 +28,12 @@ import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.kaist.ie.ui.LoadingProgressBarNode;
-import org.kaist.ie.ui.LoadingWorker;
-import org.kaist.ie.ui.NodePaletteFig;
-import org.kaist.ie.ui.NodeRenderManager;
-import org.kaist.ie.ui.ResizerPaletteFig;
-import org.kaist.ie.ui.WestToolBar;
+import org.kaist.ccs.ui.LoadingProgressBarNode;
+import org.kaist.ccs.ui.LoadingWorker;
+import org.kaist.ccs.ui.NodePaletteFig;
+import org.kaist.ccs.ui.NodeRenderManager;
+import org.kaist.ccs.ui.ResizerPaletteFig;
+import org.kaist.ccs.ui.WestToolBar;
 import org.tigris.gef.base.AlignAction;
 import org.tigris.gef.base.CmdAdjustGrid;
 import org.tigris.gef.base.CmdAdjustGuide;
@@ -73,8 +73,8 @@ import org.tigris.gef.util.Localizer;
 import org.tigris.gef.util.ResourceLoader;
 
 import ac.kaist.ccs.base.UiGlobals;
-import ac.kaist.ie.domain.CCSEdgeData;
-import ac.kaist.ie.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSEdgeData;
+import ac.kaist.ccs.domain.CCSNodeData;
 
 
 public class CoordinatorApplet extends JApplet implements ModeChangeListener {
