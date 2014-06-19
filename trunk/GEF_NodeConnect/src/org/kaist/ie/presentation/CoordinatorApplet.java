@@ -1,5 +1,8 @@
 package org.kaist.ie.presentation;
 
+import ilog.concert.IloException;
+import ilog.cplex.IloCplex;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -277,7 +280,8 @@ public class CoordinatorApplet extends JApplet implements ModeChangeListener {
     	return (int)((loc)*scale) + padding/2;
     }
 	
-	public Map<Integer, List<CCSNodeData> > makeRandomData(int size, int maxWidth, int maxHeight) {
+	public Map<Integer, List<CCSNodeData> > makeRandomData(int size, int maxWidth, int maxHeight) throws IloException {
+		 IloCplex cplex = new IloCplex();
 		Map<Integer, List<CCSNodeData> > ccsData = new HashMap<Integer, List<CCSNodeData> >();
 		Random random = new Random();
 		
