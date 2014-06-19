@@ -431,7 +431,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		
 		
 		
-		mainPanel.add(gridTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
+		//mainPanel.add(gridTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		
 
 		JXTaskPane locCtrlTask = new JXTaskPane();
@@ -452,7 +452,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
         locTaskConstraints.gridy = 0;
         locCtrlTask.add(locControlPanel, locTaskConstraints);
         locControlPanel.setPreferredSize(new Dimension(75, 55));
-		mainPanel.add(locCtrlTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
+		//mainPanel.add(locCtrlTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		
 		JXTaskPane searchOptionTask = new JXTaskPane();
 		searchOptionTask.setLayout(new MigLayout("insets -7 -7 -5 -5"));
@@ -462,7 +462,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
         searchOptionTask.setFocusable(false);
         searchOptionTask.setIcon(searchOptionTaskIcon);
         searchOptionTask.add(searchOptionPanel, "wrap");
-		mainPanel.add(searchOptionTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
+		//mainPanel.add(searchOptionTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		
 		JXTaskPane scaleTask = new JXTaskPane();
 		scaleTask.setLayout(new GridBagLayout());
@@ -477,14 +477,14 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		Icon scaleTaskIcon = ResourceLoader.lookupIconResource("scaleTask1", "scaleTask1");
 		scaleTask.setTitle("Scale");
 		scaleTask.setFocusable(false);
-		scaleTask.setCollapsed(true);
+		scaleTask.setCollapsed(false);
 		scaleTask.setIcon(scaleTaskIcon);
 		
 		scaleTask.add(scaleCombo, taskConstraints);
 		
 		mainPanel.add(scaleTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
         
-		UiGlobals.set_scaleSlider(scaleResizer);
+		//UiGlobals.set_scaleSlider(scaleResizer);
 	}
 
 	@Override

@@ -281,7 +281,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
     }
 	
 	public Map<Integer, List<CCSNodeData> > makeRandomData(int size, int maxWidth, int maxHeight) throws IloException {
-		 IloCplex cplex = new IloCplex();
+		 //IloCplex cplex = new IloCplex();
 		Map<Integer, List<CCSNodeData> > ccsData = new HashMap<Integer, List<CCSNodeData> >();
 		Random random = new Random();
 		
@@ -449,7 +449,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		JMenu edit = new JMenu(Localizer.localize("GefBase", "Edit"));
 		edit.setMnemonic('E');
-		_menubar.add(edit);
+		//_menubar.add(edit);
 
 		JMenuItem undoItem = edit.add(new UndoAction(Localizer.localize(
 				"GefBase", "Undo")));
@@ -481,7 +481,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		edit.add(new CmdUseRotate());
 
 		JMenu view = new JMenu(Localizer.localize("GefBase", "View"));
-		_menubar.add(view);
+		//_menubar.add(view);
 		view.setMnemonic('V');
 		view.add(new CmdSpawn());
 		view.add(new CmdShowProperties());
@@ -495,7 +495,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		view.add(new CmdAdjustPageBreaks());
 
 		JMenu arrange = new JMenu(Localizer.localize("GefBase", "Arrange"));
-		_menubar.add(arrange);
+		//_menubar.add(arrange);
 		arrange.setMnemonic('A');
 		groupItem = arrange.add(new CmdGroup());
 		groupItem.setMnemonic('G');
