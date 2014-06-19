@@ -17,12 +17,13 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXPanel;
-import org.kaist.ccs.fig.FigCCSNode;
-import org.kaist.ccs.ui.CNodeData;
-import org.kaist.ccs.ui.NodeRenderManager;
-import org.kaist.ie.presentation.JNodeInfoPanel;
 import org.tigris.gef.base.Globals;
 import org.tigris.gef.presentation.Fig;
+
+import ac.kaist.ccs.fig.FigCCSNode;
+import ac.kaist.ccs.presentation.JNodeInfoPanel;
+import ac.kaist.ccs.ui.CNodeData;
+import ac.kaist.ccs.ui.NodeRenderManager;
 
 public class UiGlobals extends Globals{
 	public static String isExample = "N";

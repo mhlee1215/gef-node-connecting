@@ -1,4 +1,4 @@
-package ac.kaist.ccs.main;
+package ac.kaist.ccs.presentation;
 
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
@@ -77,7 +77,7 @@ import ac.kaist.ccs.ui.ResizerPaletteFig;
 import ac.kaist.ccs.ui.WestToolBar;
 
 
-public class CCSMain extends JApplet implements ModeChangeListener {
+public class CoordinatorApplet extends JApplet implements ModeChangeListener {
 
 	public static final int _PADDING = 100;
 
@@ -110,7 +110,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	private JPanel _graphPanel = new JPanel(new BorderLayout());
 	private JMenuBar _menubar = new JMenuBar();
 
-	public CCSMain() throws Exception {
+	public CoordinatorApplet() throws Exception {
 		
 		Localizer.addResource("GefBase",
 				"org.tigris.gef.base.BaseResourceBundle");

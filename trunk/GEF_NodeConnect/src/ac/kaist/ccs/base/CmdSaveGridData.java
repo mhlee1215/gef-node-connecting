@@ -21,10 +21,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.jfree.ui.RefineryUtilities;
-import org.kaist.ie.presentation.JGridChartPanel;
-import org.kaist.ie.presentation.JGridHistogramPanel;
-import org.kaist.ie.presentation.JGridPanel;
-import org.kaist.ie.presentation.JGridTabbedFrame;
 import org.tigris.gef.base.Cmd;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.LayerGrid;
@@ -33,6 +29,10 @@ import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.util.Localizer;
 
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.presentation.JGridChartPanel;
+import ac.kaist.ccs.presentation.JGridHistogramPanel;
+import ac.kaist.ccs.presentation.JGridPanel;
+import ac.kaist.ccs.presentation.JGridTabbedFrame;
 
 
 public class CmdSaveGridData extends Cmd implements ComponentListener {
