@@ -1,6 +1,6 @@
 import javax.swing.*;
 
-import org.kaist.ie.presentation.MultiLineCellRenderer;
+import ac.kaist.ccs.presentation.MultiLineCellRenderer;
 
 import java.awt.BorderLayout;
 

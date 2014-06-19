@@ -2,7 +2,7 @@ package ac.kaist.ccs.domain;
 
 import java.awt.Color;
 
-import org.kaist.ccs.fig.FigCCSLine;
+import ac.kaist.ccs.fig.FigCCSLine;
 
 public class CCSEdgeData {
 	float cost;

@@ -6,13 +6,12 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
-import org.kaist.ccs.fig.FigCCSNode;
-import org.kaist.ccs.fig.FigCO2SourceNode;
-import org.kaist.ccs.fig.FigExcludePlantNode;
-import org.kaist.ccs.fig.FigHubNode;
-import org.kaist.ccs.fig.FigJointNode;
-
 import ac.kaist.ccs.base.DoublePair;
+import ac.kaist.ccs.fig.FigCCSNode;
+import ac.kaist.ccs.fig.FigCO2SourceNode;
+import ac.kaist.ccs.fig.FigExcludePlantNode;
+import ac.kaist.ccs.fig.FigHubNode;
+import ac.kaist.ccs.fig.FigJointNode;
 
 public class CCSNodeData {
 	int x;

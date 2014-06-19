@@ -1,21 +1,23 @@
-package ac.kaist.ccs.main;
-
-import ilog.concert.IloException;
-import ilog.cplex.IloCplex;
+package ac.kaist.ccs.presentation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+import java.util.Vector;
 
 import javax.swing.JApplet;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -67,17 +69,14 @@ import org.tigris.gef.util.Localizer;
 import org.tigris.gef.util.ResourceLoader;
 
 import ac.kaist.ccs.base.UiGlobals;
-import ac.kaist.ccs.domain.CCSEdgeData;
-import ac.kaist.ccs.domain.CCSNodeData;
-import ac.kaist.ccs.ui.LoadingProgressBarNode;
-import ac.kaist.ccs.ui.LoadingWorker;
 import ac.kaist.ccs.ui.NodePaletteFig;
 import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
+import ac.kaist.ccs.ui.Utils;
 import ac.kaist.ccs.ui.WestToolBar;
 
 
-public class CCSMain extends JApplet implements ModeChangeListener {
+public class CoordinatorAppletWithMulti extends JApplet implements ModeChangeListener {
 
 	public static final int _PADDING = 100;
 
@@ -93,8 +92,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	String edgeFileName = "";
 	int pre_scaled = 1;
 
-	int padding = 50;
-	int scale = 4;
+	
 	
 	
 	Editor editor = null;
@@ -110,8 +108,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	private JPanel _graphPanel = new JPanel(new BorderLayout());
 	private JMenuBar _menubar = new JMenuBar();
 
-	public CCSMain() throws Exception {
-		
+	public CoordinatorAppletWithMulti() throws Exception {
 		Localizer.addResource("GefBase",
 				"org.tigris.gef.base.BaseResourceBundle");
 		Localizer.addResource("GefPres",
@@ -124,7 +121,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		ResourceLoader.addResourceLocation("/org/tigris/gef/Images");
 		
 		UiGlobals.init();
-
+		
 		try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (UnsupportedLookAndFeelException e) {
@@ -147,28 +144,27 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		//UiGlobals.set_curApplet(this);
 		UiGlobals.setApplet(this);
-		
+
 	}
-	
-	private void initParam() {
+
+	private void jbInit() throws Exception {
+
+		try{
+			System.out.println("this.getCodeBase() : "+this.getCodeBase());
+		}catch(Exception e){
+			System.out.println("Executed in local!");
+		}
+		// paths.setCodebase(this.getCodeBase().toString());
+		// this.
+
 		if (getParameter("prescaled") == null)
 			pre_scaled = 1;
 		else
 			pre_scaled = Integer.parseInt(getParameter("prescaled"));
 		
-		if (getParameter("isusetargetconversion") == null)
-			UiGlobals.setUseTargetConversion(false);
-		else{
-			if("Y".equals(getParameter("isusetargetconversion")) || "1".equals(getParameter("isusetargetconversion")))
-				UiGlobals.setUseTargetConversion(true);
-			else
-				UiGlobals.setUseTargetConversion(false);
-		}
 		
-		if(this.getParameter("tocolumn") != null)
-			UiGlobals.setTargetColumnName(this.getParameter("tocolumn"));
-		else
-			UiGlobals.setTargetColumnName("");
+		
+		
 		
 		//UiGlobals.setPre_scaled(pre_scaled);
 		UiGlobals.setFileName(this.getParameter("fileName"));
@@ -178,185 +174,19 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		if(isExample == null) isExample = "N";
 		UiGlobals.setIsExample(isExample);
 		UiGlobals.setExampleType(this.getParameter("type"));
-		
-		System.out.println("===PARAMETER INFO===");
-		System.out.println("isUseConversion: "+UiGlobals.isUseTargetConversion());
-		System.out.println("fileName: "+UiGlobals.getFileName());
-		System.out.println("annotationFileName: "+UiGlobals.getAnnotationFileName());
-		System.out.println("tocolumn: "+this.getParameter("tocolumn"));
-		System.out.println("===PARAMETER INFO END===");
-	}
-
-	private void jbInit() throws Exception {
-		
-		long mega = (long) Math.pow(2, 20);
-		// Get current size of heap in bytes
-		long heapSize = Runtime.getRuntime().totalMemory();
-		// Get maximum size of heap in bytes. The heap cannot grow beyond this size.
-		// Any attempt will result in an OutOfMemoryException.
-		long heapMaxSize = Runtime.getRuntime().maxMemory();
-		// Get amount of free memory within the heap in bytes. This size will increase
-		// after garbage collection and decrease as new objects are created.
-		long heapFreeSize = Runtime.getRuntime().freeMemory();
-		System.out.println("===VM INFO=START===");
-		System.out.println("heapSize: "+heapSize/mega+"MB");
-		System.out.println("heapMaxSize: "+heapMaxSize/mega+"MB");
-		System.out.println("heapFreeSize: "+heapFreeSize/mega+"MB");
-		System.out.println("===VM INFO=END===");
-		
-		try{
-			System.out.println("this.getCodeBase() : "+this.getCodeBase());
-		}catch(Exception e){
-			System.out.println("Executed in local!");
-		}
-		// paths.setCodebase(this.getCodeBase().toString());
-		// this.
-
-		
-			
-		//int scale = 1;
-		
-		
-		
-		
-		
-		//System.out.println("isExample : "+UiGlobals.getIsExample());
-		//System.out.println("exampleType : "+UiGlobals.getExampleType());
+		System.out.println("isExample : "+UiGlobals.getIsExample());
+		System.out.println("exampleType : "+UiGlobals.getExampleType());
 		
 		//Start to read annotation file
 		//initAnnotation(UiGlobals.getAnnotationFileName());
 		
 		//Start to node rendering
-		
-		Map<Integer, List<CCSNodeData> > ccsData = null;
-		List<CCSEdgeData> ccsConData = null;
-		
-		//Insert Loading data
-		if(ccsData == null){
-			ccsData = makeRandomData(100, 200, 200);
-		}
-		if(ccsConData == null){
-			ccsConData = makeNaiveCon(ccsData);
-		}
-		
-		//Insert draw Data
-		//System.out.println(ccsData);
-		//new LoadingWorker(ccsData, ccsConData, _graph, 1);
-//		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-//			Map<Integer, List<CCSNodeData> > ccsData;
-//			List<CCSEdgeData> ccsConData;
-//			JGraph graph;
-//			int scale;
-//			
-//			public void run() {
-//				// createAndShowGUI();
-//				new LoadingWorker(ccsData, ccsConData, graph, 1);
-//			}
-//			
-//			public Runnable init(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale){
-//				this.ccsData = ccsData;
-//				this.graph = graph;
-//				this.scale = scale;
-//				this.ccsConData = ccsConData;
-//				
-//				return this;
-//			}
-//		}.init(ccsData, ccsConData, _graph, scale));
-		
-		
-		NodeRenderManager nodeRenderManager = new NodeRenderManager(ccsData, ccsConData, _graph);
+		NodeRenderManager nodeRenderManager = null;//new NodeRenderManager(_graph);
 		nodeRenderManager.init(_width, _height);
 		nodeRenderManager.drawNodes(true);
 		UiGlobals.setNodeRenderManager(nodeRenderManager);
 		
-		//if(1==1) return;
-		
-		
-		
-		
 	}
-	
-	public int cvtLoc(int loc){
-    	return (int)((loc)*scale) + padding/2;
-    }
-	
-	public Map<Integer, List<CCSNodeData> > makeRandomData(int size, int maxWidth, int maxHeight) throws IloException {
-		 IloCplex cplex = new IloCplex();
-		Map<Integer, List<CCSNodeData> > ccsData = new HashMap<Integer, List<CCSNodeData> >();
-		Random random = new Random();
-		
-		
-		List<CCSNodeData> sourceData = new ArrayList<CCSNodeData>();
-		for (int count = 0; count < size; count++) {
-			int x = cvtLoc(random.nextInt(maxWidth));
-			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSNodeData(x, y, CCSNodeData.TYPE_SOURCE);
-			sourceData.add(node);
-		}
-		
-		List<CCSNodeData> hubData = new ArrayList<CCSNodeData>();
-		for (int count = 0; count < size/10; count++) {
-			int x = cvtLoc(random.nextInt(maxWidth));
-			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSNodeData(x, y, CCSNodeData.TYPE_HUB);
-			hubData.add(node);
-		}
-		
-		List<CCSNodeData> plantData = new ArrayList<CCSNodeData>();
-		for (int count = 0; count < size/10; count++) {
-			int x = cvtLoc(random.nextInt(maxWidth));
-			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSNodeData(x, y, CCSNodeData.TYPE_PLANT);
-			plantData.add(node);
-		}
-		
-		ccsData.put(CCSNodeData.TYPE_SOURCE, sourceData);
-		ccsData.put(CCSNodeData.TYPE_HUB, hubData);
-		ccsData.put(CCSNodeData.TYPE_PLANT, plantData);
-		
-
-		return ccsData;
-	}
-	    
-	public List<CCSEdgeData> makeNaiveCon(Map<Integer, List<CCSNodeData> > ccsData){
-		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
-		
-		List<CCSNodeData> sourceData = ccsData.get(CCSNodeData.TYPE_SOURCE);
-		List<CCSNodeData> hubData = ccsData.get(CCSNodeData.TYPE_HUB);
-		
-		for(int i = 0 ; i <sourceData.size() ; i++){
-			
-			CCSNodeData curSrc = sourceData.get(i);
-			CCSNodeData minDistHub = null;
-			double minDist = 999999999;
-			
-			for(int j = 0 ; j < hubData.size(); j++){
-
-				CCSNodeData curHub = hubData.get(j);
-				
-				double curDist = dist(curSrc, curHub);
-				if(minDist > curDist){
-					minDist = curDist;
-					minDistHub = curHub;
-				}
-			}
-			
-			CCSEdgeData conData = new CCSEdgeData(curSrc, minDistHub);
-			ccsConData.add(conData);
-		}
-
-		return ccsConData;
-	}
-	
-	public double dist(CCSNodeData src1, CCSNodeData src2){
-		double dist = 0;
-		
-		dist = Math.sqrt((src1.getX() - src2.getX())*(src1.getX() - src2.getX()) + (src1.getY() - src2.getY())*(src1.getY() - src2.getY())); 
-		
-		return dist;
-	}
-	
-	
 
 	public void destroy() {
 		// TODO Auto-generated method stub
@@ -368,10 +198,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	}
 
 	public void init(JGraph jg) {
-		initParam();
+		int width = 870;
+		int height = 570;
 		setDefaultFont(UiGlobals.getNormalFont());
-		this.setToolBar(new NodePaletteFig()); // needs-more-work
-		this.setWestToolBar(new ResizerPaletteFig());
 		
 		_graph = jg;
 
@@ -384,28 +213,61 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("Color", Color.LIGHT_GRAY);
 		map.put("bgColor", Color.white);
-		map.put("spacing_include_stamp", (int)UiGlobals.getDefault_grid_spacing()+0);
+		map.put("spacing_include_stamp", (int)UiGlobals.getDefault_grid_spacing()+50);
 		map.put("paintLines", true);
 		map.put("paintDots", false);
 
 		grid.adjust(map);
 
+		
+		JDesktopPane desktopPane = new JDesktopPane();
+		this.setJMenuBar(_menubar);
 		Container content = getContentPane();
 		setUpMenus();
 		content.setLayout(new BorderLayout());
-		content.add(_menubar, BorderLayout.NORTH);
-		_graphPanel.add(_graph, BorderLayout.CENTER);
-		_graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+		//content.add(_menubar, BorderLayout.NORTH);
+		//_graphPanel.add(_graph, BorderLayout.CENTER);
+		//_graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 
-		UiGlobals.setGraphPane(_graphPanel);
 		//_mainPanel.add(_graphPanel, BorderLayout.CENTER);
-		content.add(_mainPanel, BorderLayout.CENTER);
+		
+		
+		
+		
+		JInternalFrame internalGraphPane = new JInternalFrame("Ordinator", true, true, true, true);
+		internalGraphPane.add(_graph);
+		internalGraphPane.setBounds(140, 60, width-140, height-50-50);
+		internalGraphPane.setVisible(true);
+		//content.add(_mainPanel, BorderLayout.CENTER);
 		
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new MigLayout("insets 0 0 0 0"));
 		bottomPanel.add(_statusbar, "wrap");
 		
-		content.add(bottomPanel, BorderLayout.SOUTH);
+		
+		JInternalFrame internalWestToolbarPane = new JInternalFrame("Control", true, true, true, true);
+		internalWestToolbarPane.setVisible(true);
+		internalWestToolbarPane.putClientProperty("JInternalFrame.isPalette", Boolean.TRUE);
+		internalWestToolbarPane.add(new ResizerPaletteFig());
+		internalWestToolbarPane.setBounds(0 , 60, 140, height-50-50);
+		
+		JInternalFrame internalToolbarPane = new JInternalFrame("View", true, true, true, true);
+//		javax.swing.plaf.InternalFrameUI ifu= internalToolbarPane.getUI();
+//		((javax.swing.plaf.basic.BasicInternalFrameUI)ifu).setNorthPane(null);
+//		((javax.swing.plaf.basic.BasicInternalFrameUI)ifu).setWestPane(null);
+//		((javax.swing.plaf.basic.BasicInternalFrameUI)ifu).setEastPane(null);
+//		((javax.swing.plaf.basic.BasicInternalFrameUI)ifu).setSouthPane(null);
+		internalToolbarPane.putClientProperty("JInternalFrame.isPalette", Boolean.TRUE);
+		internalToolbarPane.setVisible(true);
+		internalToolbarPane.add(new NodePaletteFig());
+		internalToolbarPane.setBounds(0 , 0, width, 60);
+		
+		
+		JInternalFrame internalBottomPane = new JInternalFrame("2", true, true, true, true);
+		internalBottomPane.add(bottomPanel);
+		internalBottomPane.setBounds(0, height-40, width, 50);
+		internalBottomPane.setVisible(true);
+		//content.add(bottomPanel, BorderLayout.SOUTH);
 		UiGlobals.set_statusBar(_statusbar);
 		UiGlobals.setCoordBottomPanel(bottomPanel);
 		setSize(870, 600);
@@ -413,7 +275,16 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		_graph.addModeChangeListener(this);
 		
-		UiGlobals.setMainPane(_mainPanel);
+		desktopPane.add(internalWestToolbarPane, JDesktopPane.PALETTE_LAYER);
+		desktopPane.add(internalToolbarPane, JDesktopPane.PALETTE_LAYER);
+		desktopPane.add(internalGraphPane);
+		desktopPane.add(internalBottomPane);
+		
+		desktopPane.setDragMode(JDesktopPane.LIVE_DRAG_MODE);
+		//setContentPane(desktopPane);
+		content.add(desktopPane);
+		//desktopPane.setBounds(0 , 0, 500, 500);
+		desktopPane.setVisible(true);
 
 		try {
 			jbInit();
@@ -422,7 +293,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void setUpMenus() {
 		//JMenuBar menuBar = new JMenuBar();
 		
@@ -586,7 +457,6 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 	}
 
-	
 	@Override
 	public void modeChange(ModeChangeEvent mce) {
 		// TODO Auto-generated method stub
@@ -594,13 +464,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	}
 
 	public void setToolBar(WestToolBar tb) {
-		_toolbar = tb;
+		
 		_mainPanel.add(_toolbar, BorderLayout.NORTH);
 	}
 
 	public void setWestToolBar(WestToolBar tb) {
-		_westToolbar = tb;
-		_mainPanel.add(_westToolbar, BorderLayout.EAST);
+		
+		_mainPanel.add(_westToolbar, BorderLayout.WEST);
 	}
 
 	public void start() {

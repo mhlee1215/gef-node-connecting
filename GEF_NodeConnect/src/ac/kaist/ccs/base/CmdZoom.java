@@ -9,7 +9,6 @@ import java.util.Formatter;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.kaist.ccs.ui.LoadingProgressBarNode;
 import org.tigris.gef.base.Cmd;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Globals;
@@ -17,6 +16,7 @@ import org.tigris.gef.base.LayerGrid;
 import org.tigris.gef.util.Localizer;
 
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.ui.LoadingProgressBarNode;
 
 /**
  * Zoom the view. Needs-More-Work:

@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jfree.ui.RefineryUtilities;
-import org.kaist.ie.presentation.JGridTabbedFrame;
 import org.tigris.gef.base.Cmd;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.LayerGrid;
@@ -18,6 +17,7 @@ import org.tigris.gef.presentation.Fig;
 import org.tigris.gef.util.Localizer;
 
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.presentation.JGridTabbedFrame;
 
 
 public class CmdGetNodes extends Cmd {

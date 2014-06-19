@@ -50,16 +50,17 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.jdesktop.swingx.JXPanel;
-import org.kaist.ccs.fig.FigCCSNode;
-import org.kaist.ie.presentation.CustomCellRenderer1;
-import org.kaist.ie.presentation.JGridChartPanel;
-import org.kaist.ie.presentation.JNodeInfoTableModel;
-import org.kaist.ie.presentation.MultiLineCellRenderer;
-import org.kaist.ie.presentation.MultiLineHeaderRenderer;
 import org.tigris.gef.base.CmdReorder;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.LayerGrid;
 import org.tigris.gef.presentation.Fig;
+
+import ac.kaist.ccs.fig.FigCCSNode;
+import ac.kaist.ccs.presentation.CustomCellRenderer1;
+import ac.kaist.ccs.presentation.JGridChartPanel;
+import ac.kaist.ccs.presentation.JNodeInfoTableModel;
+import ac.kaist.ccs.presentation.MultiLineCellRenderer;
+import ac.kaist.ccs.presentation.MultiLineHeaderRenderer;
 
 //import org.ssu.ml.presentation.
 
