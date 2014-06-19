@@ -82,11 +82,11 @@ import ac.kaist.ccs.ui.CNodeData;
  * Primitive Fig for displaying circles and ovals.
  * @author ics125
  */
-public class FigExcludePlantNode extends FigCCSNode {
+public class FigPlantNode extends FigCCSNode {
 	
 	//Color borderColor = new Color(209, 41, 255);//Color.black;
 	
-	public FigExcludePlantNode(int x, int y, int w, int h) {
+	public FigPlantNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
 		borderColor = new Color(209, 41, 255);
 		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
