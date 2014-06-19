@@ -7,7 +7,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.JApplet;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -68,7 +72,10 @@ import org.tigris.gef.util.ResourceLoader;
 
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
+import ac.kaist.ccs.domain.CCSHubData;
 import ac.kaist.ccs.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSPlantData;
+import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.ui.LoadingProgressBarNode;
 import ac.kaist.ccs.ui.LoadingWorker;
 import ac.kaist.ccs.ui.NodePaletteFig;
@@ -290,7 +297,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		for (int count = 0; count < size; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSNodeData(x, y, CCSNodeData.TYPE_SOURCE);
+			CCSNodeData node = new CCSSourceData(x, y, CCSNodeData.TYPE_SOURCE);
 			sourceData.add(node);
 		}
 		
@@ -298,7 +305,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		for (int count = 0; count < size/10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSNodeData(x, y, CCSNodeData.TYPE_HUB);
+			CCSNodeData node = new CCSHubData(x, y, CCSNodeData.TYPE_HUB);
 			hubData.add(node);
 		}
 		
@@ -306,7 +313,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		for (int count = 0; count < size/10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSNodeData(x, y, CCSNodeData.TYPE_PLANT);
+			CCSNodeData node = new CCSPlantData(x, y, CCSNodeData.TYPE_PLANT);
 			plantData.add(node);
 		}
 		
@@ -364,7 +371,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	}
 
 	public void init() {
+		
 		init(new JGraph());
+		
 	}
 
 	public void init(JGraph jg) {
@@ -384,10 +393,21 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("Color", Color.LIGHT_GRAY);
 		map.put("bgColor", Color.white);
-		map.put("spacing_include_stamp", (int)UiGlobals.getDefault_grid_spacing()+0);
+		map.put("spacing_include_stamp", 500);
 		map.put("paintLines", true);
 		map.put("paintDots", false);
+		
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(this.getClass().getResource("/ac/kaist/ccs/images/trimap.bmp"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
+		map.put("stamp", (Image)image);
+
+		System.out.println("ADJUST!: "+image);
 		grid.adjust(map);
 
 		Container content = getContentPane();

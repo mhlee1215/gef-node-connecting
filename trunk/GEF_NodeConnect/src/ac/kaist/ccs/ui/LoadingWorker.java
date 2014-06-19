@@ -284,7 +284,7 @@ public class LoadingWorker extends JPanel
 		logger.debug("thick : "+scale);
 		map.put("thick", (int) scale);
 		
-		grid.adjust(map);
+		//grid.adjust(map);
 		
 		UiGlobals.setStatusbarText(" resolution : x "+scale);
 		logger.debug("====[E]======================");

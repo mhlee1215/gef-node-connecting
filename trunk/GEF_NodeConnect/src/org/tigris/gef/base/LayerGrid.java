@@ -169,7 +169,9 @@ public class LayerGrid extends Layer {
         }
         
         //if(1==1) return;
+        System.out.println("???:"+_stamp);
         if (_stamp == null) {
+        	System.out.println("STAMP!!: "+_stamp+", "+Globals.curEditor());
             //if (_spacing > _stampHeight)
              //   _stampHeight = _stampWidth = _spacing;
             if (Globals.curEditor() == null) {
@@ -351,7 +353,13 @@ public class LayerGrid extends Layer {
         Object m;
         _stamp = null;
         setHidden(false);
+        
+        System.out.println("map:"+map);
 
+        m = map.get("stamp");
+        if (m instanceof Image)
+        	_stamp = (Image) m;
+        
         m = map.get("spacing");
         if (m instanceof Integer)
             _spacing = ((Integer) m).intValue();
@@ -406,6 +414,8 @@ public class LayerGrid extends Layer {
         		yOffset -= _spacing;
         }
         
+        
+        System.out.println("???2:"+_stamp);
         
         refreshEditors();
     }
