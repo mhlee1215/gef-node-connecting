@@ -7,17 +7,17 @@ import ac.kaist.ccs.fig.FigCCSLine;
 public class CCSEdgeData {
 	float cost;
 	
-	CCSNodeData src;
-	CCSNodeData dst;
+	CCSSourceData src;
+	CCSSourceData dst;
 	
-	FigCCSLine edge;
+	FigCCSLine edgeFig;
 	
-	public CCSEdgeData(CCSNodeData src, CCSNodeData dst){
+	public CCSEdgeData(CCSSourceData src, CCSSourceData dst){
 		this.src = src;
 		this.dst = dst;
 		
 		Color lineColor = new Color(125, 125, 125);
-		edge = new FigCCSLine(src.x+src.getNode().getWidth()/2, src.y+src.getNode().getHeight()/2, dst.x+dst.getNode().getWidth()/2, dst.y+dst.getNode().getHeight()/2, lineColor);
+		edgeFig = new FigCCSLine(src.x+src.getNode().getWidth()/2, src.y+src.getNode().getHeight()/2, dst.x+dst.getNode().getWidth()/2, dst.y+dst.getNode().getHeight()/2, lineColor);
 	}
 	
 	public float getCost() {
@@ -26,30 +26,30 @@ public class CCSEdgeData {
 	public void setCost(float cost) {
 		this.cost = cost;
 	}
-	public CCSNodeData getSrc() {
+	public CCSSourceData getSrc() {
 		return src;
 	}
-	public void setSrc(CCSNodeData src) {
+	public void setSrc(CCSSourceData src) {
 		this.src = src;
 	}
-	public CCSNodeData getDst() {
+	public CCSSourceData getDst() {
 		return dst;
 	}
-	public void setDst(CCSNodeData dst) {
+	public void setDst(CCSSourceData dst) {
 		this.dst = dst;
 	}
 	@Override
 	public String toString() {
 		return "CCSEdgeData [cost=" + cost + ", src=" + src + ", dst=" + dst
-				+ ", edge=" + edge + "]";
+				+ ", edge=" + edgeFig + "]";
 	}
 
-	public FigCCSLine getEdge() {
-		return edge;
+	public FigCCSLine getEdgeFig() {
+		return edgeFig;
 	}
 
-	public void setEdge(FigCCSLine edge) {
-		this.edge = edge;
+	public void setEdgeFig(FigCCSLine edge) {
+		this.edgeFig = edge;
 	}
 	
 	

@@ -92,6 +92,32 @@ public class FigPlantNode extends FigCCSNode {
 		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
 		// TODO Auto-generated constructor stub
 	}
+	
+	@Override
+	public void paint(Graphics g) {
+		// TODO Auto-generated method stub
+		
+		if(visible){
+			Graphics2D g2 = (Graphics2D)g.create();
+			g2.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+			
+			Color old = g2.getColor();
+			//g2.setComposite(makeComposite(0.3f));
+	    	g2.setColor(borderColor);
+	    	g2.setStroke(borderStroke);
+	    	//g2.fillOval(getX()-hubRange+getWidth()/2, getY()-hubRange+getHeight()/2, hubRange*2, hubRange*2);
+	    	int[] xPoints = {getX()+getWidth()/2, getX(), getX() + getWidth()};
+	    	int[] yPoints = {getY(), getY()+getHeight(), getY()+getHeight()};
+	    	g2.fillPolygon(xPoints, yPoints, 3);
+	    	g2.setColor(old);
+		}
+		
+		//super.paint(g);
+		
+		
+	}
 
 	
 } /* end class FigCircle */

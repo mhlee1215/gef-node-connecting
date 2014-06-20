@@ -17,15 +17,21 @@ public class CCSSourceData extends CCSNodeData {
 		
 	float co2_amount;
 	CCSSourceData hub;
+	private CCSEdgeData edge;
 	float cost;
 
-	public CCSSourceData(int x, int y, int type) {
-		super(x, y, type);		
-		int size = 11;
-		node = new FigCO2SourceNode(x, y, size, size);
+	public CCSEdgeData connectTo(CCSSourceData dstNode){
+		//this.edge = new CCSEdgeData(this, dstNode);
+		CCSEdgeData e = new CCSEdgeData(this, dstNode);
+		this.edge = e;
+		return e;
 	}
 	
-	
+	public CCSSourceData(int x, int y) {
+		super(x, y, CCSNodeData.TYPE_SOURCE);		
+		int size = 7;
+		node = new FigCO2SourceNode(x, y, size, size);
+	}
 
 	public float getCo2_amount() {
 		return co2_amount;
@@ -38,6 +44,14 @@ public class CCSSourceData extends CCSNodeData {
 	}
 
 
+
+	public CCSEdgeData getEdge() {
+		return edge;
+	}
+
+	public void setEdge(CCSEdgeData edge) {
+		this.edge = edge;
+	}
 
 	public CCSSourceData getHub() {
 		return hub;
@@ -66,7 +80,7 @@ public class CCSSourceData extends CCSNodeData {
 	@Override
 	public String toString() {
 		return "CCSSourceData [co2_amount=" + co2_amount + ", hub=" + hub
-				+ ", cost=" + cost + "]";
+				+ ", edge=" + null + ", cost=" + cost + "]";
 	}
 	
 	

@@ -8,9 +8,10 @@ public class CCSPlantData extends CCSSourceData {
 		
 	List<CCSSourceData> childHub;
 	
-	public CCSPlantData(int x, int y, int type) {
-		super(x, y, type);		
-		int size = 11;
+	public CCSPlantData(int x, int y) {
+		super(x, y);
+		this.type = CCSNodeData.TYPE_PLANT;
+		int size = 7;
 		node = new FigPlantNode(x, y, size, size);
 		childHub = new ArrayList<CCSSourceData>();
 	}

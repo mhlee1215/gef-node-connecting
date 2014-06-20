@@ -13,15 +13,16 @@ import ac.kaist.ccs.fig.FigPlantNode;
 import ac.kaist.ccs.fig.FigHubNode;
 import ac.kaist.ccs.fig.FigJointNode;
 
-public class CCSJointData extends CCSNodeData {
+public class CCSJointData extends CCSSourceData {
 		
 	float co2_amount;
-	CCSJointData hub;
+	CCSSourceData hub;
 	float cost;
 
-	public CCSJointData(int x, int y, int type) {
-		super(x, y, type);		
-		int size = 11;
+	public CCSJointData(int x, int y) {
+		super(x, y);
+		this.type = CCSNodeData.TYPE_JOINT;
+		int size = 5;
 		node = new FigJointNode(x, y, size, size);
 	}
 	
@@ -39,7 +40,7 @@ public class CCSJointData extends CCSNodeData {
 
 
 
-	public CCSJointData getHub() {
+	public CCSSourceData getHub() {
 		return hub;
 	}
 
