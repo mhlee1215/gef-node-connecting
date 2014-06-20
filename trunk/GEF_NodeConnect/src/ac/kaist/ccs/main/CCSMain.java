@@ -73,7 +73,7 @@ import org.tigris.gef.util.ResourceLoader;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSHubData;
-import ac.kaist.ccs.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.ui.LoadingProgressBarNode;
@@ -101,7 +101,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	int pre_scaled = 1;
 
 	int padding = 50;
-	int scale = 4;
+	int scale = pre_scaled;
 	
 	
 	Editor editor = null;
@@ -235,22 +235,23 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		//Start to node rendering
 		
-		Map<Integer, List<CCSNodeData> > ccsData = null;
+		Map<Integer, List<CCSSourceData> > ccsData = null;
 		List<CCSEdgeData> ccsConData = null;
 		
 		//Insert Loading data
 		if(ccsData == null){
-			ccsData = makeRandomData(100, 200, 200);
+			ccsData = makeRandomData(100, 500, 500);
 		}
 		if(ccsConData == null){
-			ccsConData = makeNaiveCon(ccsData);
+			//ccsConData = makeNaiveCon(ccsData);
+			ccsConData = makeStarCon(ccsData);
 		}
 		
 		//Insert draw Data
 		//System.out.println(ccsData);
 		//new LoadingWorker(ccsData, ccsConData, _graph, 1);
 //		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-//			Map<Integer, List<CCSNodeData> > ccsData;
+//			Map<Integer, List<CCSSourceData> > ccsData;
 //			List<CCSEdgeData> ccsConData;
 //			JGraph graph;
 //			int scale;
@@ -260,7 +261,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 //				new LoadingWorker(ccsData, ccsConData, graph, 1);
 //			}
 //			
-//			public Runnable init(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale){
+//			public Runnable init(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale){
 //				this.ccsData = ccsData;
 //				this.graph = graph;
 //				this.scale = scale;
@@ -287,59 +288,64 @@ public class CCSMain extends JApplet implements ModeChangeListener {
     	return (int)((loc)*scale) + padding/2;
     }
 	
-	public Map<Integer, List<CCSNodeData> > makeRandomData(int size, int maxWidth, int maxHeight) throws IloException {
+	public Map<Integer, List<CCSSourceData> > makeRandomData(int size, int maxWidth, int maxHeight) throws IloException {
 		 //IloCplex cplex = new IloCplex();
-		Map<Integer, List<CCSNodeData> > ccsData = new HashMap<Integer, List<CCSNodeData> >();
+		Map<Integer, List<CCSSourceData> > ccsData = new HashMap<Integer, List<CCSSourceData> >();
 		Random random = new Random();
 		
 		
-		List<CCSNodeData> sourceData = new ArrayList<CCSNodeData>();
+		List<CCSSourceData> sourceData = new ArrayList<CCSSourceData>();
+	
+		
+		
+		
 		for (int count = 0; count < size; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSSourceData(x, y, CCSNodeData.TYPE_SOURCE);
+			CCSSourceData node = new CCSSourceData(x, y);
 			sourceData.add(node);
 		}
 		
-		List<CCSNodeData> hubData = new ArrayList<CCSNodeData>();
+		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
 		for (int count = 0; count < size/10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSHubData(x, y, CCSNodeData.TYPE_HUB);
+			int range = 100;
+			CCSSourceData node = new CCSHubData(x, y, range);
 			hubData.add(node);
 		}
 		
-		List<CCSNodeData> plantData = new ArrayList<CCSNodeData>();
+		List<CCSSourceData> plantData = new ArrayList<CCSSourceData>();
 		for (int count = 0; count < size/10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSNodeData node = new CCSPlantData(x, y, CCSNodeData.TYPE_PLANT);
+			CCSSourceData node = new CCSPlantData(x, y);
 			plantData.add(node);
 		}
 		
-		ccsData.put(CCSNodeData.TYPE_SOURCE, sourceData);
-		ccsData.put(CCSNodeData.TYPE_HUB, hubData);
-		ccsData.put(CCSNodeData.TYPE_PLANT, plantData);
+		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
+		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
+		ccsData.put(CCSSourceData.TYPE_PLANT, plantData);
 		
 
 		return ccsData;
 	}
 	    
-	public List<CCSEdgeData> makeNaiveCon(Map<Integer, List<CCSNodeData> > ccsData){
+	public List<CCSEdgeData> makeNaiveCon(Map<Integer, List<CCSSourceData> > ccsData){
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 		
-		List<CCSNodeData> sourceData = ccsData.get(CCSNodeData.TYPE_SOURCE);
-		List<CCSNodeData> hubData = ccsData.get(CCSNodeData.TYPE_HUB);
+		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 		
 		for(int i = 0 ; i <sourceData.size() ; i++){
 			
-			CCSNodeData curSrc = sourceData.get(i);
-			CCSNodeData minDistHub = null;
+			CCSSourceData curSrc = sourceData.get(i);
+			CCSSourceData minDistHub = null;
 			double minDist = 999999999;
 			
 			for(int j = 0 ; j < hubData.size(); j++){
 
-				CCSNodeData curHub = hubData.get(j);
+				CCSSourceData curHub = hubData.get(j);
 				
 				double curDist = dist(curSrc, curHub);
 				if(minDist > curDist){
@@ -348,14 +354,105 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				}
 			}
 			
-			CCSEdgeData conData = new CCSEdgeData(curSrc, minDistHub);
+			CCSEdgeData conData = curSrc.connectTo(minDistHub);
 			ccsConData.add(conData);
 		}
 
 		return ccsConData;
 	}
 	
-	public double dist(CCSNodeData src1, CCSNodeData src2){
+	public List<CCSEdgeData> makeStarCon(Map<Integer, List<CCSSourceData> > ccsData){
+		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+		
+		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		
+		for(int i = 0 ; i <sourceData.size() ; i++){
+			
+			CCSSourceData curSrc = sourceData.get(i);
+			CCSHubData minDistHub = null;
+			double minDist = 999999999;
+			
+			for(int j = 0 ; j < hubData.size(); j++){
+
+				CCSHubData curHub = (CCSHubData) hubData.get(j);
+				
+				double curDist = dist(curSrc, curHub);
+				if(minDist > curDist){
+					minDist = curDist;
+					minDistHub = curHub;
+				}
+			}
+			
+			if(minDist <= minDistHub.getRange()){
+				CCSEdgeData conData = curSrc.connectTo(minDistHub);
+				//CCSEdgeData conData = new CCSEdgeData(curSrc, minDistHub);
+				ccsConData.add(conData);
+			}else{
+				//Handle CO2 source which is outside of range
+			}
+			
+			
+			
+			
+		}
+
+		return ccsConData;
+	}
+	
+	public List<CCSEdgeData> makeTreeCon(Map<Integer, List<CCSSourceData> > ccsData){
+		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+		
+		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		
+		//Need to implement
+		for(int i = 0 ; i <sourceData.size() ; i++){
+			
+			CCSSourceData curSrc = sourceData.get(i);
+			CCSHubData maxDistHub = null;
+			double maxDist = 0;
+			
+			for(int j = 0 ; j < hubData.size(); j++){
+
+				CCSHubData curHub = (CCSHubData) hubData.get(j);
+				
+				double curDist = dist(curSrc, curHub);
+				if(maxDist < curDist){
+					maxDist = curDist;
+					maxDistHub = curHub;
+				}
+			}
+			
+			
+			
+//			if(maxDist <= maxDistHub.getRange()){
+//				CCSEdgeData conData = new CCSEdgeData(curSrc, minDistHub);
+//				ccsConData.add(conData);	
+//			}else{
+//				//Handle CO2 source which is outside of range
+//			}
+			
+			
+			
+			
+		}
+
+		return ccsConData;
+	}
+	
+	public List<CCSEdgeData> makeHybridCon(Map<Integer, List<CCSSourceData> > ccsData){
+		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+		
+		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		
+		//Need to implement
+		
+		return ccsConData;
+	}
+	
+	public double dist(CCSSourceData src1, CCSSourceData src2){
 		double dist = 0;
 		
 		dist = Math.sqrt((src1.getX() - src2.getX())*(src1.getX() - src2.getX()) + (src1.getY() - src2.getY())*(src1.getY() - src2.getY())); 
@@ -393,7 +490,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("Color", Color.LIGHT_GRAY);
 		map.put("bgColor", Color.white);
-		map.put("spacing_include_stamp", 500);
+		map.put("spacing_include_stamp", 5000);
 		map.put("paintLines", true);
 		map.put("paintDots", false);
 		
@@ -405,7 +502,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			e1.printStackTrace();
 		}
 
-		map.put("stamp", (Image)image);
+		
+		//map.put("stamp", (Image)image);
 
 		System.out.println("ADJUST!: "+image);
 		grid.adjust(map);

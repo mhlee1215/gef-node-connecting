@@ -17,15 +17,26 @@ import ac.kaist.ccs.fig.FigJointNode;
 
 public class CCSHubData extends CCSSourceData {
 		
+	int range;
 	List<CCSSourceData> childSources;
 	
-	public CCSHubData(int x, int y, int type) {
-		super(x, y, type);		
-		int size = 11;
-		node = new FigHubNode(x, y, size, size);
+	public CCSHubData(int x, int y, int range) {
+		super(x, y);
+		this.type = CCSNodeData.TYPE_HUB;
+		this.range = range;
+		int size = 7;
+		node = new FigHubNode(x, y, size, size, range);
 		childSources = new ArrayList<CCSSourceData>();
 	}
 	
+	public int getRange() {
+		return range;
+	}
+
+	public void setRange(int range) {
+		this.range = range;
+	}
+
 	public List<CCSSourceData> getChildSources() {
 		return childSources;
 	}
@@ -36,7 +47,8 @@ public class CCSHubData extends CCSSourceData {
 
 	@Override
 	public String toString() {
-		return "CCSHubData [childSources=" + childSources + "]";
+		return "CCSHubData [range=" + range + ", childSources=" + childSources
+				+ "]";
 	}
 	
 	

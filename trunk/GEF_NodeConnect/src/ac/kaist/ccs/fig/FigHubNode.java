@@ -89,9 +89,9 @@ public class FigHubNode extends FigCCSNode {
 	
 	//Color borderColor = new Color(255, 176, 41);//Color.black;
 	
-	public FigHubNode(int x, int y, int w, int h) {
+	public FigHubNode(int x, int y, int w, int h, int range) {
 		super(x, y, w, h);
-		this.hubRange = 300;
+		this.hubRange = range;
 		this.borderColor = new Color(255, 176, 41);
 		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
 		// TODO Auto-generated constructor stub
@@ -118,7 +118,7 @@ public class FigHubNode extends FigCCSNode {
 			g2.setComposite(makeComposite(0.3f));
 	    	g2.setColor(borderColor);
 	    	g2.setStroke(borderStroke);
-	    	g2.fillOval(getX()-hubRange/2, getY()-hubRange/2, hubRange, hubRange);
+	    	g2.fillOval(getX()-hubRange+getWidth()/2, getY()-hubRange+getHeight()/2, hubRange*2, hubRange*2);
 	    	
 	    	g2.setColor(old);
 		}

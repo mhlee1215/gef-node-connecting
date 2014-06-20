@@ -9,6 +9,7 @@ import org.tigris.gef.graph.presentation.JGraph;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSSourceData;
 
 public class NodeRenderManager {
 
@@ -16,10 +17,10 @@ public class NodeRenderManager {
 	private int width = 0;
 	private int height = 0;
 	public static final int _PADDING = 50;
-	Map<Integer, List<CCSNodeData> > ccsData;
+	Map<Integer, List<CCSSourceData> > ccsData;
 	List<CCSEdgeData> ccsConData;
 	
-	public NodeRenderManager(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph)
+	public NodeRenderManager(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph)
 	{
 		this.ccsData = ccsData;
 		this.ccsConData = ccsConData;
@@ -43,7 +44,7 @@ public class NodeRenderManager {
 		//Node load
 		//스케일이 바뀔때마다 로드해야 함.
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			Map<Integer, List<CCSNodeData> > ccsData;
+			Map<Integer, List<CCSSourceData> > ccsData;
 			List<CCSEdgeData> ccsConData;
 			JGraph graph;
 			
@@ -53,7 +54,7 @@ public class NodeRenderManager {
 				new LoadingWorker(ccsData, ccsConData, graph, 1);
 			}
 			
-			public Runnable init(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph){
+			public Runnable init(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph){
 				this.ccsData = ccsData;
 				this.ccsConData = ccsConData;
 				this.graph = graph;

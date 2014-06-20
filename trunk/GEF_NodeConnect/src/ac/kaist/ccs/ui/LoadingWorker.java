@@ -73,7 +73,7 @@ import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
-import ac.kaist.ccs.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.fig.FigCCSLine;
 import ac.kaist.ccs.fig.FigCCSNode;
 
@@ -103,7 +103,7 @@ public class LoadingWorker extends JPanel
     private JFrame frame = null;
     private JGraph graph = null;
     
-    private Map<Integer, List<CCSNodeData> > ccsData;
+    private Map<Integer, List<CCSSourceData> > ccsData;
     private List<CCSEdgeData> ccsConData;
     
     private HashMap<String, FigCCSNode> nodeHash = new HashMap<String, FigCCSNode>();
@@ -114,7 +114,7 @@ public class LoadingWorker extends JPanel
     int scale;
     
     
-    public LoadingWorker(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale) {
+    public LoadingWorker(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale) {
         super();
         
         this.ccsData = ccsData;
@@ -293,7 +293,7 @@ public class LoadingWorker extends JPanel
     
     class NodeTask extends SwingWorker<Void, Void> {
     	boolean progressFlag = true;
-    	Map<Integer, List<CCSNodeData> > ccsData = null;
+    	Map<Integer, List<CCSSourceData> > ccsData = null;
     	List<CCSEdgeData> ccsConData = null;
     	float minLocx = 0;
     	float minLocy = 0;
@@ -306,7 +306,7 @@ public class LoadingWorker extends JPanel
     	int padding = 50;
     	
 
-    	public NodeTask(Map<Integer, List<CCSNodeData> > ccsData, List<CCSEdgeData> ccsConData, JPanel panel, JGraph graph, int scale)
+    	public NodeTask(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JPanel panel, JGraph graph, int scale)
     	{
     		this.ccsData = ccsData;
     		this.ccsConData = ccsConData;
@@ -318,12 +318,12 @@ public class LoadingWorker extends JPanel
          * Main task. Executed in background thread.
          */
     	
-    	public void addNode(List<CCSNodeData> nodeData){
+    	public void addNode(List<CCSSourceData> nodeData){
     		System.out.println("nodeData : "+nodeData);
     		Editor editor = _graph.getEditor();
     		for(int i = 0 ; i < nodeData.size() ; i++){
     			
-    			CCSNodeData node = nodeData.get(i);
+    			CCSSourceData node = nodeData.get(i);
     			Fig fig = node.getNode();
     			Point loc = fig.getLocation();
     			//loc.x = cvtLoc(loc.x);
@@ -344,6 +344,9 @@ public class LoadingWorker extends JPanel
             	}
                 if(!progressFlag) break;
                 editor.add(fig);
+                if(node.getEdge() != null)
+                	editor.add(node.getEdge().getEdgeFig());
+                
     			cur_work++;
     		}
     	}
@@ -354,7 +357,7 @@ public class LoadingWorker extends JPanel
     		for(int i = 0 ; i < ccsConData.size() ; i++){
     			
     			CCSEdgeData node = ccsConData.get(i);
-    			FigCCSLine fig = node.getEdge();
+    			FigCCSLine fig = node.getEdgeFig();
     			
     			
     			
@@ -411,27 +414,27 @@ public class LoadingWorker extends JPanel
             
             cur_work = 0;
             max_work = 0;
-            if(ccsConData != null){
-            	max_work += ccsConData.size();
-            	addEdge(ccsConData);
-            }
+//            if(ccsConData != null){
+//            	max_work += ccsConData.size();
+//            	//addEdge(ccsConData);
+//            }
             
-            List<CCSNodeData> sourceData = ccsData.get(CCSNodeData.TYPE_SOURCE);
+            List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
             if(sourceData != null){
             	max_work += sourceData.size();
             	addNode(sourceData);
             }
-            List<CCSNodeData> hubData = ccsData.get(CCSNodeData.TYPE_HUB);
+            List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
             if(hubData != null){
             	max_work += hubData.size();
             	addNode(hubData);
             }
-            List<CCSNodeData> plantData = ccsData.get(CCSNodeData.TYPE_PLANT);
+            List<CCSSourceData> plantData = ccsData.get(CCSSourceData.TYPE_PLANT);
             if(plantData != null){
             	max_work += plantData.size();
             	addNode(plantData);
             }
-            List<CCSNodeData> jointData = ccsData.get(CCSNodeData.TYPE_JOINT);
+            List<CCSSourceData> jointData = ccsData.get(CCSSourceData.TYPE_JOINT);
             if(jointData != null){
             	max_work += jointData.size();
             	addNode(jointData);

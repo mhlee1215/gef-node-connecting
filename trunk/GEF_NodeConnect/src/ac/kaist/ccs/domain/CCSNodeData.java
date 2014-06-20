@@ -32,7 +32,7 @@ public class CCSNodeData {
 		CCSNodeData a = null; //= new CCSNodeData(x, y, type);
 		switch (type) {
 		case TYPE_SOURCE:
-			a = new CCSSourceData(x, y, type);
+			a = new CCSSourceData(x, y);
 			break;
 		case TYPE_HUB:
 			a = new CCSNodeData(x, y, type);
@@ -56,7 +56,7 @@ public class CCSNodeData {
 		this.y = y;
 		this.type = type;
 		
-		int size = 11;
+		int size = 7;
 		node = new FigCCSNode(x, y, size, size);
 	}
 
