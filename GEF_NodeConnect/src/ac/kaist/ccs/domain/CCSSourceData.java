@@ -15,10 +15,13 @@ import ac.kaist.ccs.fig.FigJointNode;
 
 public class CCSSourceData extends CCSNodeData {
 		
+	int index;
 	float co2_amount;
-	CCSSourceData hub;
+	CCSSourceData clusterHub;
+	CCSSourceData dst;
 	private CCSEdgeData edge;
 	float cost;
+	float rank;
 
 	public CCSEdgeData connectTo(CCSSourceData dstNode){
 		//this.edge = new CCSEdgeData(this, dstNode);
@@ -27,10 +30,26 @@ public class CCSSourceData extends CCSNodeData {
 		return e;
 	}
 	
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
 	public CCSSourceData(int x, int y) {
 		super(x, y, CCSNodeData.TYPE_SOURCE);		
 		int size = 7;
 		node = new FigCO2SourceNode(x, y, size, size);
+	}
+
+	public float getRank() {
+		return rank;
+	}
+
+	public void setRank(float rank) {
+		this.rank = rank;
 	}
 
 	public float getCo2_amount() {
@@ -53,17 +72,21 @@ public class CCSSourceData extends CCSNodeData {
 		this.edge = edge;
 	}
 
-	public CCSSourceData getHub() {
-		return hub;
+	public CCSSourceData getClusterHub() {
+		return clusterHub;
 	}
 
-
-
-	public void setHub(CCSSourceData hub) {
-		this.hub = hub;
+	public void setClusterHub(CCSSourceData clusterHub) {
+		this.clusterHub = clusterHub;
 	}
 
+	public CCSSourceData getDst() {
+		return dst;
+	}
 
+	public void setDst(CCSSourceData dst) {
+		this.dst = dst;
+	}
 
 	public float getCost() {
 		return cost;
@@ -79,8 +102,9 @@ public class CCSSourceData extends CCSNodeData {
 
 	@Override
 	public String toString() {
-		return "CCSSourceData [co2_amount=" + co2_amount + ", hub=" + hub
-				+ ", edge=" + null + ", cost=" + cost + "]";
+		return "CCSSourceData [index=" + index + ", co2_amount=" + co2_amount
+				+ ", clusterHub=" + clusterHub + ", dst=" + dst + ", edge="
+				+ edge + ", cost=" + cost + ", rank=" + rank + "]";
 	}
 	
 	

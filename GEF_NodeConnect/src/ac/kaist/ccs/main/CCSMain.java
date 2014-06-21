@@ -12,6 +12,8 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -73,6 +75,8 @@ import org.tigris.gef.util.ResourceLoader;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSHubData;
+import ac.kaist.ccs.domain.CCSJointData;
+import ac.kaist.ccs.domain.CCSNodeData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
@@ -240,11 +244,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		//Insert Loading data
 		if(ccsData == null){
-			ccsData = makeRandomData(100, 500, 500);
+			ccsData = makeRandomData(300, 500, 500);
 		}
 		if(ccsConData == null){
 			//ccsConData = makeNaiveCon(ccsData);
-			ccsConData = makeStarCon(ccsData);
+			//ccsConData = makeStarCon(ccsData);
+			//ccsConData = makeTreeCon(ccsData);
+			ccsConData = makeBackboneCon(ccsData);
 		}
 		
 		//Insert draw Data
@@ -303,16 +309,22 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
 			CCSSourceData node = new CCSSourceData(x, y);
+			float co2 = random.nextInt(100);
+			node.setCo2_amount(co2);
 			sourceData.add(node);
+			int index = UiGlobals.addNode(node);
+			node.setIndex(index);
 		}
 		
 		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
-		for (int count = 0; count < size/10; count++) {
+		for (int count = 0; count < 10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
 			int range = 100;
 			CCSSourceData node = new CCSHubData(x, y, range);
 			hubData.add(node);
+			int index = UiGlobals.addNode(node);
+			node.setIndex(index);
 		}
 		
 		List<CCSSourceData> plantData = new ArrayList<CCSSourceData>();
@@ -321,12 +333,24 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			int y = cvtLoc(random.nextInt(maxHeight));
 			CCSSourceData node = new CCSPlantData(x, y);
 			plantData.add(node);
+			int index = UiGlobals.addNode(node);
+			node.setIndex(index);
 		}
+		
+//		List<CCSSourceData> jointData = new ArrayList<CCSSourceData>();
+//		for (int count = 0; count < size/10; count++) {
+//			int x = cvtLoc(random.nextInt(maxWidth));
+//			int y = cvtLoc(random.nextInt(maxHeight));
+//			CCSSourceData node = new CCSJointData(x, y);
+//			jointData.add(node);
+//			int index = UiGlobals.addNode(node);
+//			node.setIndex(index);
+//		}
 		
 		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
 		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
 		ccsData.put(CCSSourceData.TYPE_PLANT, plantData);
-		
+		//ccsData.put(CCSSourceData.TYPE_JOINT, jointData);
 
 		return ccsData;
 	}
@@ -361,85 +385,323 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		return ccsConData;
 	}
 	
-	public List<CCSEdgeData> makeStarCon(Map<Integer, List<CCSSourceData> > ccsData){
-		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+	public Map<Integer, List<CCSSourceData> > Clustering(Map<Integer, List<CCSSourceData> > ccsData){
+		//List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 		
 		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 		
 		for(int i = 0 ; i <sourceData.size() ; i++){
-			
 			CCSSourceData curSrc = sourceData.get(i);
-			CCSHubData minDistHub = null;
+			
+			
+			CCSHubData minRankHub = null;
 			double minDist = 999999999;
+			double minRank = 999999999;
 			
 			for(int j = 0 ; j < hubData.size(); j++){
-
 				CCSHubData curHub = (CCSHubData) hubData.get(j);
 				
+				System.out.println(curHub);
 				double curDist = dist(curSrc, curHub);
+				float curRank = (float) (curSrc.getCo2_amount() / minDist);
+				curSrc.setRank(curRank);
 				if(minDist > curDist){
 					minDist = curDist;
-					minDistHub = curHub;
+					minRank = curRank;
+					minRankHub = curHub;
 				}
 			}
 			
-			if(minDist <= minDistHub.getRange()){
-				CCSEdgeData conData = curSrc.connectTo(minDistHub);
-				//CCSEdgeData conData = new CCSEdgeData(curSrc, minDistHub);
-				ccsConData.add(conData);
-			}else{
-				//Handle CO2 source which is outside of range
+			if(minDist <= minRankHub.getRange()){
+				curSrc.setClusterHub(minRankHub);
+			}	
+		}
+		
+		for(int i = 0 ; i <sourceData.size() ; i++){
+			
+			CCSSourceData curSrc = sourceData.get(i);
+			if(curSrc.getClusterHub()!= null){
+				if(curSrc.getClusterHub().getType() == CCSNodeData.TYPE_HUB){
+					((CCSHubData)curSrc.getClusterHub()).addChildSource(curSrc.getIndex());
+					//((CCSHubData)curSrc.getHub()).getChildSources().add(curSrc);
+				}
 			}
-			
-			
-			
-			
+		}
+
+		return ccsData;
+	}
+	
+	public List<CCSEdgeData> makeStarCon(Map<Integer, List<CCSSourceData> > ccsData){
+		ccsData = Clustering(ccsData);
+		
+		
+		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		
+		for(int i = 0 ; i <sourceData.size() ; i++){			
+			CCSSourceData curSrc = sourceData.get(i);
+			if(curSrc.getClusterHub()!=null){
+				curSrc.connectTo(curSrc.getClusterHub());
+			}
 		}
 
 		return ccsConData;
 	}
 	
-	public List<CCSEdgeData> makeTreeCon(Map<Integer, List<CCSSourceData> > ccsData){
+	public List<CCSEdgeData> makeTreeCon(
+			Map<Integer, List<CCSSourceData>> ccsData) {
+		ccsData = Clustering(ccsData);
+		
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
-		
-		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
-		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
-		
-		//Need to implement
-		for(int i = 0 ; i <sourceData.size() ; i++){
-			
-			CCSSourceData curSrc = sourceData.get(i);
-			CCSHubData maxDistHub = null;
-			double maxDist = 0;
-			
-			for(int j = 0 ; j < hubData.size(); j++){
 
-				CCSHubData curHub = (CCSHubData) hubData.get(j);
+		//List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+
+		for (int j = 0; j < hubData.size(); j++) {
+
+			CCSHubData curHub = (CCSHubData) hubData.get(j);
+			
+			List<Integer> childIndexList = curHub.getChildSources();
+			List<Integer> connedtedList = new ArrayList<Integer>();
+			connedtedList.add(curHub.getIndex());		
+			
+			for(int ii = 0 ; ii < childIndexList.size() ; ){
 				
-				double curDist = dist(curSrc, curHub);
-				if(maxDist < curDist){
-					maxDist = curDist;
-					maxDistHub = curHub;
+				CCSSourceData minDistSrc = null;
+				CCSSourceData minDistConnectedSrc = null;
+				double minDist = 9999999;
+				
+				for (int i = 0 ; i < childIndexList.size(); i++){
+					int childIndex = childIndexList.get(i);
+					CCSSourceData curSrc = UiGlobals.getNode(childIndex);
+					//System.out.println("curSrc:"+curSrc.getIndex()+", childIndex:"+childIndex);
+					
+					for (int k = 0 ; k < connedtedList.size(); k++){
+						int connectedIndex = connedtedList.get(k);
+						CCSSourceData curConnected = UiGlobals.getNode(connectedIndex);
+						
+						
+						double curDist = dist(curSrc, curConnected);
+						if (minDist > curDist) {
+							minDist = curDist;
+							minDistSrc = curSrc;
+							minDistConnectedSrc = curConnected;
+						}
+					}
 				}
+				
+				if(minDistSrc != null)
+					minDistSrc.connectTo(minDistConnectedSrc);
+				
+				//System.out.println("chlidList:"+childIndexList+", connedtedList: "+connedtedList+", minDistSrc:"+minDistSrc.getIndex());
+				
+				childIndexList.remove((Integer)minDistSrc.getIndex());
+				connedtedList.add(minDistSrc.getIndex());
+				
+				//System.out.println("childIndexList.size():"+childIndexList.size());
 			}
-			
-			
-			
-//			if(maxDist <= maxDistHub.getRange()){
-//				CCSEdgeData conData = new CCSEdgeData(curSrc, minDistHub);
-//				ccsConData.add(conData);	
-//			}else{
-//				//Handle CO2 source which is outside of range
-//			}
-			
-			
-			
-			
 		}
 
 		return ccsConData;
 	}
+	
+//	public static void main(String[] argv){
+//		int x1 = 50;
+//		int y1 = 50;
+//		
+//		int x2 = 55;
+//		int y2 = 50;
+//		
+//		System.out.println(getAngle(x1, y1, x2, y2));
+//	}
+	
+	public float getAngle(int x1, int y1, int x2, int y2){
+		
+		int x_sign = x2-x1;
+		int y_sign = y2-y1;
+		
+		int x_usign = Math.abs(x_sign);
+		int y_usign = Math.abs(y_sign);
+		
+		float radian = (float) (Math.atan(y_usign /(float) x_usign) * 180 / Math.PI);
+		
+		if(x_sign >= 0 && y_sign >= 0){
+			//1st quadrant
+			//Do nothing
+		}else if(x_sign < 0 && y_sign >= 0){
+			//2nd quadrant
+			radian = 180 - radian;
+			
+		}else if(x_sign < 0 && y_sign < 0){
+			//3rd quadrant
+			radian += 180;
+		}else if(x_sign >= 0 && y_sign < 0){
+			//4th quadrant
+			radian = 360-radian;
+		}
+		
+		return radian;
+	}
+		
+	public List<CCSEdgeData> makeBackboneCon(
+			Map<Integer, List<CCSSourceData>> ccsData) {
+		ccsData = Clustering(ccsData);
+		
+		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+
+		//List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+
+		for (int j = 0; j < hubData.size(); j++) {
+
+			CCSHubData curHub = (CCSHubData) hubData.get(j);
+			List<Integer> childIndexList = curHub.getChildSources();
+			
+			//Grouping by angle = n pieces;
+			float angleNum = 6;
+			float anglePerPie = 360 / angleNum;
+			
+			int hx = curHub.getX();
+			int hy = curHub.getY();
+			Map<Integer, List<Integer> > pieBinMap = new HashMap<Integer, List<Integer> >();
+			for(int i = 0 ; i < angleNum ; i++){
+				pieBinMap.put(i, new ArrayList<Integer>());
+			}
+			
+			for (int i = 0 ; i < childIndexList.size(); i++){
+				int childIndex = childIndexList.get(i);
+				CCSSourceData curSrc = UiGlobals.getNode(childIndex);
+				
+				int cx = curSrc.getX();
+				int cy = curSrc.getY();
+				
+				float angle = getAngle(hx, hy, cx, cy);
+				int pieBin = (int) Math.floor(angle / anglePerPie);
+				
+				pieBinMap.get(pieBin).add(childIndex);
+			}
+			
+			
+			for(int i = 0 ; i < angleNum ; i++){
+				List<Integer> binNodeList = pieBinMap.get(i);
+				
+				
+				CCSSourceData maxDistSrc = null;
+				double maxDist = 0;
+				//Find node with maximum distance
+				for (int k = 0 ; k < binNodeList.size(); k++){
+					int childIndex = binNodeList.get(k);
+					CCSSourceData curSrc = UiGlobals.getNode(childIndex);
+
+					double curDist = dist(curSrc, curHub);
+					if (maxDist < curDist) {
+						maxDist = curDist;
+						maxDistSrc = curSrc;
+					}
+				}
+				
+				System.out.println("maxDistSrc: "+maxDistSrc);
+				 //CCSEdgeData conData = new CCSEdgeData(maxDistSrc, curHub);
+				 //ccsConData.add(conData);
+				//if(maxDistSrc != null)
+				//	maxDistSrc.connectTo(curHub);
+				
+				//Connect arthogonal to connection between hub to maximum distance node.
+				if(maxDistSrc != null){
+					binNodeList.remove((Integer)maxDistSrc.getIndex());
+					
+					//float distMax = maxDist;
+					double distMax = maxDist;
+					int mx = maxDistSrc.getX() - curHub.getX();
+					int my = maxDistSrc.getY() - curHub.getY();
+				
+					List<NodePair> nodePairList = new ArrayList<NodePair>();
+					
+					for (int k = 0 ; k < binNodeList.size(); k++){
+						int childIndex = binNodeList.get(k);
+						CCSSourceData curSrc = UiGlobals.getNode(childIndex);
+						
+						double distCur = dist(curSrc, curHub);
+						int cx = curSrc.getX() - curHub.getX();
+						int cy = curSrc.getY() - curHub.getY();
+						
+						double lengthToOrth = (mx*cx+my*cy) / distMax;
+						
+						int ox = (int)(lengthToOrth * mx / distMax);
+						int oy = (int)(lengthToOrth * my / distMax);
+						
+						CCSSourceData node = new CCSJointData(curHub.getX()+ox, curHub.getY()+oy);
+						int jointNodeIndex = UiGlobals.addNode(node);
+						node.setIndex(jointNodeIndex);
+						
+						
+						nodePairList.add(new NodePair(lengthToOrth, jointNodeIndex, childIndex));
+						//curSrc.connectTo(node);
+						
+					}
+					
+					Collections.sort(nodePairList, new NoAscCompare());
+					
+					CCSSourceData currentNodeForConnect = curHub;
+					for (int k = 0 ; k < nodePairList.size(); k++){
+						
+						CCSSourceData currentJointNode = UiGlobals.getNode(nodePairList.get(k).jointId);
+						CCSSourceData currentSourceNode = UiGlobals.getNode(nodePairList.get(k).sourceId);
+						
+						currentJointNode.connectTo(currentNodeForConnect);
+						currentSourceNode.connectTo(currentJointNode);
+						
+						currentNodeForConnect = currentJointNode;
+						
+					}
+					
+				
+				}
+				
+				
+
+			}
+			
+			
+			
+			
+
+			 
+
+		}
+
+		return ccsConData;
+	}
+	
+	public class NodePair {
+		double dist;
+		int jointId;
+		int sourceId;
+		
+		public NodePair(double dist, int jointId, int sourceId){
+			this.dist = dist;
+			this.jointId = jointId;
+			this.sourceId = sourceId;
+		}
+		
+	}
+	
+	static class NoAscCompare implements Comparator<NodePair> {
+		 
+		/**
+		 * 오름차순(ASC)
+		 */
+		@Override
+		public int compare(NodePair arg0, NodePair arg1) {
+			// TODO Auto-generated method stub
+			return arg0.dist < arg1.dist ? -1 : arg0.dist > arg1.dist ? 1:0;
+		}
+ 
+	}
+ 
+	
+	
 	
 	public List<CCSEdgeData> makeHybridCon(Map<Integer, List<CCSSourceData> > ccsData){
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();

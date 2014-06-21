@@ -7,14 +7,14 @@ import ac.kaist.ccs.fig.FigCCSLine;
 public class CCSEdgeData {
 	float cost;
 	
-	CCSSourceData src;
-	CCSSourceData dst;
+	int src;
+	int dst;
 	
 	FigCCSLine edgeFig;
 	
 	public CCSEdgeData(CCSSourceData src, CCSSourceData dst){
-		this.src = src;
-		this.dst = dst;
+		this.src = src.getIndex();
+		this.dst = dst.getIndex();
 		
 		Color lineColor = new Color(125, 125, 125);
 		edgeFig = new FigCCSLine(src.x+src.getNode().getWidth()/2, src.y+src.getNode().getHeight()/2, dst.x+dst.getNode().getWidth()/2, dst.y+dst.getNode().getHeight()/2, lineColor);
@@ -26,18 +26,23 @@ public class CCSEdgeData {
 	public void setCost(float cost) {
 		this.cost = cost;
 	}
-	public CCSSourceData getSrc() {
+	
+	public int getSrc() {
 		return src;
 	}
-	public void setSrc(CCSSourceData src) {
+
+	public void setSrc(int src) {
 		this.src = src;
 	}
-	public CCSSourceData getDst() {
+
+	public int getDst() {
 		return dst;
 	}
-	public void setDst(CCSSourceData dst) {
+
+	public void setDst(int dst) {
 		this.dst = dst;
 	}
+
 	@Override
 	public String toString() {
 		return "CCSEdgeData [cost=" + cost + ", src=" + src + ", dst=" + dst
