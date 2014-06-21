@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -20,6 +21,7 @@ import org.jdesktop.swingx.JXPanel;
 import org.tigris.gef.base.Globals;
 import org.tigris.gef.presentation.Fig;
 
+import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.presentation.JNodeInfoPanel;
 import ac.kaist.ccs.ui.CNodeData;
@@ -85,6 +87,30 @@ public class UiGlobals extends Globals{
 
 	private static boolean isUseTargetConversion = false;
 	private static String targetColumnName = "";
+	
+	private static Map<Integer, CCSSourceData> nodes = new HashMap<Integer, CCSSourceData>();
+	private static int nodeSize = 0;
+	
+	public static Map<Integer, CCSSourceData> getNodes(){
+		return nodes;
+	}
+	
+	public static CCSSourceData getNode(int index){
+		return nodes.get(index);
+	}
+	
+	public static CCSSourceData deleteNode(int index){
+		return nodes.put(index, null);
+	}
+	
+	public static int addNode(CCSSourceData sourceData){
+		nodes.put(nodeSize, sourceData);
+		nodeSize++;
+		return nodeSize-1;
+	}
+	
+	
+	
 	
 	public static String getLoadedFileName() {
 		return loadedFileName;

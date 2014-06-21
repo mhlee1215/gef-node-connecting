@@ -41,6 +41,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -419,26 +420,37 @@ public class LoadingWorker extends JPanel
 //            	//addEdge(ccsConData);
 //            }
             
-            List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
-            if(sourceData != null){
-            	max_work += sourceData.size();
-            	addNode(sourceData);
+            
+            Map<Integer, CCSSourceData> nodesAll = UiGlobals.getNodes();
+            List<CCSSourceData> nodeList = new ArrayList<CCSSourceData>();
+            for(Integer key : nodesAll.keySet()){
+            	if(nodesAll.get(key) != null)
+            		nodeList.add(nodesAll.get(key));
             }
-            List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
-            if(hubData != null){
-            	max_work += hubData.size();
-            	addNode(hubData);
-            }
-            List<CCSSourceData> plantData = ccsData.get(CCSSourceData.TYPE_PLANT);
-            if(plantData != null){
-            	max_work += plantData.size();
-            	addNode(plantData);
-            }
-            List<CCSSourceData> jointData = ccsData.get(CCSSourceData.TYPE_JOINT);
-            if(jointData != null){
-            	max_work += jointData.size();
-            	addNode(jointData);
-            }
+            
+            max_work += nodeList.size();
+            addNode(nodeList);
+            
+//            List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+//            if(sourceData != null){
+//            	max_work += sourceData.size();
+//            	addNode(sourceData);
+//            }
+//            List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+//            if(hubData != null){
+//            	max_work += hubData.size();
+//            	addNode(hubData);
+//            }
+//            List<CCSSourceData> plantData = ccsData.get(CCSSourceData.TYPE_PLANT);
+//            if(plantData != null){
+//            	max_work += plantData.size();
+//            	addNode(plantData);
+//            }
+//            List<CCSSourceData> jointData = ccsData.get(CCSSourceData.TYPE_JOINT);
+//            if(jointData != null){
+//            	max_work += jointData.size();
+//            	addNode(jointData);
+//            }
             
             
             	
