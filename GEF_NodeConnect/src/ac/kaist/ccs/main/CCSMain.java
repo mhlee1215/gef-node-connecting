@@ -619,7 +619,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 					}
 				}
 				
-				System.out.println("maxDistSrc: "+maxDistSrc);
+				
+				
+				
 				 //CCSEdgeData conData = new CCSEdgeData(maxDistSrc, curHub);
 				 //ccsConData.add(conData);
 				//if(maxDistSrc != null)
@@ -627,6 +629,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				
 				//Connect arthogonal to connection between hub to maximum distance node.
 				if(maxDistSrc != null){
+					maxDistSrc.connectTo(curHub);
+					System.out.println("maxDistSrc: "+maxDistSrc);
 					binNodeList.remove((Integer)maxDistSrc.getIndex());
 					
 					//float distMax = maxDist;
@@ -655,33 +659,33 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 						int jointNodeIndex = UiGlobals.addNode(node);
 						node.setIndex(jointNodeIndex);
 						
-						double lengthToOrth = dist(node, curHub);
-						nodePairList.add(new SortTuple(lengthToOrth, jointNodeIndex, childIndex));
-						//curSrc.connectTo(node);
-						
-					}
-					
-					Collections.sort(nodePairList, new NoAscCompare());
-					
-					CCSSourceData currentNodeForConnect = curHub;
-					for (int k = 0 ; k < nodePairList.size(); k++){
-						
-						CCSSourceData currentJointNode = UiGlobals.getNode(nodePairList.get(k).firstId);
-						CCSSourceData currentSourceNode = UiGlobals.getNode(nodePairList.get(k).secondId);
-						
-						currentJointNode.connectTo(currentNodeForConnect);
-						currentSourceNode.connectTo(currentJointNode);
-						
-						currentNodeForConnect = currentJointNode;
-						
-					}
-					
-				
+						//maxDistSrc : 가장 먼 노드 (이미 연결되있음)
+						//node : joint 노드
+						//curSrc : 연결할 새로운 노드
+						//curHub : 현재 허브 노드
+						jointConnection(maxDistSrc, node, curSrc, curHub);
+					}				
 				}
 			}
 		}
 
 		return ccsConData;
+	}
+	
+	//Joint connection
+	//joint node가 들어갈 자리의 양 옆 노드의 연결 사이에 joint를 집어넣는다.
+	public void jointConnection(CCSSourceData ref, CCSSourceData joint, CCSSourceData newNode, CCSSourceData hub){
+		CCSSourceData justBeforeJoint = ref;
+		
+		while(justBeforeJoint.getDst() != null){
+			if(dist(justBeforeJoint.getDst(), hub) < dist(joint, hub))
+				break;
+			justBeforeJoint = justBeforeJoint.getDst();
+		}
+		
+		joint.connectTo(justBeforeJoint.getDst());
+		justBeforeJoint.connectTo(joint);
+		newNode.connectTo(joint);
 	}
 	
 	public CCSSourceData getProjectionPoint(CCSSourceData hub, CCSSourceData ref, CCSSourceData newNode){
