@@ -251,6 +251,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			//ccsConData = makeStarCon(ccsData);
 			//ccsConData = makeTreeCon(ccsData);
 			ccsConData = makeBackboneCon(ccsData);
+			//ccsConData = makeHybridCon(ccsData);
 		}
 		
 		//Insert draw Data
@@ -466,40 +467,19 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			List<Integer> connedtedList = new ArrayList<Integer>();
 			connedtedList.add(curHub.getIndex());		
 			
+			//Add until remained node list is empty
 			for(int ii = 0 ; ii < childIndexList.size() ; ){
 				
-				CCSSourceData minDistSrc = null;
-				CCSSourceData minDistConnectedSrc = null;
-				double minDist = 9999999;
+				NodePair closestPair = getClosestPair(childIndexList, connedtedList);
 				
-				for (int i = 0 ; i < childIndexList.size(); i++){
-					int childIndex = childIndexList.get(i);
-					CCSSourceData curSrc = UiGlobals.getNode(childIndex);
-					//System.out.println("curSrc:"+curSrc.getIndex()+", childIndex:"+childIndex);
-					
-					for (int k = 0 ; k < connedtedList.size(); k++){
-						int connectedIndex = connedtedList.get(k);
-						CCSSourceData curConnected = UiGlobals.getNode(connectedIndex);
-						
-						
-						double curDist = dist(curSrc, curConnected);
-						if (minDist > curDist) {
-							minDist = curDist;
-							minDistSrc = curSrc;
-							minDistConnectedSrc = curConnected;
-						}
-					}
-				}
+				CCSSourceData minDistSrc = closestPair.first;
+				CCSSourceData minDistConnectedSrc = closestPair.second;
 				
 				if(minDistSrc != null)
 					minDistSrc.connectTo(minDistConnectedSrc);
-				
-				//System.out.println("chlidList:"+childIndexList+", connedtedList: "+connedtedList+", minDistSrc:"+minDistSrc.getIndex());
-				
+								
 				childIndexList.remove((Integer)minDistSrc.getIndex());
 				connedtedList.add(minDistSrc.getIndex());
-				
-				//System.out.println("childIndexList.size():"+childIndexList.size());
 			}
 		}
 
