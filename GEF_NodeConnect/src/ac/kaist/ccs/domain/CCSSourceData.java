@@ -26,6 +26,7 @@ public class CCSSourceData extends CCSNodeData {
 	public CCSEdgeData connectTo(CCSSourceData dstNode){
 		//this.edge = new CCSEdgeData(this, dstNode);
 		CCSEdgeData e = new CCSEdgeData(this, dstNode);
+		this.dst = dstNode;
 		this.edge = e;
 		return e;
 	}
