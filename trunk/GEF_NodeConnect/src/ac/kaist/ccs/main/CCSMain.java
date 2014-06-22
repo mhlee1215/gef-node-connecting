@@ -506,6 +506,35 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		return ccsConData;
 	}
 	
+	public NodePair getClosestPair(List<Integer> firstIDList, List<Integer> secondIDList){
+		
+		
+		CCSSourceData minDistSrc = null;
+		CCSSourceData minDistConnectedSrc = null;
+		double minDist = 9999999;
+		
+		for (int i = 0 ; i < firstIDList.size(); i++){
+			int childIndex = firstIDList.get(i);
+			CCSSourceData curSrc = UiGlobals.getNode(childIndex);
+			//System.out.println("curSrc:"+curSrc.getIndex()+", childIndex:"+childIndex);
+			
+			for (int k = 0 ; k < secondIDList.size(); k++){
+				int connectedIndex = secondIDList.get(k);
+				CCSSourceData curConnected = UiGlobals.getNode(connectedIndex);
+				
+				
+				double curDist = dist(curSrc, curConnected);
+				if (minDist > curDist) {
+					minDist = curDist;
+					minDistSrc = curSrc;
+					minDistConnectedSrc = curConnected;
+				}
+			}
+		}
+		
+		return new NodePair(minDistSrc, minDistConnectedSrc);
+	}
+	
 //	public static void main(String[] argv){
 //		int x1 = 50;
 //		int y1 = 50;
@@ -515,6 +544,15 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 //		
 //		System.out.println(getAngle(x1, y1, x2, y2));
 //	}
+	
+	public float getAngle(CCSSourceData hub, CCSSourceData ref, CCSSourceData newNode){
+		int x1 = ref.getX()-hub.getX();
+		int y1 = ref.getY()-hub.getY();
+		int x2 = newNode.getX()-hub.getX();
+		int y2 = newNode.getY()-hub.getY();
+		
+		return getAngle(x1, y1, x2, y2);	
+	}
 	
 	public float getAngle(int x1, int y1, int x2, int y2){
 		
@@ -612,31 +650,33 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 					binNodeList.remove((Integer)maxDistSrc.getIndex());
 					
 					//float distMax = maxDist;
-					double distMax = maxDist;
-					int mx = maxDistSrc.getX() - curHub.getX();
-					int my = maxDistSrc.getY() - curHub.getY();
+//					double distMax = maxDist;
+//					int mx = maxDistSrc.getX() - curHub.getX();
+//					int my = maxDistSrc.getY() - curHub.getY();
 				
-					List<NodePair> nodePairList = new ArrayList<NodePair>();
+					List<SortTuple> nodePairList = new ArrayList<SortTuple>();
 					
 					for (int k = 0 ; k < binNodeList.size(); k++){
 						int childIndex = binNodeList.get(k);
 						CCSSourceData curSrc = UiGlobals.getNode(childIndex);
 						
-						double distCur = dist(curSrc, curHub);
-						int cx = curSrc.getX() - curHub.getX();
-						int cy = curSrc.getY() - curHub.getY();
+//						int cx = curSrc.getX() - curHub.getX();
+//						int cy = curSrc.getY() - curHub.getY();
+//						
+//						double lengthToOrth = (mx*cx+my*cy) / distMax;
+//						
+//						int ox = (int)(lengthToOrth * mx / distMax);
+//						int oy = (int)(lengthToOrth * my / distMax);
 						
-						double lengthToOrth = (mx*cx+my*cy) / distMax;
+						//CCSSourceData node = new CCSJointData(curHub.getX()+ox, curHub.getY()+oy);
 						
-						int ox = (int)(lengthToOrth * mx / distMax);
-						int oy = (int)(lengthToOrth * my / distMax);
+						CCSSourceData node = getProjectionPoint(curHub, maxDistSrc, curSrc);
 						
-						CCSSourceData node = new CCSJointData(curHub.getX()+ox, curHub.getY()+oy);
 						int jointNodeIndex = UiGlobals.addNode(node);
 						node.setIndex(jointNodeIndex);
 						
-						
-						nodePairList.add(new NodePair(lengthToOrth, jointNodeIndex, childIndex));
+						double lengthToOrth = dist(node, curHub);
+						nodePairList.add(new SortTuple(lengthToOrth, jointNodeIndex, childIndex));
 						//curSrc.connectTo(node);
 						
 					}
@@ -646,8 +686,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 					CCSSourceData currentNodeForConnect = curHub;
 					for (int k = 0 ; k < nodePairList.size(); k++){
 						
-						CCSSourceData currentJointNode = UiGlobals.getNode(nodePairList.get(k).jointId);
-						CCSSourceData currentSourceNode = UiGlobals.getNode(nodePairList.get(k).sourceId);
+						CCSSourceData currentJointNode = UiGlobals.getNode(nodePairList.get(k).firstId);
+						CCSSourceData currentSourceNode = UiGlobals.getNode(nodePairList.get(k).secondId);
 						
 						currentJointNode.connectTo(currentNodeForConnect);
 						currentSourceNode.connectTo(currentJointNode);
@@ -658,60 +698,133 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 					
 				
 				}
-				
-				
-
 			}
-			
-			
-			
-			
-
-			 
-
 		}
 
 		return ccsConData;
 	}
 	
-	public class NodePair {
-		double dist;
-		int jointId;
-		int sourceId;
+	public CCSSourceData getProjectionPoint(CCSSourceData hub, CCSSourceData ref, CCSSourceData newNode){
 		
-		public NodePair(double dist, int jointId, int sourceId){
+		double distToRef = dist(hub, ref);
+		double distToNew = dist(hub, newNode);
+		
+		if(distToRef < distToNew) return null;
+		
+		int mx = ref.getX() - hub.getX();
+		int my = ref.getY() - hub.getY();
+		
+		int cx = newNode.getX() - hub.getX();
+		int cy = newNode.getY() - hub.getY();
+		
+		double distMax = dist(ref, hub);
+		double lengthToOrth = (mx*cx+my*cy) / distMax;
+		
+		int ox = (int)(lengthToOrth * mx / distMax);
+		int oy = (int)(lengthToOrth * my / distMax);
+		
+		CCSSourceData node = new CCSJointData(hub.getX()+ox, hub.getY()+oy);
+		return node;
+	}
+	
+	
+	public class NodePair{
+		CCSSourceData first;
+		CCSSourceData second;
+		
+		public NodePair(CCSSourceData first, CCSSourceData second){
+			this.first = first;
+			this.second = second;
+		}
+	}
+	
+	public class SortTuple {
+		double dist;
+		int firstId;
+		int secondId;
+		
+		public SortTuple(double dist, int firstId, int secondId){
 			this.dist = dist;
-			this.jointId = jointId;
-			this.sourceId = sourceId;
+			this.firstId = firstId;
+			this.secondId = secondId;
 		}
 		
 	}
 	
-	static class NoAscCompare implements Comparator<NodePair> {
+	static class NoAscCompare implements Comparator<SortTuple> {
 		 
 		/**
 		 * 오름차순(ASC)
 		 */
 		@Override
-		public int compare(NodePair arg0, NodePair arg1) {
+		public int compare(SortTuple arg0, SortTuple arg1) {
 			// TODO Auto-generated method stub
 			return arg0.dist < arg1.dist ? -1 : arg0.dist > arg1.dist ? 1:0;
 		}
- 
+	}
+	
+	static class NoDecCompare implements Comparator<SortTuple> {
+		 
+		/**
+		 * 오름차순(ASC)
+		 */
+		@Override
+		public int compare(SortTuple arg0, SortTuple arg1) {
+			// TODO Auto-generated method stub
+			return arg0.dist > arg1.dist ? -1 : arg0.dist < arg1.dist ? 1:0;
+		}
 	}
  
 	
 	
 	
 	public List<CCSEdgeData> makeHybridCon(Map<Integer, List<CCSSourceData> > ccsData){
-		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 		
-		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		ccsData = Clustering(ccsData);
+		
+		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+
+		//List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+
+		for (int j = 0; j < hubData.size(); j++) {
+
+			CCSHubData curHub = (CCSHubData) hubData.get(j);
+			
+			List<Integer> childIndexList = curHub.getChildSources();
+			List<SortTuple> nodesSortByRank = new ArrayList<SortTuple>();
+				
+			//Get Nodes with rank with descending order
+			for (int i = 0 ; i < childIndexList.size(); i++){
+				int childIndex = childIndexList.get(i);
+				CCSSourceData curSrc = UiGlobals.getNode(childIndex);
+				nodesSortByRank.add(new SortTuple(getRank(curHub, curSrc), childIndex, childIndex));
+			}
+			
+			Collections.sort(nodesSortByRank, new NoDecCompare());
+			
+			//Add from high rank node
+			//Actual adding routine.
+			for(int i = 0 ; i < nodesSortByRank.size(); i++){
+				int highRankNodeId = nodesSortByRank.get(i).firstId;
+				CCSSourceData curSrc = UiGlobals.getNode(highRankNodeId);
+				
+			}
+			
+			
+		}
 		
 		//Need to implement
 		
+		//Sort by Rank
+		
+		
+		
 		return ccsConData;
+	}
+	
+	public double getRank(CCSSourceData hub, CCSSourceData ref){
+		return ref.getCo2_amount()/dist(hub, ref);
 	}
 	
 	public double dist(CCSSourceData src1, CCSSourceData src2){
