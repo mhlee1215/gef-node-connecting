@@ -237,7 +237,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		if (ccsData == null) {
 			// ccsData = makeRandomData(300, 500, 500);
 			ccsData = makeRefRandomData(refImage);
-			//return;
+			// return;
 		}
 		if (ccsConData == null) {
 			// ccsConData = makeNaiveCon(ccsData);
@@ -259,15 +259,15 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		return (int) ((loc) * scale) + padding / 2;
 	}
 
-	public double getColorDist(Color c1, Color c2){
-		double dA = c1.getAlpha()-c2.getAlpha();
-		double dR = c1.getRed()-c2.getRed();
-		double dG = c1.getGreen()-c2.getGreen();
-		double dB = c1.getBlue()-c2.getBlue();
-		
-		return Math.sqrt(dA*dA+dR*dR+dG*dG+dB*dB);
+	public double getColorDist(Color c1, Color c2) {
+		double dA = c1.getAlpha() - c2.getAlpha();
+		double dR = c1.getRed() - c2.getRed();
+		double dG = c1.getGreen() - c2.getGreen();
+		double dB = c1.getBlue() - c2.getBlue();
+
+		return Math.sqrt(dA * dA + dR * dR + dG * dG + dB * dB);
 	}
-	
+
 	public Color getPixelARGB(int pixel) {
 		int alpha = (pixel >> 24) & 0xff;
 		int red = (pixel >> 16) & 0xff;
@@ -277,34 +277,32 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		// ", " + blue);\
 		return new Color(alpha, red, green, blue);
 	}
-	
-	public Color getColorBin(Color c, List<Color> colorBinList, double threshold){
+
+	public Color getColorBin(Color c, List<Color> colorBinList, double threshold) {
 		Color resultBin = null;
 		double minDist = 9999999;
-		
-		for(Color cc : colorBinList){
+
+		for (Color cc : colorBinList) {
 			double curDist = getColorDist(c, cc);
-			if( curDist < threshold && curDist < minDist){
+			if (curDist < threshold && curDist < minDist) {
 				resultBin = cc;
 				minDist = curDist;
 			}
 		}
-		
+
 		return resultBin;
 	}
-	
-
 
 	public Map<Integer, List<CCSSourceData>> makeRefRandomData(
 			BufferedImage refImage) {
-		
+
 		Map<Integer, List<CCSSourceData>> ccsData = new HashMap<Integer, List<CCSSourceData>>();
 		Random random = new Random();
 
 		int h = refImage.getHeight();
 		int w = refImage.getWidth();
-		
-		System.out.println("height : "+h+", width:"+w);
+
+		System.out.println("height : " + h + ", width:" + w);
 
 		Map<Color, List<Dimension>> colorIdxMap = new HashMap<Color, List<Dimension>>();
 		List<Color> colorBinList = new ArrayList<Color>();
@@ -312,18 +310,17 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {
-				//int loc = i * w + j;
+				// int loc = i * w + j;
 				Dimension loc = new Dimension(j, i);
 				int pixel = refImage.getRGB(j, i);
 				Color c = getPixelARGB(pixel);
-				
-				
+
 				Color cBin = getColorBin(c, colorBinList, threshold);
-				if(cBin == null){
+				if (cBin == null) {
 					cBin = c;
 					colorBinList.add(c);
 				}
-				
+
 				List<Dimension> locList = colorIdxMap.get(cBin);
 				if (locList == null) {
 					locList = new ArrayList<Dimension>();
@@ -335,36 +332,38 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		System.out.println("colorIdxMap key Size:"
 				+ colorIdxMap.keySet().size());
-		//System.out.println("colorIdxMap:"+colorIdxMap.get(colorBinList.get(0)));
+		// System.out.println("colorIdxMap:"+colorIdxMap.get(colorBinList.get(0)));
 
 		// int pixel = image.getRGB(j, i);
 		// printPixelARGB(pixel);
-		
-		int sourcePerEachResgion = 15;
+
+		int sourcePerEachResgion = 10;
 		int hubPerEachRegion = 1;
-		
+
 		List<CCSSourceData> sourceData = new ArrayList<CCSSourceData>();
 		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
-		
+
 		int cnt = 0;
-		for(int i = 0 ; i < colorBinList.size(); i++){
-		
+		for (int i = 0; i < colorBinList.size(); i++) {
+
 			Color ck = colorBinList.get(i);
-			
-			//Filter background color
-			if( getColorDist(ck, new Color(255, 255, 255, 255)) < 10) continue;
-			//Filter noise
+
+			// Filter background color
+			if (getColorDist(ck, new Color(255, 255, 255, 255)) < 10)
+				continue;
+			// Filter noise
 			List<Dimension> locList = colorIdxMap.get(ck);
-			if(locList.size() < 500) continue;
+			if (locList.size() < 500)
+				continue;
 			cnt++;
-			System.out.println("locList: "+locList.size());			
-			System.out.println("ck:"+ck);
-			System.out.println("cnt:"+cnt);
-			
+			System.out.println("locList: " + locList.size());
+			System.out.println("ck:" + ck);
+			System.out.println("cnt:" + cnt);
+
 			for (int count = 0; count < sourcePerEachResgion; count++) {
 				Dimension curLoc = locList.get(random.nextInt(locList.size()));
 				locList.remove(curLoc);
-				
+
 				int x = cvtLoc((int) curLoc.getWidth());
 				int y = cvtLoc((int) curLoc.getHeight());
 				CCSSourceData node = new CCSSourceData(x, y);
@@ -373,13 +372,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				sourceData.add(node);
 				int index = UiGlobals.addNode(node);
 				node.setIndex(index);
-				
+
 			}
-			
+
 			for (int count = 0; count < hubPerEachRegion; count++) {
 				Dimension curLoc = locList.get(random.nextInt(locList.size()));
 				locList.remove(curLoc);
-				
+
 				int x = cvtLoc((int) curLoc.getWidth());
 				int y = cvtLoc((int) curLoc.getHeight());
 				int range = 100;
@@ -388,13 +387,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				int index = UiGlobals.addNode(node);
 				node.setIndex(index);
 			}
-			
-			//break;
+
+			// break;
 		}
-		
+
 		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
 		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
-		
+
 		return ccsData;
 	}
 
@@ -504,7 +503,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			for (int j = 0; j < hubData.size(); j++) {
 				CCSHubData curHub = (CCSHubData) hubData.get(j);
 
-				//System.out.println(curHub);
+				// System.out.println(curHub);
 				double curDist = dist(curSrc, curHub);
 				float curRank = (float) (curSrc.getCo2_amount() / minDist);
 				curSrc.setRank(curRank);
@@ -731,7 +730,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				// distance node.
 				if (maxDistSrc != null) {
 					maxDistSrc.connectTo(curHub);
-					//System.out.println("maxDistSrc: " + maxDistSrc);
+					// System.out.println("maxDistSrc: " + maxDistSrc);
 					binNodeList.remove((Integer) maxDistSrc.getIndex());
 
 					// float distMax = maxDist;
