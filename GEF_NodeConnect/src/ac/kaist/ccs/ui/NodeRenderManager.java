@@ -51,7 +51,7 @@ public class NodeRenderManager {
 			public void run() {
 				// createAndShowGUI();
 				//new LoadingProgressBarNode(graph);
-				new LoadingWorker(ccsData, ccsConData, graph, 1);
+				new LoadingWorker(ccsData, ccsConData, graph, UiGlobals.getGrid_scale());
 			}
 			
 			public Runnable init(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph){

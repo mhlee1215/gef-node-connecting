@@ -13,6 +13,7 @@ public class CCSEdgeData {
 	FigCCSLine edgeFig;
 	
 	public CCSEdgeData(CCSSourceData src, CCSSourceData dst){
+		if(src == null || dst == null) return;
 		this.src = src.getIndex();
 		this.dst = dst.getIndex();
 		

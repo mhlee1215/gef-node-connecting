@@ -106,6 +106,16 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 	private final String LAYER_ORIGINAL = "Original";
 	private final String LAYER_ALL = "All";
 	
+	int taskWidth = 125;
+	
+	public int getTaskWidth() {
+		return taskWidth;
+	}
+
+	public void setTaskWidth(int taskWidth) {
+		this.taskWidth = taskWidth;
+	}
+
 	public ResizerPaletteFig() {
 		defineButtons();
 	}
@@ -388,80 +398,80 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		mainPanel.setLayout(new MigLayout("insets 1 1 1 1"));
 		//GridBagConstraints c = new GridBagConstraints();
 		
-		int leftToolbarWidth = 30;
+		//int leftToolbarWidth = 30;
 		
-		int taskWidth = 125;
+		
 		
 		
 		
 		
 		
         
-        gridResizer.setPreferredSize(new Dimension(leftToolbarWidth, 100));
-		JPanel resizerPanel = new JPanel();
-		resizerPanel.setLayout(new GridBagLayout());
-		resizerPanel.setBorder(BorderFactory.createTitledBorder(""));
-		//resizerPanel.setBackground(Color.white);
-		resizerPanel.add(gridResizer);
+//        gridResizer.setPreferredSize(new Dimension(leftToolbarWidth, 100));
+//		JPanel resizerPanel = new JPanel();
+//		resizerPanel.setLayout(new GridBagLayout());
+//		resizerPanel.setBorder(BorderFactory.createTitledBorder(""));
+//		//resizerPanel.setBackground(Color.white);
+//		resizerPanel.add(gridResizer);
 		
-        JXTaskPane gridTask = new JXTaskPane();
-        Icon gridTaskIcon = ResourceLoader.lookupIconResource("gridTask", "gridTask");
-        //gridTask.setLayout(new GridBagLayout());
-		GridBagConstraints gridTaskConstraints = new GridBagConstraints();
-		gridTaskConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridTaskConstraints.anchor = GridBagConstraints.PAGE_START;
-		gridTaskConstraints.weightx = 1;
-		gridTaskConstraints.insets = new Insets(-6,-8,-6,-8);  //top padding
-		gridTaskConstraints.gridx = 0;
-		gridTaskConstraints.gridy = 0;
-        gridTask.setTitle("Grid size");
-        gridTask.setFocusable(false);
-        gridTask.setCollapsed(true);
-        gridTask.setIcon(gridTaskIcon);
-        
-        gridTaskConstraints.insets = new Insets(-6,-8,-6,-8);  //top padding
-		gridTaskConstraints.gridx = 0;
-		gridTaskConstraints.gridy = 0;
-        gridTask.add(gridSpinner);
-		
-        gridTaskConstraints.insets = new Insets(8,-8,-6,-8);  //top padding
-		gridTaskConstraints.gridx = 0;
-		gridTaskConstraints.gridy = 1;
-		gridTask.add(resizerPanel);
+//        JXTaskPane gridTask = new JXTaskPane();
+//        Icon gridTaskIcon = ResourceLoader.lookupIconResource("gridTask", "gridTask");
+//        //gridTask.setLayout(new GridBagLayout());
+//		GridBagConstraints gridTaskConstraints = new GridBagConstraints();
+//		gridTaskConstraints.fill = GridBagConstraints.HORIZONTAL;
+//		gridTaskConstraints.anchor = GridBagConstraints.PAGE_START;
+//		gridTaskConstraints.weightx = 1;
+//		gridTaskConstraints.insets = new Insets(-6,-8,-6,-8);  //top padding
+//		gridTaskConstraints.gridx = 0;
+//		gridTaskConstraints.gridy = 0;
+//        gridTask.setTitle("Grid size");
+//        gridTask.setFocusable(false);
+//        gridTask.setCollapsed(true);
+//        gridTask.setIcon(gridTaskIcon);
+//        
+//        gridTaskConstraints.insets = new Insets(-6,-8,-6,-8);  //top padding
+//		gridTaskConstraints.gridx = 0;
+//		gridTaskConstraints.gridy = 0;
+//        gridTask.add(gridSpinner);
+//		
+//        gridTaskConstraints.insets = new Insets(8,-8,-6,-8);  //top padding
+//		gridTaskConstraints.gridx = 0;
+//		gridTaskConstraints.gridy = 1;
+//		gridTask.add(resizerPanel);
 		
 		
 		
 		//mainPanel.add(gridTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		
 
-		JXTaskPane locCtrlTask = new JXTaskPane();
-		locCtrlTask.setLayout(new GridBagLayout());
-        Icon locCtrlTaskIcon = ResourceLoader.lookupIconResource("direction_up", "direction_up");
-        locCtrlTask.setTitle("Grid move");
-        locCtrlTask.setCollapsed(true);
-        locCtrlTask.setFocusable(false);
-        locControlPanel.setBorder(BorderFactory.createTitledBorder(""));
-        locCtrlTask.setIcon(locCtrlTaskIcon);
-        
-        GridBagConstraints locTaskConstraints = new GridBagConstraints();
-        //locTaskConstraints.fill = GridBagConstraints.HORIZONTAL;
-        locTaskConstraints.anchor = GridBagConstraints.PAGE_START;
-        locTaskConstraints.weightx = 1;
-        locTaskConstraints.insets = new Insets(-4,-8,-6,-8);  //top padding
-        locTaskConstraints.gridx = 0;
-        locTaskConstraints.gridy = 0;
-        locCtrlTask.add(locControlPanel, locTaskConstraints);
-        locControlPanel.setPreferredSize(new Dimension(75, 55));
+//		JXTaskPane locCtrlTask = new JXTaskPane();
+//		locCtrlTask.setLayout(new GridBagLayout());
+//        Icon locCtrlTaskIcon = ResourceLoader.lookupIconResource("direction_up", "direction_up");
+//        locCtrlTask.setTitle("Grid move");
+//        locCtrlTask.setCollapsed(true);
+//        locCtrlTask.setFocusable(false);
+//        locControlPanel.setBorder(BorderFactory.createTitledBorder(""));
+//        locCtrlTask.setIcon(locCtrlTaskIcon);
+//        
+//        GridBagConstraints locTaskConstraints = new GridBagConstraints();
+//        //locTaskConstraints.fill = GridBagConstraints.HORIZONTAL;
+//        locTaskConstraints.anchor = GridBagConstraints.PAGE_START;
+//        locTaskConstraints.weightx = 1;
+//        locTaskConstraints.insets = new Insets(-4,-8,-6,-8);  //top padding
+//        locTaskConstraints.gridx = 0;
+//        locTaskConstraints.gridy = 0;
+//        locCtrlTask.add(locControlPanel, locTaskConstraints);
+//        locControlPanel.setPreferredSize(new Dimension(75, 55));
 		//mainPanel.add(locCtrlTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		
-		JXTaskPane searchOptionTask = new JXTaskPane();
-		searchOptionTask.setLayout(new MigLayout("insets -7 -7 -5 -5"));
-        Icon searchOptionTaskIcon = ResourceLoader.lookupIconResource("searchOption", "searchOption");
-        searchOptionTask.setTitle("Search Option");
-        searchOptionTask.setCollapsed(true);
-        searchOptionTask.setFocusable(false);
-        searchOptionTask.setIcon(searchOptionTaskIcon);
-        searchOptionTask.add(searchOptionPanel, "wrap");
+//		JXTaskPane searchOptionTask = new JXTaskPane();
+//		searchOptionTask.setLayout(new MigLayout("insets -7 -7 -5 -5"));
+//        Icon searchOptionTaskIcon = ResourceLoader.lookupIconResource("searchOption", "searchOption");
+//        searchOptionTask.setTitle("Search Option");
+//        searchOptionTask.setCollapsed(true);
+//        searchOptionTask.setFocusable(false);
+//        searchOptionTask.setIcon(searchOptionTaskIcon);
+//        searchOptionTask.add(searchOptionPanel, "wrap");
 		//mainPanel.add(searchOptionTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		
 		JXTaskPane scaleTask = new JXTaskPane();
