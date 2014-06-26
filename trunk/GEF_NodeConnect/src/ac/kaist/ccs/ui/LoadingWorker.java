@@ -89,7 +89,7 @@ public class LoadingWorker extends JPanel
 	private final static int STATUS_CANCELED = 2;
 	
 	private int status;
-	private int pre_scaled;
+	//private int pre_scaled;
 	
     private JProgressBar progressBar;
     private JButton startButton;
@@ -122,7 +122,7 @@ public class LoadingWorker extends JPanel
         this.ccsConData = ccsConData;
         
         this.graph = graph;
-        this.pre_scaled = UiGlobals.getPre_scaled();
+        //this.pre_scaled = UiGlobals.getPre_scaled();
       
         this.scale = scale;
         
@@ -260,7 +260,7 @@ public class LoadingWorker extends JPanel
 		double scale = UiGlobals.getGrid_scale();//Math.pow(2, pre_scaled - 1);
 
 		
-		logger.debug("pre_scaled : " + pre_scaled + ", real scale : "+ scale);
+		//logger.debug("pre_scaled : " + pre_scaled + ", real scale : "+ scale);
 		
 
 		logger.debug("edtor.setScale("+1.0 / scale+")");
@@ -320,15 +320,15 @@ public class LoadingWorker extends JPanel
          */
     	
     	public void addNode(List<CCSSourceData> nodeData){
-    		System.out.println("nodeData : "+nodeData);
+    		//System.out.println("nodeData : "+nodeData);
     		Editor editor = _graph.getEditor();
     		for(int i = 0 ; i < nodeData.size() ; i++){
     			
     			CCSSourceData node = nodeData.get(i);
     			Fig fig = node.getNode();
     			Point loc = fig.getLocation();
-    			//loc.x = cvtLoc(loc.x);
-    			//loc.y = cvtLoc(loc.y);
+    			loc.x = cvtLoc(loc.x);
+    			loc.y = cvtLoc(loc.y);
     			fig.setLocation(loc);
     			
     			
@@ -353,7 +353,7 @@ public class LoadingWorker extends JPanel
     	}
     	
     	public void addEdge(List<CCSEdgeData> ccsConData){
-    		System.out.println("ccsConData : "+ccsConData);
+    		//System.out.println("ccsConData : "+ccsConData);
     		Editor editor = _graph.getEditor();
     		for(int i = 0 ; i < ccsConData.size() ; i++){
     			
@@ -529,7 +529,7 @@ public class LoadingWorker extends JPanel
         }
         
         public int cvtLoc(int loc){
-        	return (int)((loc)*scale) + padding/2;
+        	return (int)((loc)*scale);// + padding/2;
         }
         public void stop(){
         	progressFlag = false;

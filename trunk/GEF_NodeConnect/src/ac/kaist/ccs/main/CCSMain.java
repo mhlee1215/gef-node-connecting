@@ -6,6 +6,7 @@ import ilog.cplex.IloCplex;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -87,7 +88,6 @@ import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
 import ac.kaist.ccs.ui.WestToolBar;
 
-
 public class CCSMain extends JApplet implements ModeChangeListener {
 
 	public static final int _PADDING = 100;
@@ -104,10 +104,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	String edgeFileName = "";
 	int pre_scaled = 1;
 
-	int padding = 50;
+	int padding = 0;
 	int scale = pre_scaled;
-	
-	
+
 	Editor editor = null;
 
 	private WestToolBar _toolbar = null;
@@ -116,13 +115,15 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	private JGraph _graph;
 	/** A statusbar (shown at bottom ow window). */
 	private JLabel _statusbar = new JLabel(" ");
-	//private JXPanel jxpanel;
+	// private JXPanel jxpanel;
 	private JPanel _mainPanel = new JPanel(new BorderLayout());
 	private JPanel _graphPanel = new JPanel(new BorderLayout());
 	private JMenuBar _menubar = new JMenuBar();
 
+	BufferedImage refImage = null;
+
 	public CCSMain() throws Exception {
-		
+
 		Localizer.addResource("GefBase",
 				"org.tigris.gef.base.BaseResourceBundle");
 		Localizer.addResource("GefPres",
@@ -133,179 +134,278 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		ResourceLoader.addResourceExtension("png");
 		ResourceLoader.addResourceExtension("jpg");
 		ResourceLoader.addResourceLocation("/org/tigris/gef/Images");
-		
+
 		UiGlobals.init();
 
 		try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (UnsupportedLookAndFeelException e) {
-        	e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            try {
-			  UIManager.setLookAndFeel(
-			    UIManager.getSystemLookAndFeelClassName());
+			UIManager
+					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			try {
+				UIManager.setLookAndFeel(UIManager
+						.getSystemLookAndFeelClassName());
 			} catch (Exception e1) {
 			}
-        } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		//UiGlobals.set_curApplet(this);
+		// UiGlobals.set_curApplet(this);
 		UiGlobals.setApplet(this);
-		
+
 	}
-	
+
 	private void initParam() {
 		if (getParameter("prescaled") == null)
 			pre_scaled = 1;
 		else
 			pre_scaled = Integer.parseInt(getParameter("prescaled"));
-		
+
 		if (getParameter("isusetargetconversion") == null)
 			UiGlobals.setUseTargetConversion(false);
-		else{
-			if("Y".equals(getParameter("isusetargetconversion")) || "1".equals(getParameter("isusetargetconversion")))
+		else {
+			if ("Y".equals(getParameter("isusetargetconversion"))
+					|| "1".equals(getParameter("isusetargetconversion")))
 				UiGlobals.setUseTargetConversion(true);
 			else
 				UiGlobals.setUseTargetConversion(false);
 		}
-		
-		if(this.getParameter("tocolumn") != null)
+
+		if (this.getParameter("tocolumn") != null)
 			UiGlobals.setTargetColumnName(this.getParameter("tocolumn"));
 		else
 			UiGlobals.setTargetColumnName("");
-		
-		//UiGlobals.setPre_scaled(pre_scaled);
+
+		// UiGlobals.setPre_scaled(pre_scaled);
 		UiGlobals.setFileName(this.getParameter("fileName"));
-		UiGlobals.setAnnotationFileName(this.getParameter("annotationFileName"));
-		
+		UiGlobals
+				.setAnnotationFileName(this.getParameter("annotationFileName"));
+
 		String isExample = this.getParameter("isExample");
-		if(isExample == null) isExample = "N";
+		if (isExample == null)
+			isExample = "N";
 		UiGlobals.setIsExample(isExample);
 		UiGlobals.setExampleType(this.getParameter("type"));
-		
+
 		System.out.println("===PARAMETER INFO===");
-		System.out.println("isUseConversion: "+UiGlobals.isUseTargetConversion());
-		System.out.println("fileName: "+UiGlobals.getFileName());
-		System.out.println("annotationFileName: "+UiGlobals.getAnnotationFileName());
-		System.out.println("tocolumn: "+this.getParameter("tocolumn"));
+		System.out.println("isUseConversion: "
+				+ UiGlobals.isUseTargetConversion());
+		System.out.println("fileName: " + UiGlobals.getFileName());
+		System.out.println("annotationFileName: "
+				+ UiGlobals.getAnnotationFileName());
+		System.out.println("tocolumn: " + this.getParameter("tocolumn"));
 		System.out.println("===PARAMETER INFO END===");
 	}
 
 	private void jbInit() throws Exception {
-		
+
 		long mega = (long) Math.pow(2, 20);
 		// Get current size of heap in bytes
 		long heapSize = Runtime.getRuntime().totalMemory();
-		// Get maximum size of heap in bytes. The heap cannot grow beyond this size.
+		// Get maximum size of heap in bytes. The heap cannot grow beyond this
+		// size.
 		// Any attempt will result in an OutOfMemoryException.
 		long heapMaxSize = Runtime.getRuntime().maxMemory();
-		// Get amount of free memory within the heap in bytes. This size will increase
+		// Get amount of free memory within the heap in bytes. This size will
+		// increase
 		// after garbage collection and decrease as new objects are created.
 		long heapFreeSize = Runtime.getRuntime().freeMemory();
 		System.out.println("===VM INFO=START===");
-		System.out.println("heapSize: "+heapSize/mega+"MB");
-		System.out.println("heapMaxSize: "+heapMaxSize/mega+"MB");
-		System.out.println("heapFreeSize: "+heapFreeSize/mega+"MB");
+		System.out.println("heapSize: " + heapSize / mega + "MB");
+		System.out.println("heapMaxSize: " + heapMaxSize / mega + "MB");
+		System.out.println("heapFreeSize: " + heapFreeSize / mega + "MB");
 		System.out.println("===VM INFO=END===");
-		
-		try{
-			System.out.println("this.getCodeBase() : "+this.getCodeBase());
-		}catch(Exception e){
+
+		try {
+			System.out.println("this.getCodeBase() : " + this.getCodeBase());
+		} catch (Exception e) {
 			System.out.println("Executed in local!");
 		}
-		// paths.setCodebase(this.getCodeBase().toString());
-		// this.
 
-		
-			
-		//int scale = 1;
-		
-		
-		
-		
-		
-		//System.out.println("isExample : "+UiGlobals.getIsExample());
-		//System.out.println("exampleType : "+UiGlobals.getExampleType());
-		
-		//Start to read annotation file
-		//initAnnotation(UiGlobals.getAnnotationFileName());
-		
-		//Start to node rendering
-		
-		Map<Integer, List<CCSSourceData> > ccsData = null;
+		Map<Integer, List<CCSSourceData>> ccsData = null;
 		List<CCSEdgeData> ccsConData = null;
-		
-		//Insert Loading data
-		if(ccsData == null){
-			ccsData = makeRandomData(300, 500, 500);
+
+		// Insert Loading data
+		if (ccsData == null) {
+			// ccsData = makeRandomData(300, 500, 500);
+			ccsData = makeRefRandomData(refImage);
+			//return;
 		}
-		if(ccsConData == null){
-			//ccsConData = makeNaiveCon(ccsData);
-			//ccsConData = makeStarCon(ccsData);
-			//ccsConData = makeTreeCon(ccsData);
+		if (ccsConData == null) {
+			// ccsConData = makeNaiveCon(ccsData);
+			// ccsConData = makeStarCon(ccsData);
+			// ccsConData = makeTreeCon(ccsData);
 			ccsConData = makeBackboneCon(ccsData);
-			//ccsConData = makeHybridCon(ccsData);
+			// ccsConData = makeHybridCon(ccsData);
 		}
-		
-		//Insert draw Data
-		//System.out.println(ccsData);
-		//new LoadingWorker(ccsData, ccsConData, _graph, 1);
-//		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-//			Map<Integer, List<CCSSourceData> > ccsData;
-//			List<CCSEdgeData> ccsConData;
-//			JGraph graph;
-//			int scale;
-//			
-//			public void run() {
-//				// createAndShowGUI();
-//				new LoadingWorker(ccsData, ccsConData, graph, 1);
-//			}
-//			
-//			public Runnable init(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale){
-//				this.ccsData = ccsData;
-//				this.graph = graph;
-//				this.scale = scale;
-//				this.ccsConData = ccsConData;
-//				
-//				return this;
-//			}
-//		}.init(ccsData, ccsConData, _graph, scale));
-		
-		
-		NodeRenderManager nodeRenderManager = new NodeRenderManager(ccsData, ccsConData, _graph);
+
+		NodeRenderManager nodeRenderManager = new NodeRenderManager(ccsData,
+				ccsConData, _graph);
 		nodeRenderManager.init(_width, _height);
 		nodeRenderManager.drawNodes(true);
 		UiGlobals.setNodeRenderManager(nodeRenderManager);
+
+	}
+
+	public int cvtLoc(int loc) {
+		return (int) ((loc) * scale) + padding / 2;
+	}
+
+	public double getColorDist(Color c1, Color c2){
+		double dA = c1.getAlpha()-c2.getAlpha();
+		double dR = c1.getRed()-c2.getRed();
+		double dG = c1.getGreen()-c2.getGreen();
+		double dB = c1.getBlue()-c2.getBlue();
 		
-		//if(1==1) return;
-		
-		
-		
-		
+		return Math.sqrt(dA*dA+dR*dR+dG*dG+dB*dB);
 	}
 	
-	public int cvtLoc(int loc){
-    	return (int)((loc)*scale) + padding/2;
-    }
+	public Color getPixelARGB(int pixel) {
+		int alpha = (pixel >> 24) & 0xff;
+		int red = (pixel >> 16) & 0xff;
+		int green = (pixel >> 8) & 0xff;
+		int blue = (pixel) & 0xff;
+		// System.out.println("argb: " + alpha + ", " + red + ", " + green +
+		// ", " + blue);\
+		return new Color(alpha, red, green, blue);
+	}
 	
-	public Map<Integer, List<CCSSourceData> > makeRandomData(int size, int maxWidth, int maxHeight) throws IloException {
-		 //IloCplex cplex = new IloCplex();
-		Map<Integer, List<CCSSourceData> > ccsData = new HashMap<Integer, List<CCSSourceData> >();
-		Random random = new Random();
+	public Color getColorBin(Color c, List<Color> colorBinList, double threshold){
+		Color resultBin = null;
+		double minDist = 9999999;
 		
+		for(Color cc : colorBinList){
+			double curDist = getColorDist(c, cc);
+			if( curDist < threshold && curDist < minDist){
+				resultBin = cc;
+				minDist = curDist;
+			}
+		}
+		
+		return resultBin;
+	}
+	
+
+
+	public Map<Integer, List<CCSSourceData>> makeRefRandomData(
+			BufferedImage refImage) {
+		
+		Map<Integer, List<CCSSourceData>> ccsData = new HashMap<Integer, List<CCSSourceData>>();
+		Random random = new Random();
+
+		int h = refImage.getHeight();
+		int w = refImage.getWidth();
+		
+		System.out.println("height : "+h+", width:"+w);
+
+		Map<Color, List<Dimension>> colorIdxMap = new HashMap<Color, List<Dimension>>();
+		List<Color> colorBinList = new ArrayList<Color>();
+		double threshold = 10;
+
+		for (int i = 0; i < h; i++) {
+			for (int j = 0; j < w; j++) {
+				//int loc = i * w + j;
+				Dimension loc = new Dimension(j, i);
+				int pixel = refImage.getRGB(j, i);
+				Color c = getPixelARGB(pixel);
+				
+				
+				Color cBin = getColorBin(c, colorBinList, threshold);
+				if(cBin == null){
+					cBin = c;
+					colorBinList.add(c);
+				}
+				
+				List<Dimension> locList = colorIdxMap.get(cBin);
+				if (locList == null) {
+					locList = new ArrayList<Dimension>();
+					colorIdxMap.put(c, locList);
+				}
+				locList.add(loc);
+			}
+		}
+
+		System.out.println("colorIdxMap key Size:"
+				+ colorIdxMap.keySet().size());
+		//System.out.println("colorIdxMap:"+colorIdxMap.get(colorBinList.get(0)));
+
+		// int pixel = image.getRGB(j, i);
+		// printPixelARGB(pixel);
+		
+		int sourcePerEachResgion = 15;
+		int hubPerEachRegion = 1;
 		
 		List<CCSSourceData> sourceData = new ArrayList<CCSSourceData>();
-	
+		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
 		
+		int cnt = 0;
+		for(int i = 0 ; i < colorBinList.size(); i++){
 		
+			Color ck = colorBinList.get(i);
+			
+			//Filter background color
+			if( getColorDist(ck, new Color(255, 255, 255, 255)) < 10) continue;
+			//Filter noise
+			List<Dimension> locList = colorIdxMap.get(ck);
+			if(locList.size() < 500) continue;
+			cnt++;
+			System.out.println("locList: "+locList.size());			
+			System.out.println("ck:"+ck);
+			System.out.println("cnt:"+cnt);
+			
+			for (int count = 0; count < sourcePerEachResgion; count++) {
+				Dimension curLoc = locList.get(random.nextInt(locList.size()));
+				locList.remove(curLoc);
+				
+				int x = cvtLoc((int) curLoc.getWidth());
+				int y = cvtLoc((int) curLoc.getHeight());
+				CCSSourceData node = new CCSSourceData(x, y);
+				float co2 = random.nextInt(100);
+				node.setCo2_amount(co2);
+				sourceData.add(node);
+				int index = UiGlobals.addNode(node);
+				node.setIndex(index);
+				
+			}
+			
+			for (int count = 0; count < hubPerEachRegion; count++) {
+				Dimension curLoc = locList.get(random.nextInt(locList.size()));
+				locList.remove(curLoc);
+				
+				int x = cvtLoc((int) curLoc.getWidth());
+				int y = cvtLoc((int) curLoc.getHeight());
+				int range = 100;
+				CCSSourceData node = new CCSHubData(x, y, range);
+				hubData.add(node);
+				int index = UiGlobals.addNode(node);
+				node.setIndex(index);
+			}
+			
+			//break;
+		}
 		
+		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
+		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
+		
+		return ccsData;
+	}
+
+	public Map<Integer, List<CCSSourceData>> makeRandomData(int size,
+			int maxWidth, int maxHeight) throws IloException {
+		// IloCplex cplex = new IloCplex();
+		Map<Integer, List<CCSSourceData>> ccsData = new HashMap<Integer, List<CCSSourceData>>();
+		Random random = new Random();
+
+		List<CCSSourceData> sourceData = new ArrayList<CCSSourceData>();
+
 		for (int count = 0; count < size; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
@@ -316,7 +416,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			int index = UiGlobals.addNode(node);
 			node.setIndex(index);
 		}
-		
+
 		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
 		for (int count = 0; count < 10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
@@ -327,9 +427,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			int index = UiGlobals.addNode(node);
 			node.setIndex(index);
 		}
-		
+
 		List<CCSSourceData> plantData = new ArrayList<CCSSourceData>();
-		for (int count = 0; count < size/10; count++) {
+		for (int count = 0; count < size / 10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
 			CCSSourceData node = new CCSPlantData(x, y);
@@ -337,172 +437,175 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			int index = UiGlobals.addNode(node);
 			node.setIndex(index);
 		}
-		
-//		List<CCSSourceData> jointData = new ArrayList<CCSSourceData>();
-//		for (int count = 0; count < size/10; count++) {
-//			int x = cvtLoc(random.nextInt(maxWidth));
-//			int y = cvtLoc(random.nextInt(maxHeight));
-//			CCSSourceData node = new CCSJointData(x, y);
-//			jointData.add(node);
-//			int index = UiGlobals.addNode(node);
-//			node.setIndex(index);
-//		}
-		
+
+		// List<CCSSourceData> jointData = new ArrayList<CCSSourceData>();
+		// for (int count = 0; count < size/10; count++) {
+		// int x = cvtLoc(random.nextInt(maxWidth));
+		// int y = cvtLoc(random.nextInt(maxHeight));
+		// CCSSourceData node = new CCSJointData(x, y);
+		// jointData.add(node);
+		// int index = UiGlobals.addNode(node);
+		// node.setIndex(index);
+		// }
+
 		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
 		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
 		ccsData.put(CCSSourceData.TYPE_PLANT, plantData);
-		//ccsData.put(CCSSourceData.TYPE_JOINT, jointData);
+		// ccsData.put(CCSSourceData.TYPE_JOINT, jointData);
 
 		return ccsData;
 	}
-	    
-	public List<CCSEdgeData> makeNaiveCon(Map<Integer, List<CCSSourceData> > ccsData){
+
+	public List<CCSEdgeData> makeNaiveCon(
+			Map<Integer, List<CCSSourceData>> ccsData) {
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
-		
+
 		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
-		
-		for(int i = 0 ; i <sourceData.size() ; i++){
-			
+
+		for (int i = 0; i < sourceData.size(); i++) {
+
 			CCSSourceData curSrc = sourceData.get(i);
 			CCSSourceData minDistHub = null;
 			double minDist = 999999999;
-			
-			for(int j = 0 ; j < hubData.size(); j++){
+
+			for (int j = 0; j < hubData.size(); j++) {
 
 				CCSSourceData curHub = hubData.get(j);
-				
+
 				double curDist = dist(curSrc, curHub);
-				if(minDist > curDist){
+				if (minDist > curDist) {
 					minDist = curDist;
 					minDistHub = curHub;
 				}
 			}
-			
+
 			CCSEdgeData conData = curSrc.connectTo(minDistHub);
 			ccsConData.add(conData);
 		}
 
 		return ccsConData;
 	}
-	
-	public Map<Integer, List<CCSSourceData> > Clustering(Map<Integer, List<CCSSourceData> > ccsData){
-		//List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
-		
+
+	public Map<Integer, List<CCSSourceData>> Clustering(
+			Map<Integer, List<CCSSourceData>> ccsData) {
+		// List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+
 		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
-		
-		for(int i = 0 ; i <sourceData.size() ; i++){
+
+		for (int i = 0; i < sourceData.size(); i++) {
 			CCSSourceData curSrc = sourceData.get(i);
-			
-			
+
 			CCSHubData minRankHub = null;
 			double minDist = 999999999;
 			double minRank = 999999999;
-			
-			for(int j = 0 ; j < hubData.size(); j++){
+
+			for (int j = 0; j < hubData.size(); j++) {
 				CCSHubData curHub = (CCSHubData) hubData.get(j);
-				
-				System.out.println(curHub);
+
+				//System.out.println(curHub);
 				double curDist = dist(curSrc, curHub);
 				float curRank = (float) (curSrc.getCo2_amount() / minDist);
 				curSrc.setRank(curRank);
-				if(minDist > curDist){
+				if (minDist > curDist) {
 					minDist = curDist;
 					minRank = curRank;
 					minRankHub = curHub;
 				}
 			}
-			
-			if(minDist <= minRankHub.getRange()){
+
+			if (minDist <= minRankHub.getRange()) {
 				curSrc.setClusterHub(minRankHub);
-			}	
+			}
 		}
-		
-		for(int i = 0 ; i <sourceData.size() ; i++){
-			
+
+		for (int i = 0; i < sourceData.size(); i++) {
+
 			CCSSourceData curSrc = sourceData.get(i);
-			if(curSrc.getClusterHub()!= null){
-				if(curSrc.getClusterHub().getType() == CCSNodeData.TYPE_HUB){
-					((CCSHubData)curSrc.getClusterHub()).addChildSource(curSrc.getIndex());
-					//((CCSHubData)curSrc.getHub()).getChildSources().add(curSrc);
+			if (curSrc.getClusterHub() != null) {
+				if (curSrc.getClusterHub().getType() == CCSNodeData.TYPE_HUB) {
+					((CCSHubData) curSrc.getClusterHub()).addChildSource(curSrc
+							.getIndex());
+					// ((CCSHubData)curSrc.getHub()).getChildSources().add(curSrc);
 				}
 			}
 		}
 
 		return ccsData;
 	}
-	
-	public List<CCSEdgeData> makeStarCon(Map<Integer, List<CCSSourceData> > ccsData){
+
+	public List<CCSEdgeData> makeStarCon(
+			Map<Integer, List<CCSSourceData>> ccsData) {
 		ccsData = Clustering(ccsData);
-		
-		
+
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
-		
-		for(int i = 0 ; i <sourceData.size() ; i++){			
+
+		for (int i = 0; i < sourceData.size(); i++) {
 			CCSSourceData curSrc = sourceData.get(i);
-			if(curSrc.getClusterHub()!=null){
+			if (curSrc.getClusterHub() != null) {
 				curSrc.connectTo(curSrc.getClusterHub());
 			}
 		}
 
 		return ccsConData;
 	}
-	
+
 	public List<CCSEdgeData> makeTreeCon(
 			Map<Integer, List<CCSSourceData>> ccsData) {
 		ccsData = Clustering(ccsData);
-		
+
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 
-		//List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		// List<CCSSourceData> sourceData =
+		// ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 
 		for (int j = 0; j < hubData.size(); j++) {
 
 			CCSHubData curHub = (CCSHubData) hubData.get(j);
-			
+
 			List<Integer> childIndexList = curHub.getChildSources();
 			List<Integer> connedtedList = new ArrayList<Integer>();
-			connedtedList.add(curHub.getIndex());		
-			
-			//Add until remained node list is empty
-			for(int ii = 0 ; ii < childIndexList.size() ; ){
-				
-				NodePair closestPair = getClosestPair(childIndexList, connedtedList);
-				
+			connedtedList.add(curHub.getIndex());
+
+			// Add until remained node list is empty
+			for (int ii = 0; ii < childIndexList.size();) {
+
+				NodePair closestPair = getClosestPair(childIndexList,
+						connedtedList);
+
 				CCSSourceData minDistSrc = closestPair.first;
 				CCSSourceData minDistConnectedSrc = closestPair.second;
-				
-				if(minDistSrc != null)
+
+				if (minDistSrc != null)
 					minDistSrc.connectTo(minDistConnectedSrc);
-								
-				childIndexList.remove((Integer)minDistSrc.getIndex());
+
+				childIndexList.remove((Integer) minDistSrc.getIndex());
 				connedtedList.add(minDistSrc.getIndex());
 			}
 		}
 
 		return ccsConData;
 	}
-	
-	public NodePair getClosestPair(List<Integer> firstIDList, List<Integer> secondIDList){
-		
-		
+
+	public NodePair getClosestPair(List<Integer> firstIDList,
+			List<Integer> secondIDList) {
+
 		CCSSourceData minDistSrc = null;
 		CCSSourceData minDistConnectedSrc = null;
 		double minDist = 9999999;
-		
-		for (int i = 0 ; i < firstIDList.size(); i++){
+
+		for (int i = 0; i < firstIDList.size(); i++) {
 			int childIndex = firstIDList.get(i);
 			CCSSourceData curSrc = UiGlobals.getNode(childIndex);
-			//System.out.println("curSrc:"+curSrc.getIndex()+", childIndex:"+childIndex);
-			
-			for (int k = 0 ; k < secondIDList.size(); k++){
+			// System.out.println("curSrc:"+curSrc.getIndex()+", childIndex:"+childIndex);
+
+			for (int k = 0; k < secondIDList.size(); k++) {
 				int connectedIndex = secondIDList.get(k);
 				CCSSourceData curConnected = UiGlobals.getNode(connectedIndex);
-				
-				
+
 				double curDist = dist(curSrc, curConnected);
 				if (minDist > curDist) {
 					minDist = curDist;
@@ -511,104 +614,104 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				}
 			}
 		}
-		
+
 		return new NodePair(minDistSrc, minDistConnectedSrc);
 	}
-	
-//	public static void main(String[] argv){
-//		int x1 = 50;
-//		int y1 = 50;
-//		
-//		int x2 = 55;
-//		int y2 = 50;
-//		
-//		System.out.println(getAngle(x1, y1, x2, y2));
-//	}
-	
-	public float getAngle(CCSSourceData hub, CCSSourceData ref, CCSSourceData newNode){
-		int x1 = ref.getX()-hub.getX();
-		int y1 = ref.getY()-hub.getY();
-		int x2 = newNode.getX()-hub.getX();
-		int y2 = newNode.getY()-hub.getY();
-		
-		return getAngle(x1, y1, x2, y2);	
+
+	// public static void main(String[] argv){
+	// int x1 = 50;
+	// int y1 = 50;
+	//
+	// int x2 = 55;
+	// int y2 = 50;
+	//
+	// System.out.println(getAngle(x1, y1, x2, y2));
+	// }
+
+	public float getAngle(CCSSourceData hub, CCSSourceData ref,
+			CCSSourceData newNode) {
+		int x1 = ref.getX() - hub.getX();
+		int y1 = ref.getY() - hub.getY();
+		int x2 = newNode.getX() - hub.getX();
+		int y2 = newNode.getY() - hub.getY();
+
+		return getAngle(x1, y1, x2, y2);
 	}
-	
-	public float getAngle(int x1, int y1, int x2, int y2){
-		
-		int x_sign = x2-x1;
-		int y_sign = y2-y1;
-		
+
+	public float getAngle(int x1, int y1, int x2, int y2) {
+
+		int x_sign = x2 - x1;
+		int y_sign = y2 - y1;
+
 		int x_usign = Math.abs(x_sign);
 		int y_usign = Math.abs(y_sign);
-		
-		float radian = (float) (Math.atan(y_usign /(float) x_usign) * 180 / Math.PI);
-		
-		if(x_sign >= 0 && y_sign >= 0){
-			//1st quadrant
-			//Do nothing
-		}else if(x_sign < 0 && y_sign >= 0){
-			//2nd quadrant
+
+		float radian = (float) (Math.atan(y_usign / (float) x_usign) * 180 / Math.PI);
+
+		if (x_sign >= 0 && y_sign >= 0) {
+			// 1st quadrant
+			// Do nothing
+		} else if (x_sign < 0 && y_sign >= 0) {
+			// 2nd quadrant
 			radian = 180 - radian;
-			
-		}else if(x_sign < 0 && y_sign < 0){
-			//3rd quadrant
+
+		} else if (x_sign < 0 && y_sign < 0) {
+			// 3rd quadrant
 			radian += 180;
-		}else if(x_sign >= 0 && y_sign < 0){
-			//4th quadrant
-			radian = 360-radian;
+		} else if (x_sign >= 0 && y_sign < 0) {
+			// 4th quadrant
+			radian = 360 - radian;
 		}
-		
+
 		return radian;
 	}
-		
+
 	public List<CCSEdgeData> makeBackboneCon(
 			Map<Integer, List<CCSSourceData>> ccsData) {
 		ccsData = Clustering(ccsData);
-		
+
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 
-		//List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		// List<CCSSourceData> sourceData =
+		// ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 
 		for (int j = 0; j < hubData.size(); j++) {
 
 			CCSHubData curHub = (CCSHubData) hubData.get(j);
 			List<Integer> childIndexList = curHub.getChildSources();
-			
-			//Grouping by angle = n pieces;
+
+			// Grouping by angle = n pieces;
 			float angleNum = 6;
 			float anglePerPie = 360 / angleNum;
-			
+
 			int hx = curHub.getX();
 			int hy = curHub.getY();
-			Map<Integer, List<Integer> > pieBinMap = new HashMap<Integer, List<Integer> >();
-			for(int i = 0 ; i < angleNum ; i++){
+			Map<Integer, List<Integer>> pieBinMap = new HashMap<Integer, List<Integer>>();
+			for (int i = 0; i < angleNum; i++) {
 				pieBinMap.put(i, new ArrayList<Integer>());
 			}
-			
-			for (int i = 0 ; i < childIndexList.size(); i++){
+
+			for (int i = 0; i < childIndexList.size(); i++) {
 				int childIndex = childIndexList.get(i);
 				CCSSourceData curSrc = UiGlobals.getNode(childIndex);
-				
+
 				int cx = curSrc.getX();
 				int cy = curSrc.getY();
-				
+
 				float angle = getAngle(hx, hy, cx, cy);
 				int pieBin = (int) Math.floor(angle / anglePerPie);
-				
+
 				pieBinMap.get(pieBin).add(childIndex);
 			}
-			
-			
-			for(int i = 0 ; i < angleNum ; i++){
+
+			for (int i = 0; i < angleNum; i++) {
 				List<Integer> binNodeList = pieBinMap.get(i);
-				
-				
+
 				CCSSourceData maxDistSrc = null;
 				double maxDist = 0;
-				//Find node with maximum distance
-				for (int k = 0 ; k < binNodeList.size(); k++){
+				// Find node with maximum distance
+				for (int k = 0; k < binNodeList.size(); k++) {
 					int childIndex = binNodeList.get(k);
 					CCSSourceData curSrc = UiGlobals.getNode(childIndex);
 
@@ -618,208 +721,207 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 						maxDistSrc = curSrc;
 					}
 				}
-				
-				
-				
-				
-				 //CCSEdgeData conData = new CCSEdgeData(maxDistSrc, curHub);
-				 //ccsConData.add(conData);
-				//if(maxDistSrc != null)
-				//	maxDistSrc.connectTo(curHub);
-				
-				//Connect arthogonal to connection between hub to maximum distance node.
-				if(maxDistSrc != null){
+
+				// CCSEdgeData conData = new CCSEdgeData(maxDistSrc, curHub);
+				// ccsConData.add(conData);
+				// if(maxDistSrc != null)
+				// maxDistSrc.connectTo(curHub);
+
+				// Connect arthogonal to connection between hub to maximum
+				// distance node.
+				if (maxDistSrc != null) {
 					maxDistSrc.connectTo(curHub);
-					System.out.println("maxDistSrc: "+maxDistSrc);
-					binNodeList.remove((Integer)maxDistSrc.getIndex());
-					
-					//float distMax = maxDist;
-//					double distMax = maxDist;
-//					int mx = maxDistSrc.getX() - curHub.getX();
-//					int my = maxDistSrc.getY() - curHub.getY();
-				
+					//System.out.println("maxDistSrc: " + maxDistSrc);
+					binNodeList.remove((Integer) maxDistSrc.getIndex());
+
+					// float distMax = maxDist;
+					// double distMax = maxDist;
+					// int mx = maxDistSrc.getX() - curHub.getX();
+					// int my = maxDistSrc.getY() - curHub.getY();
+
 					List<SortTuple> nodePairList = new ArrayList<SortTuple>();
-					
-					for (int k = 0 ; k < binNodeList.size(); k++){
+
+					for (int k = 0; k < binNodeList.size(); k++) {
 						int childIndex = binNodeList.get(k);
 						CCSSourceData curSrc = UiGlobals.getNode(childIndex);
-						
-//						int cx = curSrc.getX() - curHub.getX();
-//						int cy = curSrc.getY() - curHub.getY();
-//						
-//						double lengthToOrth = (mx*cx+my*cy) / distMax;
-//						
-//						int ox = (int)(lengthToOrth * mx / distMax);
-//						int oy = (int)(lengthToOrth * my / distMax);
-						
-						//CCSSourceData node = new CCSJointData(curHub.getX()+ox, curHub.getY()+oy);
-						
-						CCSSourceData node = getProjectionPoint(curHub, maxDistSrc, curSrc);
-						
+
+						// int cx = curSrc.getX() - curHub.getX();
+						// int cy = curSrc.getY() - curHub.getY();
+						//
+						// double lengthToOrth = (mx*cx+my*cy) / distMax;
+						//
+						// int ox = (int)(lengthToOrth * mx / distMax);
+						// int oy = (int)(lengthToOrth * my / distMax);
+
+						// CCSSourceData node = new
+						// CCSJointData(curHub.getX()+ox, curHub.getY()+oy);
+
+						CCSSourceData node = getProjectionPoint(curHub,
+								maxDistSrc, curSrc);
+
 						int jointNodeIndex = UiGlobals.addNode(node);
 						node.setIndex(jointNodeIndex);
-						
-						//maxDistSrc : 가장 먼 노드 (이미 연결되있음)
-						//node : joint 노드
-						//curSrc : 연결할 새로운 노드
-						//curHub : 현재 허브 노드
+
+						// maxDistSrc : 가장 먼 노드 (이미 연결되있음)
+						// node : joint 노드
+						// curSrc : 연결할 새로운 노드
+						// curHub : 현재 허브 노드
 						jointConnection(maxDistSrc, node, curSrc, curHub);
-					}				
+					}
 				}
 			}
 		}
 
 		return ccsConData;
 	}
-	
-	//Joint connection
-	//joint node가 들어갈 자리의 양 옆 노드의 연결 사이에 joint를 집어넣는다.
-	public void jointConnection(CCSSourceData ref, CCSSourceData joint, CCSSourceData newNode, CCSSourceData hub){
+
+	// Joint connection
+	// joint node가 들어갈 자리의 양 옆 노드의 연결 사이에 joint를 집어넣는다.
+	public void jointConnection(CCSSourceData ref, CCSSourceData joint,
+			CCSSourceData newNode, CCSSourceData hub) {
 		CCSSourceData justBeforeJoint = ref;
-		
-		while(justBeforeJoint.getDst() != null){
-			if(dist(justBeforeJoint.getDst(), hub) < dist(joint, hub))
+
+		while (justBeforeJoint.getDst() != null) {
+			if (dist(justBeforeJoint.getDst(), hub) < dist(joint, hub))
 				break;
 			justBeforeJoint = justBeforeJoint.getDst();
 		}
-		
+
 		joint.connectTo(justBeforeJoint.getDst());
 		justBeforeJoint.connectTo(joint);
 		newNode.connectTo(joint);
 	}
-	
-	public CCSSourceData getProjectionPoint(CCSSourceData hub, CCSSourceData ref, CCSSourceData newNode){
-		
+
+	public CCSSourceData getProjectionPoint(CCSSourceData hub,
+			CCSSourceData ref, CCSSourceData newNode) {
+
 		double distToRef = dist(hub, ref);
 		double distToNew = dist(hub, newNode);
-		
-		if(distToRef < distToNew) return null;
-		
+
+		if (distToRef < distToNew)
+			return null;
+
 		int mx = ref.getX() - hub.getX();
 		int my = ref.getY() - hub.getY();
-		
+
 		int cx = newNode.getX() - hub.getX();
 		int cy = newNode.getY() - hub.getY();
-		
+
 		double distMax = dist(ref, hub);
-		double lengthToOrth = (mx*cx+my*cy) / distMax;
-		
-		int ox = (int)(lengthToOrth * mx / distMax);
-		int oy = (int)(lengthToOrth * my / distMax);
-		
-		CCSSourceData node = new CCSJointData(hub.getX()+ox, hub.getY()+oy);
+		double lengthToOrth = (mx * cx + my * cy) / distMax;
+
+		int ox = (int) (lengthToOrth * mx / distMax);
+		int oy = (int) (lengthToOrth * my / distMax);
+
+		CCSSourceData node = new CCSJointData(hub.getX() + ox, hub.getY() + oy);
 		return node;
 	}
-	
-	
-	public class NodePair{
+
+	public class NodePair {
 		CCSSourceData first;
 		CCSSourceData second;
-		
-		public NodePair(CCSSourceData first, CCSSourceData second){
+
+		public NodePair(CCSSourceData first, CCSSourceData second) {
 			this.first = first;
 			this.second = second;
 		}
 	}
-	
+
 	public class SortTuple {
 		double dist;
 		int firstId;
 		int secondId;
-		
-		public SortTuple(double dist, int firstId, int secondId){
+
+		public SortTuple(double dist, int firstId, int secondId) {
 			this.dist = dist;
 			this.firstId = firstId;
 			this.secondId = secondId;
 		}
-		
+
 	}
-	
+
 	static class NoAscCompare implements Comparator<SortTuple> {
-		 
+
 		/**
 		 * 오름차순(ASC)
 		 */
 		@Override
 		public int compare(SortTuple arg0, SortTuple arg1) {
 			// TODO Auto-generated method stub
-			return arg0.dist < arg1.dist ? -1 : arg0.dist > arg1.dist ? 1:0;
+			return arg0.dist < arg1.dist ? -1 : arg0.dist > arg1.dist ? 1 : 0;
 		}
 	}
-	
+
 	static class NoDecCompare implements Comparator<SortTuple> {
-		 
+
 		/**
 		 * 오름차순(ASC)
 		 */
 		@Override
 		public int compare(SortTuple arg0, SortTuple arg1) {
 			// TODO Auto-generated method stub
-			return arg0.dist > arg1.dist ? -1 : arg0.dist < arg1.dist ? 1:0;
+			return arg0.dist > arg1.dist ? -1 : arg0.dist < arg1.dist ? 1 : 0;
 		}
 	}
- 
-	
-	
-	
-	public List<CCSEdgeData> makeHybridCon(Map<Integer, List<CCSSourceData> > ccsData){
-		
+
+	public List<CCSEdgeData> makeHybridCon(
+			Map<Integer, List<CCSSourceData>> ccsData) {
+
 		ccsData = Clustering(ccsData);
-		
+
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 
-		//List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		// List<CCSSourceData> sourceData =
+		// ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 
 		for (int j = 0; j < hubData.size(); j++) {
 
 			CCSHubData curHub = (CCSHubData) hubData.get(j);
-			
+
 			List<Integer> childIndexList = curHub.getChildSources();
 			List<SortTuple> nodesSortByRank = new ArrayList<SortTuple>();
-				
-			//Get Nodes with rank with descending order
-			for (int i = 0 ; i < childIndexList.size(); i++){
+
+			// Get Nodes with rank with descending order
+			for (int i = 0; i < childIndexList.size(); i++) {
 				int childIndex = childIndexList.get(i);
 				CCSSourceData curSrc = UiGlobals.getNode(childIndex);
-				nodesSortByRank.add(new SortTuple(getRank(curHub, curSrc), childIndex, childIndex));
+				nodesSortByRank.add(new SortTuple(getRank(curHub, curSrc),
+						childIndex, childIndex));
 			}
-			
+
 			Collections.sort(nodesSortByRank, new NoDecCompare());
-			
-			//Add from high rank node
-			//Actual adding routine.
-			for(int i = 0 ; i < nodesSortByRank.size(); i++){
+
+			// Add from high rank node
+			// Actual adding routine.
+			for (int i = 0; i < nodesSortByRank.size(); i++) {
 				int highRankNodeId = nodesSortByRank.get(i).firstId;
 				CCSSourceData curSrc = UiGlobals.getNode(highRankNodeId);
-				
+
 			}
-			
-			
+
 		}
-		
-		//Need to implement
-		
-		//Sort by Rank
-		
-		
-		
+
+		// Need to implement
+
+		// Sort by Rank
+
 		return ccsConData;
 	}
-	
-	public double getRank(CCSSourceData hub, CCSSourceData ref){
-		return ref.getCo2_amount()/dist(hub, ref);
+
+	public double getRank(CCSSourceData hub, CCSSourceData ref) {
+		return ref.getCo2_amount() / dist(hub, ref);
 	}
-	
-	public double dist(CCSSourceData src1, CCSSourceData src2){
+
+	public double dist(CCSSourceData src1, CCSSourceData src2) {
 		double dist = 0;
-		
-		dist = Math.sqrt((src1.getX() - src2.getX())*(src1.getX() - src2.getX()) + (src1.getY() - src2.getY())*(src1.getY() - src2.getY())); 
-		
+
+		dist = Math.sqrt((src1.getX() - src2.getX())
+				* (src1.getX() - src2.getX()) + (src1.getY() - src2.getY())
+				* (src1.getY() - src2.getY()));
+
 		return dist;
 	}
-	
-	
 
 	public void destroy() {
 		// TODO Auto-generated method stub
@@ -827,17 +929,19 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	}
 
 	public void init() {
-		
+
 		init(new JGraph());
-		
+
 	}
 
 	public void init(JGraph jg) {
 		initParam();
 		setDefaultFont(UiGlobals.getNormalFont());
-		this.setToolBar(new NodePaletteFig()); // needs-more-work
-		this.setWestToolBar(new ResizerPaletteFig());
-		
+		NodePaletteFig topBar = new NodePaletteFig();
+		this.setToolBar(topBar); // needs-more-work
+		ResizerPaletteFig westBar = new ResizerPaletteFig();
+		this.setWestToolBar(westBar);
+
 		_graph = jg;
 
 		editor = _graph.getEditor();
@@ -852,19 +956,23 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		map.put("spacing_include_stamp", 5000);
 		map.put("paintLines", true);
 		map.put("paintDots", false);
-		
-		BufferedImage image = null;
+
 		try {
-			image = ImageIO.read(this.getClass().getResource("/ac/kaist/ccs/images/trimap.bmp"));
+			refImage = ImageIO.read(this.getClass().getResource(
+					"/ac/kaist/ccs/images/korea_02.jpg"));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
-		
-		//map.put("stamp", (Image)image);
+		int bgPadding = 20;
 
-		System.out.println("ADJUST!: "+image);
+		int bgWidth = refImage.getWidth() + bgPadding;
+		int bgHeight = refImage.getHeight() + bgPadding;
+
+		map.put("stamp", (Image) refImage);
+
+		System.out.println("ADJUST!: " + refImage);
 		grid.adjust(map);
 
 		Container content = getContentPane();
@@ -875,21 +983,22 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		_graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 
 		UiGlobals.setGraphPane(_graphPanel);
-		//_mainPanel.add(_graphPanel, BorderLayout.CENTER);
+		// _mainPanel.add(_graphPanel, BorderLayout.CENTER);
 		content.add(_mainPanel, BorderLayout.CENTER);
-		
+
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new MigLayout("insets 0 0 0 0"));
 		bottomPanel.add(_statusbar, "wrap");
-		
+
 		content.add(bottomPanel, BorderLayout.SOUTH);
 		UiGlobals.set_statusBar(_statusbar);
 		UiGlobals.setCoordBottomPanel(bottomPanel);
-		setSize(870, 600);
+		setSize(bgWidth + westBar.getTaskWidth(), bgHeight + topBar.getHeight());
+
 		setVisible(true);
 
 		_graph.addModeChangeListener(this);
-		
+
 		UiGlobals.setMainPane(_mainPanel);
 
 		try {
@@ -899,10 +1008,10 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void setUpMenus() {
-		//JMenuBar menuBar = new JMenuBar();
-		
+		// JMenuBar menuBar = new JMenuBar();
+
 		JMenuItem openItem, saveItem, printItem, exitItem;
 		JMenuItem deleteItem, copyItem, pasteItem;
 		JMenuItem groupItem, ungroupItem;
@@ -926,7 +1035,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		JMenu edit = new JMenu(Localizer.localize("GefBase", "Edit"));
 		edit.setMnemonic('E');
-		//_menubar.add(edit);
+		// _menubar.add(edit);
 
 		JMenuItem undoItem = edit.add(new UndoAction(Localizer.localize(
 				"GefBase", "Undo")));
@@ -958,7 +1067,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		edit.add(new CmdUseRotate());
 
 		JMenu view = new JMenu(Localizer.localize("GefBase", "View"));
-		//_menubar.add(view);
+		// _menubar.add(view);
 		view.setMnemonic('V');
 		view.add(new CmdSpawn());
 		view.add(new CmdShowProperties());
@@ -972,7 +1081,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		view.add(new CmdAdjustPageBreaks());
 
 		JMenu arrange = new JMenu(Localizer.localize("GefBase", "Arrange"));
-		//_menubar.add(arrange);
+		// _menubar.add(arrange);
 		arrange.setMnemonic('A');
 		groupItem = arrange.add(new CmdGroup());
 		groupItem.setMnemonic('G');
@@ -989,8 +1098,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		align.add(new AlignAction(AlignAction.ALIGN_V_CENTERS));
 		align.add(new AlignAction(AlignAction.ALIGN_TO_GRID));
 
-		JMenu distribute = new JMenu(Localizer
-				.localize("GefBase", "Distribute"));
+		JMenu distribute = new JMenu(
+				Localizer.localize("GefBase", "Distribute"));
 		arrange.add(distribute);
 		distribute.add(new DistributeAction(DistributeAction.H_SPACING));
 		distribute.add(new DistributeAction(DistributeAction.H_CENTERS));
@@ -1063,7 +1172,6 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 	}
 
-	
 	@Override
 	public void modeChange(ModeChangeEvent mce) {
 		// TODO Auto-generated method stub
@@ -1089,46 +1197,26 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		// TODO Auto-generated method stub
 		super.stop();
 	}
-	
+
 	/**
 	 * Set default font
+	 * 
 	 * @param font
 	 */
-	public void setDefaultFont(Font font)
-	{
-		
-			String[] applyList = {
-				"RadioButtonMenuItem.font",
-				"CheckBoxMenuItem.font",
-				"RadioButton.font",
-				"ToolBar.font",
-				"ProgressBar.font",
-				"Menu.font",
-				"Button.font",
-				"TitledBorder.font",
-				"ComboBox.font",
-				"ToggleButton.font",
-				"TabbedPane.font",
-				"List.font",
-				"MenuBar.font",
-				"MenuItem.font",
-				"CheckBox.font",
-				"Label.font",
-			};
-			
-			int nSize = applyList.length;
-			for( int i=0; i < nSize; i++ ){
-				UIManager.put(applyList[i], font);
-			}
-			
+	public void setDefaultFont(Font font) {
+
+		String[] applyList = { "RadioButtonMenuItem.font",
+				"CheckBoxMenuItem.font", "RadioButton.font", "ToolBar.font",
+				"ProgressBar.font", "Menu.font", "Button.font",
+				"TitledBorder.font", "ComboBox.font", "ToggleButton.font",
+				"TabbedPane.font", "List.font", "MenuBar.font",
+				"MenuItem.font", "CheckBox.font", "Label.font", };
+
+		int nSize = applyList.length;
+		for (int i = 0; i < nSize; i++) {
+			UIManager.put(applyList[i], font);
+		}
+
 	}
-
-	
-	
-	
-
-	
-	
-	
 
 }
