@@ -20,7 +20,7 @@ public class CCSJointData extends CCSSourceData {
 	float cost;
 
 	public CCSJointData(int x, int y) {
-		super(x, y);
+		super(x, y, 0, 0);
 		this.type = CCSNodeData.TYPE_JOINT;
 		int size = 5;
 		node = new FigJointNode(x, y, size, size);

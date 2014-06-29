@@ -291,7 +291,7 @@ public class CoordinatorApplet extends JApplet implements ModeChangeListener {
 		for (int count = 0; count < size; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSSourceData node = new CCSSourceData(x, y);
+			CCSSourceData node = new CCSSourceData(x, y, 0, 0);
 			sourceData.add(node);
 		}
 		
