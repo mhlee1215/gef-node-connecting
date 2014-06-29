@@ -21,6 +21,7 @@ import org.jdesktop.swingx.JXPanel;
 import org.tigris.gef.base.Globals;
 import org.tigris.gef.presentation.Fig;
 
+import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.presentation.JNodeInfoPanel;
@@ -90,28 +91,47 @@ public class UiGlobals extends Globals{
 	
 	private static Map<Integer, CCSSourceData> nodes = new HashMap<Integer, CCSSourceData>();
 	private static int nodeSize = 0;
+	private static Map<Integer, CCSEdgeData> edges = new HashMap<Integer, CCSEdgeData>();
+	private static int edgeSize = 0;
 	
 	public static Map<Integer, CCSSourceData> getNodes(){
 		return nodes;
+	}
+	
+	public static Map<Integer, CCSEdgeData> getEdges(){
+		return edges;
 	}
 	
 	public static CCSSourceData getNode(int index){
 		return nodes.get(index);
 	}
 	
+	public static CCSEdgeData getEdge(int index){
+		return edges.get(index);
+	}
+	
 	public static CCSSourceData deleteNode(int index){
 		return nodes.put(index, null);
 	}
 	
-	public static int addNode(CCSSourceData sourceData){
-		nodes.put(nodeSize, sourceData);
-		nodeSize++;
-		return nodeSize-1;
+	public static CCSEdgeData deleteEdge(int index){
+		return edges.put(index, null);
 	}
 	
+	public static CCSSourceData addNode(CCSSourceData sourceData){
+		nodes.put(nodeSize, sourceData);
+		nodeSize++;
+		sourceData.setIndex(nodeSize-1);
+		return sourceData;
+	}
 	
-	
-	
+	public static CCSEdgeData addEdge(CCSEdgeData edgeData){
+		edges.put(edgeSize, edgeData);
+		edgeSize++;
+		edgeData.setIndex(edgeSize-1);
+		return edgeData;
+	}
+		
 	public static String getLoadedFileName() {
 		return loadedFileName;
 	}

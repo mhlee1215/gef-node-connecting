@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import ac.kaist.ccs.base.DoublePair;
+import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.fig.FigCO2SourceNode;
 import ac.kaist.ccs.fig.FigPlantNode;
@@ -14,20 +15,26 @@ import ac.kaist.ccs.fig.FigHubNode;
 import ac.kaist.ccs.fig.FigJointNode;
 
 public class CCSSourceData extends CCSNodeData {
-		
+	
+
 	int index;
 	float co2_amount;
-	CCSSourceData clusterHub;
-	CCSSourceData dst;
-	private CCSEdgeData edge;
 	float cost;
 	float rank;
+	int terrain_type;
+	
+	int clusterHub;
+	int dst;
+	int edge;
+	
+	
 
 	public CCSEdgeData connectTo(CCSSourceData dstNode){
 		//this.edge = new CCSEdgeData(this, dstNode);
 		CCSEdgeData e = new CCSEdgeData(this, dstNode);
-		this.dst = dstNode;
-		this.edge = e;
+		this.dst = dstNode.getIndex();
+		e = UiGlobals.addEdge(e);
+		this.edge = e.getIndex();
 		return e;
 	}
 	
@@ -39,10 +46,12 @@ public class CCSSourceData extends CCSNodeData {
 		this.index = index;
 	}
 
-	public CCSSourceData(int x, int y) {
+	public CCSSourceData(int x, int y, int co2_amount, int terrain_type) {
 		super(x, y, CCSNodeData.TYPE_SOURCE);		
 		int size = 7;
 		node = new FigCO2SourceNode(x, y, size, size);
+		this.co2_amount = co2_amount;
+		this.terrain_type = terrain_type;
 	}
 
 	public float getRank() {
@@ -66,27 +75,27 @@ public class CCSSourceData extends CCSNodeData {
 
 
 	public CCSEdgeData getEdge() {
-		return edge;
+		return UiGlobals.getEdge(edge);
 	}
 
 	public void setEdge(CCSEdgeData edge) {
-		this.edge = edge;
+		this.edge = edge.getIndex();
 	}
 
 	public CCSSourceData getClusterHub() {
-		return clusterHub;
+		return UiGlobals.getNode(clusterHub);
 	}
 
 	public void setClusterHub(CCSSourceData clusterHub) {
-		this.clusterHub = clusterHub;
+		this.clusterHub = clusterHub.getIndex();
 	}
 
 	public CCSSourceData getDst() {
-		return dst;
+		return UiGlobals.getNode(dst);
 	}
 
 	public void setDst(CCSSourceData dst) {
-		this.dst = dst;
+		this.dst = dst.getIndex();
 	}
 
 	public float getCost() {

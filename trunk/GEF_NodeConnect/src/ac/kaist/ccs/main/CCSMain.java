@@ -1,7 +1,6 @@
 package ac.kaist.ccs.main;
 
 import ilog.concert.IloException;
-import ilog.cplex.IloCplex;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -78,11 +77,9 @@ import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSHubData;
 import ac.kaist.ccs.domain.CCSJointData;
 import ac.kaist.ccs.domain.CCSNodeData;
-import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
-import ac.kaist.ccs.ui.LoadingProgressBarNode;
-import ac.kaist.ccs.ui.LoadingWorker;
+import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.ui.NodePaletteFig;
 import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
@@ -121,6 +118,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	private JMenuBar _menubar = new JMenuBar();
 
 	BufferedImage refImage = null;
+	BufferedImage refTerrainImage = null;
 
 	public CCSMain() throws Exception {
 
@@ -136,6 +134,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		ResourceLoader.addResourceLocation("/org/tigris/gef/Images");
 
 		UiGlobals.init();
+		CCSStatics.init();
 
 		try {
 			UIManager
@@ -236,7 +235,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		// Insert Loading data
 		if (ccsData == null) {
 			// ccsData = makeRandomData(300, 500, 500);
-			ccsData = makeRefRandomData(refImage);
+			ccsData = makeRefRandomData(refImage, refTerrainImage);
 			// return;
 		}
 		if (ccsConData == null) {
@@ -246,7 +245,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			ccsConData = makeBackboneCon(ccsData);
 			// ccsConData = makeHybridCon(ccsData);
 		}
-
+		System.out.println("Randering!");
 		NodeRenderManager nodeRenderManager = new NodeRenderManager(ccsData,
 				ccsConData, _graph);
 		nodeRenderManager.init(_width, _height);
@@ -275,7 +274,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		int blue = (pixel) & 0xff;
 		// System.out.println("argb: " + alpha + ", " + red + ", " + green +
 		// ", " + blue);\
-		return new Color(alpha, red, green, blue);
+		return new Color(red, green, blue);
 	}
 
 	public Color getColorBin(Color c, List<Color> colorBinList, double threshold) {
@@ -294,7 +293,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	}
 
 	public Map<Integer, List<CCSSourceData>> makeRefRandomData(
-			BufferedImage refImage) {
+			BufferedImage refImage, BufferedImage refTerrainImage) {
 
 		Map<Integer, List<CCSSourceData>> ccsData = new HashMap<Integer, List<CCSSourceData>>();
 		Random random = new Random();
@@ -304,9 +303,10 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		System.out.println("height : " + h + ", width:" + w);
 
-		Map<Color, List<Dimension>> colorIdxMap = new HashMap<Color, List<Dimension>>();
+		Map<Dimension, Integer> terrianTypexMap = new HashMap<Dimension, Integer>();
+		Map<Integer, List<Dimension>> regionIdxMap = new HashMap<Integer, List<Dimension>>();
 		List<Color> colorBinList = new ArrayList<Color>();
-		double threshold = 10;
+		//double threshold = 10;
 
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {
@@ -314,64 +314,84 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				Dimension loc = new Dimension(j, i);
 				int pixel = refImage.getRGB(j, i);
 				Color c = getPixelARGB(pixel);
+				Integer region_idx = CCSStatics.regionColorMap.get(c);
+				//Skip unrecognized region.
+				if(region_idx == null) continue;
+				
+				int pixelTerrain = refTerrainImage.getRGB(j,  i);
+				Color tColor = getPixelARGB(pixelTerrain);
+				//if(CCSStatics.terrainColorMap.get(tColor) == null)
+				//	System.out.println("tColor:"+tColor+", "+CCSStatics.terrainColorMap);
+				terrianTypexMap.put(loc, CCSStatics.terrainColorMap.get(tColor));
+				
+				
 
-				Color cBin = getColorBin(c, colorBinList, threshold);
-				if (cBin == null) {
-					cBin = c;
-					colorBinList.add(c);
+				if(region_idx != null){
+					List<Dimension> locList = regionIdxMap.get(region_idx);
+					if (locList == null) {
+						locList = new ArrayList<Dimension>();
+						regionIdxMap.put(region_idx, locList);
+					}
+					locList.add(loc);
 				}
+				
+//				Color cBin = getColorBin(c, colorBinList, threshold);
+//				if (cBin == null) {
+//					cBin = c;
+//					colorBinList.add(c);
+//				}
 
-				List<Dimension> locList = colorIdxMap.get(cBin);
-				if (locList == null) {
-					locList = new ArrayList<Dimension>();
-					colorIdxMap.put(c, locList);
-				}
-				locList.add(loc);
+//				List<Dimension> locList = colorIdxMap.get(cBin);
+//				if (locList == null) {
+//					locList = new ArrayList<Dimension>();
+//					colorIdxMap.put(c, locList);
+//				}
+//				locList.add(loc);
 			}
 		}
 
 		System.out.println("colorIdxMap key Size:"
-				+ colorIdxMap.keySet().size());
+				+ regionIdxMap.keySet().size());
 		// System.out.println("colorIdxMap:"+colorIdxMap.get(colorBinList.get(0)));
 
 		// int pixel = image.getRGB(j, i);
 		// printPixelARGB(pixel);
 
-		int sourcePerEachResgion = 10;
+		int sourcePerEachResgion = 100;
 		int hubPerEachRegion = 1;
 
 		List<CCSSourceData> sourceData = new ArrayList<CCSSourceData>();
 		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
 
-		int cnt = 0;
-		for (int i = 0; i < colorBinList.size(); i++) {
-
-			Color ck = colorBinList.get(i);
-
-			// Filter background color
-			if (getColorDist(ck, new Color(255, 255, 255, 255)) < 10)
-				continue;
-			// Filter noise
-			List<Dimension> locList = colorIdxMap.get(ck);
-			if (locList.size() < 500)
-				continue;
-			cnt++;
-			System.out.println("locList: " + locList.size());
-			System.out.println("ck:" + ck);
-			System.out.println("cnt:" + cnt);
-
+		//System.out.println(CCSStatics.terrainColorMap);
+		
+		
+		//System.out.println(terrianTypexMap);
+		
+		for(Integer region_idx : regionIdxMap.keySet()){
+			List<Dimension> locList = regionIdxMap.get(region_idx);
+			
 			for (int count = 0; count < sourcePerEachResgion; count++) {
+				//System.out.println("size :"+locList.size());
 				Dimension curLoc = locList.get(random.nextInt(locList.size()));
 				locList.remove(curLoc);
 
 				int x = cvtLoc((int) curLoc.getWidth());
 				int y = cvtLoc((int) curLoc.getHeight());
-				CCSSourceData node = new CCSSourceData(x, y);
-				float co2 = random.nextInt(100);
+				int co2 = random.nextInt(100);
+				
+				Integer loc_terrain_type = terrianTypexMap.get(curLoc);
+				if(loc_terrain_type == null){
+					count--;
+					continue;
+				}
+
+				CCSSourceData node = new CCSSourceData(x, y, co2, loc_terrain_type);
+				
 				node.setCo2_amount(co2);
 				sourceData.add(node);
-				int index = UiGlobals.addNode(node);
-				node.setIndex(index);
+				UiGlobals.addNode(node);
+				//node.setIndex(index);
 
 			}
 
@@ -379,18 +399,24 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				Dimension curLoc = locList.get(random.nextInt(locList.size()));
 				locList.remove(curLoc);
 
+				Integer loc_terrain_type = terrianTypexMap.get(curLoc);
+				if(loc_terrain_type == null){
+					count--;
+					continue;
+				}
+				
 				int x = cvtLoc((int) curLoc.getWidth());
 				int y = cvtLoc((int) curLoc.getHeight());
 				int range = 100;
-				CCSSourceData node = new CCSHubData(x, y, range);
+				int co2 = random.nextInt(100);
+				CCSSourceData node = new CCSHubData(x, y, co2, loc_terrain_type, range);
 				hubData.add(node);
-				int index = UiGlobals.addNode(node);
-				node.setIndex(index);
+				UiGlobals.addNode(node);
+				//node.setIndex(index);
 			}
-
-			// break;
 		}
-
+	
+		System.out.println("COLOR END!");
 		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
 		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
 
@@ -408,12 +434,14 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		for (int count = 0; count < size; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSSourceData node = new CCSSourceData(x, y);
-			float co2 = random.nextInt(100);
-			node.setCo2_amount(co2);
+			int co2 = random.nextInt(100);
+			int terrain_type = random.nextInt(10);
+			
+			CCSSourceData node = new CCSSourceData(x, y, co2, terrain_type);
+			
 			sourceData.add(node);
-			int index = UiGlobals.addNode(node);
-			node.setIndex(index);
+			UiGlobals.addNode(node);
+			//node.setIndex(index);
 		}
 
 		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
@@ -421,10 +449,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
 			int range = 100;
-			CCSSourceData node = new CCSHubData(x, y, range);
+			int co2 = random.nextInt(100);
+			int terrain_type = random.nextInt(10);
+			CCSSourceData node = new CCSHubData(x, y, co2, terrain_type, range);
+			
 			hubData.add(node);
-			int index = UiGlobals.addNode(node);
-			node.setIndex(index);
+			UiGlobals.addNode(node);
+			//node.setIndex(index);
 		}
 
 		List<CCSSourceData> plantData = new ArrayList<CCSSourceData>();
@@ -433,8 +464,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			int y = cvtLoc(random.nextInt(maxHeight));
 			CCSSourceData node = new CCSPlantData(x, y);
 			plantData.add(node);
-			int index = UiGlobals.addNode(node);
-			node.setIndex(index);
+			UiGlobals.addNode(node);
+			//node.setIndex(index);
 		}
 
 		// List<CCSSourceData> jointData = new ArrayList<CCSSourceData>();
@@ -758,8 +789,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 						CCSSourceData node = getProjectionPoint(curHub,
 								maxDistSrc, curSrc);
 
-						int jointNodeIndex = UiGlobals.addNode(node);
-						node.setIndex(jointNodeIndex);
+						UiGlobals.addNode(node);
+						//node.setIndex(jointNodeIndex);
 
 						// maxDistSrc : 가장 먼 노드 (이미 연결되있음)
 						// node : joint 노드
@@ -781,9 +812,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		CCSSourceData justBeforeJoint = ref;
 
 		while (justBeforeJoint.getDst() != null) {
+			if(ref.getDst().getIndex() == justBeforeJoint.getDst().getIndex()) break;
 			if (dist(justBeforeJoint.getDst(), hub) < dist(joint, hub))
 				break;
 			justBeforeJoint = justBeforeJoint.getDst();
+			//System.out.println("HUL>..."+justBeforeJoint.getIndex()+", D1:"+dist(justBeforeJoint.getDst(), hub)+", D2"+dist(joint, hub));
 		}
 
 		joint.connectTo(justBeforeJoint.getDst());
@@ -959,6 +992,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		try {
 			refImage = ImageIO.read(this.getClass().getResource(
 					"/ac/kaist/ccs/images/korea_02.jpg"));
+			refTerrainImage = ImageIO.read(this.getClass().getResource(
+					"/ac/kaist/ccs/images/Terrain_1.png"));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

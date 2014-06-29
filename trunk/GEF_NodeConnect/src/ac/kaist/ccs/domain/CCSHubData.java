@@ -20,8 +20,8 @@ public class CCSHubData extends CCSSourceData {
 	int range;
 	List<Integer> childSources;
 	
-	public CCSHubData(int x, int y, int range) {
-		super(x, y);
+	public CCSHubData(int x, int y, int co2_amount, int terrain_type, int range) {
+		super(x, y, co2_amount, terrain_type);
 		this.type = CCSNodeData.TYPE_HUB;
 		this.range = range;
 		int size = 7;

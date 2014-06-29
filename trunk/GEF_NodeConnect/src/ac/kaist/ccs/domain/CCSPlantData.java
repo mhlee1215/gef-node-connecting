@@ -9,7 +9,7 @@ public class CCSPlantData extends CCSSourceData {
 	List<CCSSourceData> childHub;
 	
 	public CCSPlantData(int x, int y) {
-		super(x, y);
+		super(x, y, 0, 0);
 		this.type = CCSNodeData.TYPE_PLANT;
 		int size = 7;
 		node = new FigPlantNode(x, y, size, size);

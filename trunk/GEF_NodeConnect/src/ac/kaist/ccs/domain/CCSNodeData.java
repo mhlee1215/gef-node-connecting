@@ -28,28 +28,28 @@ public class CCSNodeData {
 
 	
 
-	public static CCSNodeData createNode(int x, int y, int type){
-		CCSNodeData a = null; //= new CCSNodeData(x, y, type);
-		switch (type) {
-		case TYPE_SOURCE:
-			a = new CCSSourceData(x, y);
-			break;
-		case TYPE_HUB:
-			a = new CCSNodeData(x, y, type);
-			break;
-		case TYPE_JOINT:
-			a = new CCSNodeData(x, y, type);
-			break;
-		case TYPE_PLANT:
-			a = new CCSNodeData(x, y, type);
-			break;
-		default:
-			a = new CCSNodeData(x, y, type);
-			break;
-
-		}
-		return a;
-	}
+//	public static CCSNodeData createNode(int x, int y, int type){
+//		CCSNodeData a = null; //= new CCSNodeData(x, y, type);
+//		switch (type) {
+//		case TYPE_SOURCE:
+//			a = new CCSSourceData(x, y);
+//			break;
+//		case TYPE_HUB:
+//			a = new CCSNodeData(x, y, type);
+//			break;
+//		case TYPE_JOINT:
+//			a = new CCSNodeData(x, y, type);
+//			break;
+//		case TYPE_PLANT:
+//			a = new CCSNodeData(x, y, type);
+//			break;
+//		default:
+//			a = new CCSNodeData(x, y, type);
+//			break;
+//
+//		}
+//		return a;
+//	}
 	
 	public CCSNodeData(int x, int y, int type) {
 		this.x = x;
