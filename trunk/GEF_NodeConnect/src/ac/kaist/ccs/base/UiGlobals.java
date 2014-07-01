@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXMultiSplitPane;
-import org.jdesktop.swingx.JXPanel;
 import org.tigris.gef.base.Globals;
+import org.tigris.gef.graph.presentation.JGraph;
 import org.tigris.gef.presentation.Fig;
 
 import ac.kaist.ccs.domain.CCSEdgeData;
@@ -29,6 +29,7 @@ import ac.kaist.ccs.ui.CNodeData;
 import ac.kaist.ccs.ui.NodeRenderManager;
 
 public class UiGlobals extends Globals{
+	public static JGraph graph;
 	public static String isExample = "N";
 	public static String exampleType = "1";
 	

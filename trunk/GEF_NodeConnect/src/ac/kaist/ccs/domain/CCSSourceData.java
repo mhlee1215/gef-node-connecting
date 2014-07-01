@@ -2,7 +2,9 @@ package ac.kaist.ccs.domain;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
@@ -27,6 +29,13 @@ public class CCSSourceData extends CCSNodeData {
 	int clusterHub;
 	int dst;
 	int edge;
+	
+	List<Integer> childSources;
+	
+	
+	public static int VIEW_TYPE_CO2 = 0;
+	public static int VIEW_TYPE_COST = 1;
+	public int viewType = VIEW_TYPE_CO2;
 	
 	
 
@@ -54,6 +63,7 @@ public class CCSSourceData extends CCSNodeData {
 		node.setOwner(this);
 		this.co2_amount = co2_amount;
 		this.terrain_type = terrain_type;
+		childSources = new ArrayList<Integer>();
 	}
 	
 	public CCSSourceData(int x, int y, float co2_amount, int industry_type, int terrain_type) {
@@ -61,8 +71,21 @@ public class CCSSourceData extends CCSNodeData {
 		this(x, y, co2_amount, terrain_type);
 		this.industry_type = industry_type;
 		
+		
 	}
 
+	public List<Integer> getChildSources() {
+		return childSources;
+	}
+
+	public void setChildSources(List<Integer> childSources) {
+		this.childSources = childSources;
+	}
+	
+	public void addChildSource(int childIndex){
+		this.childSources.add(childIndex);
+	}
+	
 	public float getRank() {
 		return rank;
 	}

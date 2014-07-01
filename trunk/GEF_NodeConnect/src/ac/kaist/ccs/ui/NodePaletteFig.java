@@ -33,6 +33,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -49,6 +52,7 @@ import org.tigris.gef.ui.ToolBar;
 
 import ac.kaist.ccs.base.CmdZoom;
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.domain.CCSSourceData;
 
 /**
  * A Palette that defines buttons to create lines, rectangles, rounded
@@ -105,9 +109,11 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
         //	add(new CmdShowFuncAssociate(), "FuncAssociatie", "funcAssociate", ToolBar.BUTTON_TYPE_TEXT);
         //add(new CmdShowAbout(), "Show About", "about1", ToolBar.BUTTON_TYPE_NO_TEXT);
         
-        
-        
-       
+        String[] viewTypeStrings = {"CO2 Amount", "Cost"}; 
+        JComboBox viewTypeCombo = new JComboBox(viewTypeStrings);
+        viewTypeCombo.setName("ViewTypeCombo");
+        add(viewTypeCombo);
+        viewTypeCombo.addActionListener(this);
 		//add(resetButton);
 		
 		
@@ -125,8 +131,26 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
 			
 		}
 		else if(s instanceof JComboBox){
-		    JComboBox cb = (JComboBox)s;
-		    String scaleName = (String)cb.getSelectedItem();
+			JComboBox cb = (JComboBox)s;
+			if("ViewTypeCombo".equals(cb.getName())){
+				System.out.println("Selected view type : "+cb.getSelectedIndex());	
+				
+				Map<Integer, CCSSourceData> nodesAll = UiGlobals.getNodes();
+	            List<CCSSourceData> nodeList = new ArrayList<CCSSourceData>();
+	            for(Integer key : nodesAll.keySet()){
+	            	if(nodesAll.get(key) != null){
+	            		if(cb.getSelectedIndex() == CCSSourceData.VIEW_TYPE_CO2){
+	            			nodesAll.get(key).viewType = CCSSourceData.VIEW_TYPE_CO2;
+	    				}else if(cb.getSelectedIndex() == CCSSourceData.VIEW_TYPE_COST){
+	    					nodesAll.get(key).viewType = CCSSourceData.VIEW_TYPE_COST;
+	    				}
+	            		 
+	            	}
+	            }
+				
+	            UiGlobals.graph.getEditor().damageAll();
+			}
+		    
 		}
 	}
 

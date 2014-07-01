@@ -1054,6 +1054,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		this.setWestToolBar(westBar);
 
 		_graph = jg;
+		UiGlobals.graph = _graph;
 
 		editor = _graph.getEditor();
 		// _graph.setBackground(Color.white);

@@ -38,6 +38,10 @@ import java.util.Vector;
 import org.tigris.gef.base.Geometry;
 import org.tigris.gef.presentation.Fig;
 
+import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.domain.CCSEdgeData;
+import ac.kaist.ccs.domain.CCSNodeData;
+
 /** Class to display lines in diagrams. */
 
 public class FigCCSLine extends Fig {
@@ -355,6 +359,17 @@ public class FigCCSLine extends Fig {
 
         if (lineWidth <= 0)
             return;
+        
+        CCSEdgeData edgeData = (CCSEdgeData) this.getOwner();
+        CCSNodeData srcNode = UiGlobals.getNode(edgeData.getSrc());
+        CCSNodeData dstNode = UiGlobals.getNode(edgeData.getDst());
+        
+        _x1 = srcNode.getX();
+        _y1 = srcNode.getY();
+        
+        _x2 = dstNode.getX();
+        _y2 = dstNode.getY();
+        
 
         if (dashed) {
             g.setColor(lineColor);
