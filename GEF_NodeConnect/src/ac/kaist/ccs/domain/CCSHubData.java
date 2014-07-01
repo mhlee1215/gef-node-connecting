@@ -18,7 +18,7 @@ import ac.kaist.ccs.fig.FigJointNode;
 public class CCSHubData extends CCSSourceData {
 		
 	int range;
-	List<Integer> childSources;
+	
 	
 	public CCSHubData(int x, int y, int co2_amount, int terrain_type, int range) {
 		super(x, y, co2_amount, terrain_type);
@@ -27,7 +27,7 @@ public class CCSHubData extends CCSSourceData {
 		int size = 7;
 		node = new FigHubNode(x, y, size, size, range);
 		node.setOwner(this);
-		childSources = new ArrayList<Integer>();
+		
 	}
 	
 	public int getRange() {
@@ -38,17 +38,7 @@ public class CCSHubData extends CCSSourceData {
 		this.range = range;
 	}
 
-	public List<Integer> getChildSources() {
-		return childSources;
-	}
-
-	public void setChildSources(List<Integer> childSources) {
-		this.childSources = childSources;
-	}
 	
-	public void addChildSource(int childIndex){
-		this.childSources.add(childIndex);
-	}
 
 	@Override
 	public String toString() {

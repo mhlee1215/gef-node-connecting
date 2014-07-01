@@ -190,22 +190,28 @@ public class FigSourceNode extends FigCCSNode {
 	    	
 	    	
 	    	CCSSourceData sData = (CCSSourceData) this.getOwner();
-			if(sData.getCo2_amount() < 100){
+	    	float magnitude = 0.0f;
+	    	if(sData.viewType == CCSSourceData.VIEW_TYPE_CO2)
+	    		magnitude = sData.getCo2_amount();
+	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_COST)
+	    		magnitude = sData.getCost();
+	    	
+			if(magnitude < 100){
 				_w = 5;
 				_h = 5;
-			}else if(sData.getCo2_amount() < 500){
+			}else if(magnitude < 500){
 				_w = 9;
 				_h = 9;
-			}else if(sData.getCo2_amount() < 1000){
+			}else if(magnitude < 1000){
 				_w = 13;
 				_h = 13;
-			}else if(sData.getCo2_amount() < 3000){
+			}else if(magnitude < 3000){
 				_w = 15;
 				_h = 15;
-			}else if(sData.getCo2_amount() < 5000){
+			}else if(magnitude < 5000){
 				_w = 17;
 				_h = 17;
-			}else if(sData.getCo2_amount() < 7000){
+			}else if(magnitude < 7000){
 				_w = 19;
 				_h = 19;
 			}else{
