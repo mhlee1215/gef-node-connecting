@@ -9,7 +9,7 @@ import java.util.Vector;
 import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.fig.FigCCSNode;
-import ac.kaist.ccs.fig.FigCO2SourceNode;
+import ac.kaist.ccs.fig.FigSourceNode;
 import ac.kaist.ccs.fig.FigPlantNode;
 import ac.kaist.ccs.fig.FigHubNode;
 import ac.kaist.ccs.fig.FigJointNode;
@@ -22,7 +22,8 @@ public class CCSSourceData extends CCSNodeData {
 	float cost;
 	float rank;
 	int terrain_type;
-	
+	int industry_type;
+
 	int clusterHub;
 	int dst;
 	int edge;
@@ -46,12 +47,20 @@ public class CCSSourceData extends CCSNodeData {
 		this.index = index;
 	}
 
-	public CCSSourceData(int x, int y, int co2_amount, int terrain_type) {
+	public CCSSourceData(int x, int y, float co2_amount, int terrain_type) {
 		super(x, y, CCSNodeData.TYPE_SOURCE);		
 		int size = 7;
-		node = new FigCO2SourceNode(x, y, size, size);
+		node = new FigSourceNode(x, y, size, size);
+		node.setOwner(this);
 		this.co2_amount = co2_amount;
 		this.terrain_type = terrain_type;
+	}
+	
+	public CCSSourceData(int x, int y, float co2_amount, int industry_type, int terrain_type) {
+		//super(x, y, CCSNodeData.TYPE_SOURCE);
+		this(x, y, co2_amount, terrain_type);
+		this.industry_type = industry_type;
+		
 	}
 
 	public float getRank() {
@@ -90,6 +99,38 @@ public class CCSSourceData extends CCSNodeData {
 		this.clusterHub = clusterHub.getIndex();
 	}
 
+	public int getTerrain_type() {
+		return terrain_type;
+	}
+	
+	public String getTerrain_typeStringShort() {
+		return CCSStatics.terrainTypeStringShortMap.get(this.terrain_type);
+	}
+	
+	public String getTerrain_typeString() {
+		return CCSStatics.terrainTypeStringMap.get(this.terrain_type);
+	}
+
+	public void setTerrain_type(int terrain_type) {
+		this.terrain_type = terrain_type;
+	}
+
+	public int getIndustry_type() {
+		return industry_type;
+	}
+	
+	public String getIndustry_typeString() {
+		return CCSStatics.plantTypeStringMap.get(industry_type);
+	}
+	
+	public String getIndustry_typeStringShort() {
+		return CCSStatics.plantTypeStringShortMap.get(industry_type);
+	}
+
+	public void setIndustry_type(int industry_type) {
+		this.industry_type = industry_type;
+	}
+
 	public CCSSourceData getDst() {
 		return UiGlobals.getNode(dst);
 	}
@@ -112,9 +153,12 @@ public class CCSSourceData extends CCSNodeData {
 
 	@Override
 	public String toString() {
-		return "CCSSourceData [index=" + index + ", co2_amount=" + co2_amount
-				+ ", clusterHub=" + clusterHub + ", dst=" + dst + ", edge="
-				+ edge + ", cost=" + cost + ", rank=" + rank + "]";
+		return "{\"index\":\"" + index + "\", \"co2_amount\":\"" + co2_amount
+				+ "\", \"cost\":\"" + cost + "\", \"rank\":\"" + rank
+				+ "\", \"terrain_type\":\"" + terrain_type
+				+ "\", \"industry_type\":\"" + industry_type
+				+ "\", \"clusterHub\":\"" + clusterHub + "\", \"dst\":\"" + dst
+				+ "\", \"edge\":\"" + edge + "\"}";
 	}
 	
 	

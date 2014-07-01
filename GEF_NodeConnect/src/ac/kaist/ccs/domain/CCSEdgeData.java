@@ -22,6 +22,7 @@ public class CCSEdgeData {
 		
 		Color lineColor = new Color(125, 125, 125);
 		edgeFig = new FigCCSLine(src.x+src.getNode().getWidth()/2, src.y+src.getNode().getHeight()/2, dst.x+dst.getNode().getWidth()/2, dst.y+dst.getNode().getHeight()/2, lineColor);
+		edgeFig.setOwner(this);
 	}
 	
 	public int getIndex() {

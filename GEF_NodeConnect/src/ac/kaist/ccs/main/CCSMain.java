@@ -80,6 +80,7 @@ import ac.kaist.ccs.domain.CCSNodeData;
 import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSStatics;
+import ac.kaist.ccs.domain.CCSStatics.PlantData;
 import ac.kaist.ccs.ui.NodePaletteFig;
 import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
@@ -305,8 +306,14 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		Map<Dimension, Integer> terrianTypexMap = new HashMap<Dimension, Integer>();
 		Map<Integer, List<Dimension>> regionIdxMap = new HashMap<Integer, List<Dimension>>();
-		List<Color> colorBinList = new ArrayList<Color>();
-		//double threshold = 10;
+		
+		List<Color> terrainColorBinList = new ArrayList<Color>();
+		for(Color key : CCSStatics.terrainColorMap.keySet()){
+			terrainColorBinList.add(key);
+		}
+		
+		
+		double threshold = 10;
 
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {
@@ -320,11 +327,10 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				
 				int pixelTerrain = refTerrainImage.getRGB(j,  i);
 				Color tColor = getPixelARGB(pixelTerrain);
-				//if(CCSStatics.terrainColorMap.get(tColor) == null)
-				//	System.out.println("tColor:"+tColor+", "+CCSStatics.terrainColorMap);
-				terrianTypexMap.put(loc, CCSStatics.terrainColorMap.get(tColor));
 				
+				Color tBin = getColorBin(tColor, terrainColorBinList, threshold);
 				
+				terrianTypexMap.put(loc, CCSStatics.terrainColorMap.get(tBin));
 
 				if(region_idx != null){
 					List<Dimension> locList = regionIdxMap.get(region_idx);
@@ -369,51 +375,104 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		//System.out.println(terrianTypexMap);
 		
 		for(Integer region_idx : regionIdxMap.keySet()){
+			
+			List<PlantData> plantList = CCSStatics.plantInfoMap.get(region_idx);
 			List<Dimension> locList = regionIdxMap.get(region_idx);
 			
-			for (int count = 0; count < sourcePerEachResgion; count++) {
-				//System.out.println("size :"+locList.size());
-				Dimension curLoc = locList.get(random.nextInt(locList.size()));
-				locList.remove(curLoc);
-
-				int x = cvtLoc((int) curLoc.getWidth());
-				int y = cvtLoc((int) curLoc.getHeight());
-				int co2 = random.nextInt(100);
+			for(PlantData plantData : plantList){
 				
-				Integer loc_terrain_type = terrianTypexMap.get(curLoc);
-				if(loc_terrain_type == null){
-					count--;
-					continue;
-				}
-
-				CCSSourceData node = new CCSSourceData(x, y, co2, loc_terrain_type);
+				List<Float> portions = getRandomPortions(plantData.plant_num);
+				for (int plant_count = 0; plant_count < plantData.plant_num; plant_count++) {
+					float cur_co2 = portions.get(plant_count) * plantData.co2_amount;
 				
-				node.setCo2_amount(co2);
-				sourceData.add(node);
-				UiGlobals.addNode(node);
-				//node.setIndex(index);
+					Dimension curLoc = locList.get(random.nextInt(locList.size()));
+					locList.remove(curLoc);
+					
+					int x = cvtLoc((int) curLoc.getWidth());
+					int y = cvtLoc((int) curLoc.getHeight());
+					
+					
+					Integer loc_terrain_type = terrianTypexMap.get(curLoc);
+					if(loc_terrain_type == null){
+						plant_count--;
+						continue;
+					}
 
-			}
-
-			for (int count = 0; count < hubPerEachRegion; count++) {
-				Dimension curLoc = locList.get(random.nextInt(locList.size()));
-				locList.remove(curLoc);
-
-				Integer loc_terrain_type = terrianTypexMap.get(curLoc);
-				if(loc_terrain_type == null){
-					count--;
-					continue;
+					CCSSourceData node = new CCSSourceData(x, y, cur_co2, plantData.industry_type, loc_terrain_type);
+					
+					sourceData.add(node);
+					UiGlobals.addNode(node);
 				}
 				
-				int x = cvtLoc((int) curLoc.getWidth());
-				int y = cvtLoc((int) curLoc.getHeight());
-				int range = 100;
-				int co2 = random.nextInt(100);
-				CCSSourceData node = new CCSHubData(x, y, co2, loc_terrain_type, range);
-				hubData.add(node);
-				UiGlobals.addNode(node);
-				//node.setIndex(index);
+				for (int count = 0; count < hubPerEachRegion; count++) {
+					Dimension curLoc = locList.get(random.nextInt(locList.size()));
+					locList.remove(curLoc);
+
+					Integer loc_terrain_type = terrianTypexMap.get(curLoc);
+					if(loc_terrain_type == null){
+						count--;
+						continue;
+					}
+					
+					int x = cvtLoc((int) curLoc.getWidth());
+					int y = cvtLoc((int) curLoc.getHeight());
+					int range = 100;
+					int co2 = random.nextInt(100);
+					CCSSourceData node = new CCSHubData(x, y, co2, loc_terrain_type, range);
+					hubData.add(node);
+					UiGlobals.addNode(node);
+					//node.setIndex(index);
+				}
+				
+				
 			}
+			
+			
+			
+//			for (int count = 0; count < sourcePerEachResgion; count++) {
+//				System.out.println("size :"+locList.size());
+//				
+//				Dimension curLoc = locList.get(random.nextInt(locList.size()));
+//				locList.remove(curLoc);
+//
+//				int x = cvtLoc((int) curLoc.getWidth());
+//				int y = cvtLoc((int) curLoc.getHeight());
+//				int co2 = random.nextInt(100);
+//				
+//				Integer loc_terrain_type = terrianTypexMap.get(curLoc);
+//				if(loc_terrain_type == null){
+//					count--;
+//					continue;
+//				}
+//
+//				CCSSourceData node = new CCSSourceData(x, y, co2, loc_terrain_type);
+//				
+//				node.setCo2_amount(co2);
+//				sourceData.add(node);
+//				UiGlobals.addNode(node);
+//				//node.setIndex(index);
+//
+//			}
+//
+//			for (int count = 0; count < hubPerEachRegion; count++) {
+//				Dimension curLoc = locList.get(random.nextInt(locList.size()));
+//				locList.remove(curLoc);
+//
+//				Integer loc_terrain_type = terrianTypexMap.get(curLoc);
+//				if(loc_terrain_type == null){
+//					count--;
+//					continue;
+//				}
+//				
+//				int x = cvtLoc((int) curLoc.getWidth());
+//				int y = cvtLoc((int) curLoc.getHeight());
+//				int range = 100;
+//				int co2 = random.nextInt(100);
+//				CCSSourceData node = new CCSHubData(x, y, co2, loc_terrain_type, range);
+//				hubData.add(node);
+//				UiGlobals.addNode(node);
+//				//node.setIndex(index);
+//			}
 		}
 	
 		System.out.println("COLOR END!");
@@ -421,6 +480,26 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
 
 		return ccsData;
+	}
+	
+	public List<Float> getRandomPortions(int pie_num){
+		List<Integer> portions_int = new ArrayList<Integer>();
+		List<Float> portions = new ArrayList<Float>();
+		
+		Random rand = new Random();
+		
+		int sum = 0;
+		for(int i = 0 ; i < pie_num ; i ++){
+			int cur_val = rand.nextInt(100);
+			sum+=cur_val;
+			portions_int.add(cur_val);
+		}
+		
+		for(int i = 0 ; i < pie_num ; i ++){
+			portions.add(portions_int.get(i) / (float)sum);
+		}
+
+		return portions;
 	}
 
 	public Map<Integer, List<CCSSourceData>> makeRandomData(int size,
@@ -994,6 +1073,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 					"/ac/kaist/ccs/images/korea_02.jpg"));
 			refTerrainImage = ImageIO.read(this.getClass().getResource(
 					"/ac/kaist/ccs/images/Terrain_1.png"));
+			
+			CCSStatics.refImg = refImage;
+			CCSStatics.refTerrainImg = refTerrainImage;
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

@@ -77,6 +77,7 @@ public class LayerGrid extends Layer {
      * works much faster.
      */
     private transient Image _stamp = null;
+    private transient Image _stampOri = null;
 
     /** The size of the image stamp. */
     private int _stampWidth = 1000, _stampHeight = 1000;
@@ -351,7 +352,7 @@ public class LayerGrid extends Layer {
     public void adjust(HashMap map) {
         super.adjust(map);
         Object m;
-        _stamp = null;
+        //_stamp = null;
         setHidden(false);
         
         System.out.println("map:"+map);

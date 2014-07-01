@@ -46,10 +46,10 @@
 
 package ac.kaist.ccs.fig;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -78,60 +78,29 @@ import ac.kaist.ccs.base.CmdGetNodes;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSSourceData;
+import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.ui.CNodeData;
 
 /**
  * Primitive Fig for displaying circles and ovals.
  * @author ics125
  */
-public class FigHubNode extends FigCCSNode {
+public class FigSourceNode extends FigCCSNode {
 	
-	int hubRange;
+	//Color borderColor = new Color(84, 255, 61);//Color.black;
 	
-	//Color borderColor = new Color(255, 176, 41);//Color.black;
-	
-	public FigHubNode(int x, int y, int w, int h, int range) {
+	public FigSourceNode(int x, int y, int w, int h) {
 		super(x, y, w, h);
-		this.hubRange = range;
-		this.borderColor = new Color(255, 176, 41);
+		
+		borderColor = new Color(84, 255, 61);
 		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public String toString() {
-		return "FigHubNode [hubRange=" + hubRange + ", borderColor="
-				+ borderColor + "]";
+		return "FigCO2SourceNode [borderColor=" + borderColor + "]";
 	}
 	
-	@Override
-	public void paint(Graphics g) {
-		// TODO Auto-generated method stub
-		
-		
-		if(visible){
-			Graphics2D g2 = (Graphics2D)g.create();
-			g2.setRenderingHint(
-			RenderingHints.KEY_ANTIALIASING,
-			RenderingHints.VALUE_ANTIALIAS_ON);
-			
-			Color old = g2.getColor();
-			g2.setComposite(makeComposite(0.15f));
-	    	g2.setColor(borderColor);
-	    	g2.setStroke(borderStroke);
-	    	g2.fillOval(getX()-hubRange+getWidth()/2, getY()-hubRange+getHeight()/2, hubRange*2, hubRange*2);
-	    	
-	    	g2.setColor(old);
-		}
-		
-		super.paint(g);
-	}
-	
-	private AlphaComposite makeComposite(float alpha) {
-		  int type = AlphaComposite.SRC_OVER;
-		  return(AlphaComposite.getInstance(type, alpha));
-		 }
-
 	public Vector getPopUpActions(MouseEvent me) {
         Vector popUpActions = new Vector();
         
@@ -143,9 +112,11 @@ public class FigHubNode extends FigCCSNode {
         
         CCSSourceData sourceData = (CCSSourceData) this.getOwner();
      
-        int nodeCount = 1;
+        int nodeCount = 3;
         
         nodeStr = "CO2: "+Float.toString(sourceData.getCo2_amount());
+        nodeStr += "<br>Industry Type: "+sourceData.getIndustry_typeString();
+        nodeStr += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
         
 //        for(int count = 0 ; count < list.size() ; count++)
 //        {
@@ -177,7 +148,7 @@ public class FigHubNode extends FigCCSNode {
         	name.setPreferredSize(new Dimension(120, (nodeCount+2)*24));
         else
         	name.setPreferredSize(new Dimension(120, (nodeCount)*24));
-        name.setToolTipText("hihi");
+        name.setToolTipText("The source properties are displayed.");
         name.setOpaque(true);
         name.setBackground(new Color(255, 255, 221));
         name.setFocusable(false);
@@ -202,10 +173,76 @@ public class FigHubNode extends FigCCSNode {
         return popUpActions;
     }
 	
+	@Override
+	public void paint(Graphics g) {
+    	if(visible){
+	    	//g.draw
+	       // drawRect(g, isFilled(), getFillColor(), getLineWidth(), getLineColor(), getX(), getY(), getWidth(),
+	        //        getHeight(), getDashed(), _dashes, _dashPeriod);
+	    	
+	    	Graphics2D g2 = (Graphics2D)g.create();
+			g2.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+					
+	    	Color old = g2.getColor();
+	    	g2.setColor(coreColor);
+	    	
+	    	
+	    	CCSSourceData sData = (CCSSourceData) this.getOwner();
+			if(sData.getCo2_amount() < 100){
+				_w = 5;
+				_h = 5;
+			}else if(sData.getCo2_amount() < 500){
+				_w = 9;
+				_h = 9;
+			}else if(sData.getCo2_amount() < 1000){
+				_w = 13;
+				_h = 13;
+			}else if(sData.getCo2_amount() < 3000){
+				_w = 15;
+				_h = 15;
+			}else if(sData.getCo2_amount() < 5000){
+				_w = 17;
+				_h = 17;
+			}else if(sData.getCo2_amount() < 7000){
+				_w = 19;
+				_h = 19;
+			}else{
+				_w = 21;
+				_h = 21;
+			}
+	    	
+	    	
+	    	g2.fillOval(getX(), getY(), getWidth(), getHeight());
+	    	
+	    	g2.setColor(borderColor);
+	    	g2.setStroke(borderStroke);
+	    	g2.drawOval(getX(), getY(), getWidth(), getHeight());
+	    	
+	    	g2.setColor(old);
+	    	
+	    	if(this.getOwner() instanceof CCSSourceData){
+	    		Font oldFont = g2.getFont();
+	    		
+	    		g2.setFont(new Font("TimesRoman", Font.PLAIN, 5)); 
+	    		CCSSourceData owner = (CCSSourceData) getOwner();
+	    		Color fontColor = new Color(0, 0, 0);
+	    		g2.setColor(fontColor);
+	    		
+	    		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		        RenderingHints.VALUE_ANTIALIAS_ON);
+
+	    		String propertyStr = owner.getIndustry_typeString()+","+owner.getTerrain_typeStringShort();
+	    		//String propertyStr = Integer.toString(owner.getIndustry_type())+","+CCSStatics.terrainTypeStringMap.get(owner.getTerrain_type());
+	    		
+		        g2.drawString(propertyStr,getX()+4,getY()-4);
+		        
+		        g2.setColor(old);
+		        g2.setFont(oldFont);
+	    	}
+    	}
+    }
+
 	
-	
-	
-    
-    
-    
 } /* end class FigCircle */

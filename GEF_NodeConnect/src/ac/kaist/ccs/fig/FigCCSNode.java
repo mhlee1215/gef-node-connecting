@@ -76,6 +76,8 @@ import org.tigris.gef.util.Localizer;
 import ac.kaist.ccs.base.CmdGetNodes;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.domain.CCSSourceData;
+import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.ui.CNodeData;
 
 /**
@@ -191,62 +193,67 @@ public class FigCCSNode extends FigRect implements MouseListener {
         Vector popUpActions = new Vector();
         
         Editor editor = UiGlobals.curEditor();
-        List<Fig> list = editor.getSelectionManager().getSelectedFigs();
+        //List<Fig> list = editor.getSelectionManager().getSelectedFigs();
         String nodeStr = "";
         String prefix = "<html><body style=\"background-color: #ffffdd\"><h3><font color=#000000><span >";
         String postfix = "</span></font></h3></body></html>";
+        
+        CCSSourceData sourceData = (CCSSourceData) this.getOwner();
      
-        int nodeCount = 0;
+        int nodeCount = 1;
         
-        for(int count = 0 ; count < list.size() ; count++)
-        {
-        	Fig node = list.get(count);
-
-        	Object desc = node.getOwner();
-        	if(desc instanceof NodeDescriptor)
-        	{
-        		
-        		NodeDescriptor nodeDesc = (NodeDescriptor)desc;
-        		System.out.println("name : "+nodeDesc.getName()+", "+node.getLocation());
-        		if(count == 0)
-        			nodeStr = nodeDesc.getName();
-        		else if(count < 6)
-        			nodeStr += "<br>&nbsp;"+nodeDesc.getName();
-        		else {
-        			nodeStr += "<br>&nbsp;...<br>&nbsp;...<br>&nbsp;Total "+list.size()+" nodes";
-        			break;
-        		}
-        		nodeCount++;
-        	}
-        }
+        nodeStr = "CO2: "+Float.toString(sourceData.getCo2_amount());
+        
+//        for(int count = 0 ; count < list.size() ; count++)
+//        {
+//        	Fig node = list.get(count);
+//
+//        	Object desc = node.getOwner();
+//        	if(desc instanceof NodeDescriptor)
+//        	{
+//        		
+//        		NodeDescriptor nodeDesc = (NodeDescriptor)desc;
+//        		System.out.println("name : "+nodeDesc.getName()+", "+node.getLocation());
+//        		if(count == 0)
+//        			nodeStr = nodeDesc.getName();
+//        		else if(count < 6)
+//        			nodeStr += "<br>&nbsp;"+nodeDesc.getName();
+//        		else {
+//        			nodeStr += "<br>&nbsp;...<br>&nbsp;...<br>&nbsp;Total "+list.size()+" nodes";
+//        			break;
+//        		}
+//        		nodeCount++;
+//        	}
+//        }
         
         
         
-        NodeDescriptor desc = (NodeDescriptor)this.getOwner();
+        //NodeDescriptor desc = (NodeDescriptor)this.getOwner();
         JLabel name = new JLabel(prefix+nodeStr+postfix);
         if(nodeCount > 5)
         	name.setPreferredSize(new Dimension(120, (nodeCount+2)*24));
         else
         	name.setPreferredSize(new Dimension(120, (nodeCount)*24));
-        name.setToolTipText(desc.getName());
+        name.setToolTipText("hihi");
         name.setOpaque(true);
         name.setBackground(new Color(255, 255, 221));
         name.setFocusable(false);
         
         //name.set
         
-        JMenu getMenu = new JMenu(Localizer.localize("PresentationGef",
-        "Get selected Node"));
-        
-        getMenu.add(new CmdGetNodes());
+//        JMenu getMenu = new JMenu(Localizer.localize("PresentationGef",
+//        "Get selected Node"));
+//        
+//        getMenu.add(new CmdGetNodes());
 
         
         
         
         //popUpActions.addElement(orderMenu);
         popUpActions.addElement(name);
-        popUpActions.addElement(new JSeparator());
-        popUpActions.addElement(getMenu);
+        
+        //popUpActions.addElement(new JSeparator());
+        //popUpActions.addElement(getMenu);
         //popUpActions.addElement(getClustering);
 
         return popUpActions;
@@ -255,47 +262,40 @@ public class FigCCSNode extends FigRect implements MouseListener {
     /** Paint this FigRect */
     public void paint(Graphics g) {
     	if(visible){
-    	//g.draw
-       // drawRect(g, isFilled(), getFillColor(), getLineWidth(), getLineColor(), getX(), getY(), getWidth(),
-        //        getHeight(), getDashed(), _dashes, _dashPeriod);
-    	
-    	Graphics2D g2 = (Graphics2D)g.create();
-		g2.setRenderingHint(
-		RenderingHints.KEY_ANTIALIASING,
-		RenderingHints.VALUE_ANTIALIAS_ON);
-		
-//		int w = getWidth();
-//		int h = getHeight();
-//		int arc = 4;
-//		int padding = 2;
-//		
-//		
-//		BufferedImage shadow = GraphicsUtilities.createCompatibleTranslucentImage(w+padding, h+padding);
-//		
-//		Graphics2D g3 = shadow.createGraphics();
-//	    g3.setColor(Color.white);
-//	    g3.fillRoundRect(0, 0, w+padding, h+padding, arc, arc);
-//	    g3.dispose();
-//	    
-//		int shadowSize = 1;
-//		Color shadowColor = Color.black;
-//		ShadowRenderer renderer = new ShadowRenderer(shadowSize, 0.5f, shadowColor);
-//	    shadow = renderer.createShadow(shadow);
-//	    
-//		//if(this.drawShadow){
-//		    g2.drawImage(shadow, getX()-padding, getY()-padding, getWidth()+padding, getHeight()+padding, null);
-//		//}
-		
-		
-    	Color old = g2.getColor();
-    	g2.setColor(coreColor);
-    	g2.fillOval(getX(), getY(), getWidth(), getHeight());
-    	
-    	g2.setColor(borderColor);
-    	g2.setStroke(borderStroke);
-    	g2.drawOval(getX(), getY(), getWidth(), getHeight());
-    	
-    	g2.setColor(old);
+	    	//g.draw
+	       // drawRect(g, isFilled(), getFillColor(), getLineWidth(), getLineColor(), getX(), getY(), getWidth(),
+	        //        getHeight(), getDashed(), _dashes, _dashPeriod);
+	    	
+	    	Graphics2D g2 = (Graphics2D)g.create();
+			g2.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+					
+	    	Color old = g2.getColor();
+	    	g2.setColor(coreColor);
+	    	g2.fillOval(getX(), getY(), getWidth(), getHeight());
+	    	
+	    	g2.setColor(borderColor);
+	    	g2.setStroke(borderStroke);
+	    	g2.drawOval(getX(), getY(), getWidth(), getHeight());
+	    	
+	    	g2.setColor(old);
+	    	
+	    	if(this.getOwner() instanceof CCSSourceData){
+	    		CCSSourceData owner = (CCSSourceData) getOwner();
+	    		Color fontColor = new Color(0, 0, 0);
+	    		g2.setColor(fontColor);
+	    		
+	    		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		        RenderingHints.VALUE_ANTIALIAS_ON);
+
+	    		String propertyStr = CCSStatics.plantTypeStringMap.get(owner.getIndustry_type())+","+CCSStatics.terrainTypeStringShortMap.get(owner.getTerrain_type());
+	    		//String propertyStr = Integer.toString(owner.getIndustry_type())+","+CCSStatics.terrainTypeStringMap.get(owner.getTerrain_type());
+	    		
+		        g2.drawString(propertyStr,getX()+4,getY()-4);
+		        
+		        g2.setColor(old);
+	    	}
     	}
     }
 

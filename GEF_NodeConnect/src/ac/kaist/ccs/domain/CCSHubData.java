@@ -10,7 +10,7 @@ import java.util.Vector;
 
 import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.fig.FigCCSNode;
-import ac.kaist.ccs.fig.FigCO2SourceNode;
+import ac.kaist.ccs.fig.FigSourceNode;
 import ac.kaist.ccs.fig.FigPlantNode;
 import ac.kaist.ccs.fig.FigHubNode;
 import ac.kaist.ccs.fig.FigJointNode;
@@ -26,6 +26,7 @@ public class CCSHubData extends CCSSourceData {
 		this.range = range;
 		int size = 7;
 		node = new FigHubNode(x, y, size, size, range);
+		node.setOwner(this);
 		childSources = new ArrayList<Integer>();
 	}
 	

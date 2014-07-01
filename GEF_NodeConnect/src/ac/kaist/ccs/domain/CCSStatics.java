@@ -1,6 +1,7 @@
 package ac.kaist.ccs.domain;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,9 @@ import java.util.Map;
 
 public class CCSStatics {
 	static boolean isInitialized = false;
+	
+	public static BufferedImage refImg;
+	public static BufferedImage refTerrainImg;
 	
 	public static int REGION_SEOUL = 1;
 	public static int REGION_INCHEON = 2;
@@ -63,6 +67,11 @@ public class CCSStatics {
 	
 	public static Map<Integer, Double> unitCaptureCostMap = null;//new HashMap<Integer, Double>();
 	public static Map<Integer, Double> captureCapitalCostMap = null;//new HashMap<Integer, Double>();
+	
+	public static Map<Integer, String> plantTypeStringMap = null;
+	public static Map<Integer, String> plantTypeStringShortMap = null;
+	public static Map<Integer, String> terrainTypeStringMap = null;
+	public static Map<Integer, String> terrainTypeStringShortMap = null;
 
 	public static void init(){
 		isInitialized = true;
@@ -208,6 +217,42 @@ public class CCSStatics {
 		//terrainColorMap.put(TERRAIN_TYPE_FOREST, new Color(255, 255, 255, 255));
 		//terrainColorMap.put(TERRAIN_TYPE_OFFSHORE_LESS_500, new Color(255, 255, 255, 255));
 		//terrainColorMap.put(TERRAIN_TYPE_OFFSHORE_OVER_500, new Color(255, 255, 255, 255));
+		
+		plantTypeStringMap = new HashMap<Integer, String>();
+		plantTypeStringMap.put(PLANT_TYPE_A,  "Power Plant");
+		plantTypeStringMap.put(PLANT_TYPE_B,  "Iron and Steel");
+		plantTypeStringMap.put(PLANT_TYPE_C,  "Oil Refinery");
+		plantTypeStringMap.put(PLANT_TYPE_D,  "Petrochemical");
+		
+		plantTypeStringShortMap = new HashMap<Integer, String>();
+		plantTypeStringShortMap.put(PLANT_TYPE_A,  "A");
+		plantTypeStringShortMap.put(PLANT_TYPE_B,  "B");
+		plantTypeStringShortMap.put(PLANT_TYPE_C,  "C");
+		plantTypeStringShortMap.put(PLANT_TYPE_D,  "D");
+		
+		terrainTypeStringShortMap = new HashMap<Integer, String>();
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_FLAT_DRY,  "DRY");
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_MOUNTAINOUS,  "MTN");
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_MARCH_WETLAND,  "WET");
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_RIVER,  "RIVER");
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_HIGHPOPULATION,  "HPP");
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_DESERT,  "DST");
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_FOREST,  "FST");
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_OFFSHORE_LESS_500,  "O<500");
+		terrainTypeStringShortMap.put(TERRAIN_TYPE_OFFSHORE_OVER_500,  "O>500");
+		
+		terrainTypeStringMap = new HashMap<Integer, String>();
+		terrainTypeStringMap.put(TERRAIN_TYPE_FLAT_DRY,  "Flat and Dry");
+		terrainTypeStringMap.put(TERRAIN_TYPE_MOUNTAINOUS,  "Mountainous");
+		terrainTypeStringMap.put(TERRAIN_TYPE_MARCH_WETLAND,  "March Wetland");
+		terrainTypeStringMap.put(TERRAIN_TYPE_RIVER,  "River");
+		terrainTypeStringMap.put(TERRAIN_TYPE_HIGHPOPULATION,  "High Population");
+		terrainTypeStringMap.put(TERRAIN_TYPE_DESERT,  "Desert");
+		terrainTypeStringMap.put(TERRAIN_TYPE_FOREST,  "Forest");
+		terrainTypeStringMap.put(TERRAIN_TYPE_OFFSHORE_LESS_500,  "Offshore < 500");
+		terrainTypeStringMap.put(TERRAIN_TYPE_OFFSHORE_OVER_500,  "Offshore > 500");
+		
+		
 		
 	}
 	

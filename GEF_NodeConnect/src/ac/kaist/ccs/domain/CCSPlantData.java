@@ -6,23 +6,24 @@ import ac.kaist.ccs.fig.FigPlantNode;
 
 public class CCSPlantData extends CCSSourceData {
 		
-	List<CCSSourceData> childHub;
+	List<Integer> childHub;
 	
 	public CCSPlantData(int x, int y) {
 		super(x, y, 0, 0);
 		this.type = CCSNodeData.TYPE_PLANT;
 		int size = 7;
 		node = new FigPlantNode(x, y, size, size);
-		childHub = new ArrayList<CCSSourceData>();
+		node.setOwner(this);
+		childHub = new ArrayList<Integer>();
 	}
 	
 	
-	public List<CCSSourceData> getChildHub() {
+	public List<Integer> getChildHub() {
 		return childHub;
 	}
 
 
-	public void setChildHub(List<CCSSourceData> childHub) {
+	public void setChildHub(List<Integer> childHub) {
 		this.childHub = childHub;
 	}
 
