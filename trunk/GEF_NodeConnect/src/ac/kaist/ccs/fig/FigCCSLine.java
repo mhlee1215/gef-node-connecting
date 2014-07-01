@@ -32,6 +32,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.util.Vector;
 
 import org.tigris.gef.base.Geometry;
 import org.tigris.gef.presentation.Fig;
@@ -105,6 +107,12 @@ public class FigCCSLine extends Fig {
         _y2 = y2;
         calcBounds();
         firePropChange("bounds", null, null);
+    }
+    
+    @Override
+    public Vector getPopUpActions(MouseEvent me) {
+    	// TODO Auto-generated method stub
+    	return super.getPopUpActions(me);
     }
 
     public int getX1() {
@@ -452,4 +460,7 @@ public class FigCCSLine extends Fig {
         return rect.intersectsLine(_x1, _y1, _x2, _y2);
     }
 
+    
+    
+    
 } /* end class FigLine */

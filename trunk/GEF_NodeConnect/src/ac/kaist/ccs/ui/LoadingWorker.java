@@ -35,6 +35,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -67,6 +68,7 @@ import org.jdesktop.swingx.util.PaintUtils;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Layer;
 import org.tigris.gef.base.LayerGrid;
+import org.tigris.gef.base.ReorderAction;
 import org.tigris.gef.graph.presentation.JGraph;
 import org.tigris.gef.presentation.Fig;
 
@@ -75,6 +77,7 @@ import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSSourceData;
+import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.fig.FigCCSLine;
 import ac.kaist.ccs.fig.FigCCSNode;
 
@@ -252,8 +255,8 @@ public class LoadingWorker extends JPanel
 
 		int width, height;
 		
-		width = 500;//graph.getWidth();//(int) maxLocx - (int) minLocx + NodeRenderManager._PADDING;
-		height = 500;//graph.getHeight();// (int) maxLocy - (int) minLocy + NodeRenderManager._PADDING;
+		width = CCSStatics.refImg.getWidth();//graph.getWidth();//(int) maxLocx - (int) minLocx + NodeRenderManager._PADDING;
+		height = CCSStatics.refImg.getHeight();//graph.getHeight();// (int) maxLocy - (int) minLocy + NodeRenderManager._PADDING;
 		System.out.println("width: "+width);
 		System.out.println("height: "+height);
 
@@ -280,12 +283,13 @@ public class LoadingWorker extends JPanel
 		LayerGrid grid = (LayerGrid) editor.getLayerManager().findLayerNamed(
 				"Grid");
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		logger.debug("spacing_include_stamp : "+(UiGlobals.getGrid_spacing()*scale));
-		map.put("spacing_include_stamp", (int)(UiGlobals.getGrid_spacing()*scale));
-		logger.debug("thick : "+scale);
-		map.put("thick", (int) scale);
-		
-		//grid.adjust(map);
+		map.put("Color", Color.LIGHT_GRAY);
+		map.put("bgColor", Color.white);
+		map.put("spacing_include_stamp", 5000);
+		map.put("paintLines", true);
+		map.put("paintDots", false);
+		map.put("stamp", (Image) CCSStatics.refImg);
+		grid.adjust(map);
 		
 		UiGlobals.setStatusbarText(" resolution : x "+scale);
 		logger.debug("====[E]======================");
@@ -345,8 +349,13 @@ public class LoadingWorker extends JPanel
             	}
                 if(!progressFlag) break;
                 editor.add(fig);
-                if(node.getEdge() != null)
-                	editor.add(node.getEdge().getEdgeFig());
+                
+                //fig.reorder(func, lay);
+                if(node.getEdge() != null){
+                	Fig edgeFig = node.getEdge().getEdgeFig();
+                	editor.add(edgeFig);
+                	edgeFig.reorder(ReorderAction.SEND_TO_BACK, editor.getLayerManager().getActiveLayer());
+                }
                 
     			cur_work++;
     		}

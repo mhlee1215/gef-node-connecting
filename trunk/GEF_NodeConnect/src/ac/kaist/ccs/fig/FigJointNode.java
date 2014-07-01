@@ -76,6 +76,7 @@ import org.tigris.gef.util.Localizer;
 import ac.kaist.ccs.base.CmdGetNodes;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.ui.CNodeData;
 
 /**
@@ -92,7 +93,30 @@ public class FigJointNode extends FigCCSNode {
 		// TODO Auto-generated constructor stub
 	}
 
-	
+	@Override
+	public void paint(Graphics g) {
+    	if(visible){
+	    	//g.draw
+	       // drawRect(g, isFilled(), getFillColor(), getLineWidth(), getLineColor(), getX(), getY(), getWidth(),
+	        //        getHeight(), getDashed(), _dashes, _dashPeriod);
+	    	
+	    	Graphics2D g2 = (Graphics2D)g.create();
+			g2.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+					
+	    	Color old = g2.getColor();
+	    	g2.setColor(coreColor);
+	    	g2.fillOval(getX(), getY(), getWidth(), getHeight());
+	    	
+	    	g2.setColor(borderColor);
+	    	g2.setStroke(borderStroke);
+	    	g2.drawOval(getX(), getY(), getWidth(), getHeight());
+	    	
+	    	g2.setColor(old);
+
+    	}
+    }
 	
 
     

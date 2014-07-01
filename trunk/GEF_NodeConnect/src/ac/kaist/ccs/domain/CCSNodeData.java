@@ -8,7 +8,7 @@ import java.util.Vector;
 
 import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.fig.FigCCSNode;
-import ac.kaist.ccs.fig.FigCO2SourceNode;
+import ac.kaist.ccs.fig.FigSourceNode;
 import ac.kaist.ccs.fig.FigPlantNode;
 import ac.kaist.ccs.fig.FigHubNode;
 import ac.kaist.ccs.fig.FigJointNode;
