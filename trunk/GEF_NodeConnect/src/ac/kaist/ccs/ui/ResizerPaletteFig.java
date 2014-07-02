@@ -164,114 +164,6 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		scaleCombo.addActionListener(this);
 		
 		
-		int gridMax = 200;
-		int gridMin = 1;
-		gridCurValue = UiGlobals.getDefault_grid_spacing();
-		gridResizer = new JSlider(JSlider.VERTICAL,
-				gridMin, gridMax, gridCurValue);
-		gridResizer.setName("gridResizer");
-		//gridResizer.setBackground(Color.white);
-		//Font font = new Font("Dialog.plain", 0, 10);
-		
-		JLabel minLabel = new JLabel("▼");
-		//minLabel.setFont(font);
-		JLabel maxLabel = new JLabel("▲");
-		//maxLabel.setFont(font);
-		Hashtable<Integer, JLabel> labelTable = 
-            new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer( gridMin ),
-				minLabel );
-		labelTable.put(new Integer( gridMax ),
-				maxLabel );
-		gridResizer.setLabelTable(labelTable);
-		
-		//gridResizer.setPreferredSize(new Dimension(50, 500));
-        gridResizer.setPaintLabels(true);
-        gridResizer.setMajorTickSpacing(1);
-        gridResizer.addChangeListener(this);
-        //gridResizer.setPaintTicks(true);
-        //BorderFactory a;
-        
-        
-//        gridResizer.setBorder(
-//                //BorderFactory.createEmptyBorder(0,0,0,0)
-//                //BorderFactory.createLineBorder(Color.black, 1)
-//        		
-//                BorderFactory.createTitledBorder("Grid")
-//                );
-        
-		
-		UiGlobals.set_gridSlider(gridResizer);
-		
-		
-		SpinnerModel model =
-	        new SpinnerNumberModel(gridCurValue, 	//initial value
-	        						gridMin , 		//min
-	                                gridMax , 		//max
-	                                1);       		//step
-
-		gridSpinner = new JSpinner();
-		gridSpinner.setName("gridSpinner");
-		
-		gridSpinner.setModel(model);
-		
-		gridSpinner.addChangeListener(this);
-		
-		
-		
-		JPanel locControlPanel = new JPanel();
-		//locControlPanel.setPreferredSize(new Dimension(50, 80));
-		locControlPanel.setLayout(null);
-		
-		int btnWidth = 25;
-		int btnHeight = 25;
-		
-		JButton buttonUp = new JButton("");
-		Icon upIcon = ResourceLoader.lookupIconResource("directionUp", "direction_up");
-		buttonUp.setIcon(upIcon);
-		buttonUp.setActionCommand("gridUp");
-		buttonUp.addActionListener(this);
-		buttonUp.setPreferredSize(new Dimension(btnWidth, btnHeight));
-		buttonUp.setMargin(new Insets(0, 0, 0, 0));
-		buttonUp.setBounds(btnWidth, 0, btnWidth, btnHeight);
-		buttonUp.setBackground(Color.white);
-		locControlPanel.add(buttonUp);
-		
-		JButton buttonDown = new JButton("");
-		Icon downIcon = ResourceLoader.lookupIconResource("directionDown", "direction_up");
-		buttonDown.setIcon(downIcon);
-		buttonDown.setActionCommand("gridDown");
-		buttonDown.addActionListener(this);
-		buttonDown.setPreferredSize(new Dimension(btnWidth, btnHeight));
-		buttonDown.setMargin(new Insets(0, 0, 0, 0));
-		buttonDown.setBounds(btnWidth, btnWidth, btnWidth, btnHeight);
-		locControlPanel.add(buttonDown);
-		
-		JButton buttonLeft = new JButton("");
-		Icon leftIcon = ResourceLoader.lookupIconResource("directionLeft", "direction_up");
-		buttonLeft.setIcon(leftIcon);
-		buttonLeft.setActionCommand("gridLeft");
-		buttonLeft.addActionListener(this);
-		buttonLeft.setPreferredSize(new Dimension(btnWidth, btnHeight));
-		buttonLeft.setMargin(new Insets(0, 0, 0, 0));
-		buttonLeft.setBounds(0, btnWidth/2, btnWidth, btnHeight);
-		locControlPanel.add(buttonLeft);
-		
-		JButton buttonRight = new JButton("");
-		Icon rightIcon = ResourceLoader.lookupIconResource("directionRight", "direction_up");
-		buttonRight.setIcon(rightIcon);
-		buttonRight.setActionCommand("gridRight");
-		buttonRight.addActionListener(this);
-		buttonRight.setPreferredSize(new Dimension(btnWidth, btnHeight));
-		buttonRight.setMargin(new Insets(0, 0, 0, 0));
-		buttonRight.setBounds(btnWidth*2, btnWidth/2, btnWidth, btnHeight);
-		locControlPanel.add(buttonRight);
-		//locControlPanel.setBackground(Color.white);
-		
-		
-		
-		
-		
 		
 		int scaleMin = UiGlobals.getPre_scaled();
 		int scaleMax = 12;
@@ -282,10 +174,10 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		scaleResizer.setBackground(Color.white);
 		Hashtable<Integer, JLabel> scaleLableTable = 
             new Hashtable<Integer, JLabel>();
-		scaleLableTable.put(new Integer( scaleMin ),
-				minLabel );
-		scaleLableTable.put(new Integer( scaleMax ),
-				maxLabel );
+//		scaleLableTable.put(new Integer( scaleMin ),
+//				minLabel );
+//		scaleLableTable.put(new Integer( scaleMax ),
+//				maxLabel );
 		scaleResizer.setLabelTable(scaleLableTable);
         scaleResizer.setPaintLabels(true);
         scaleResizer.addChangeListener(this);
@@ -297,97 +189,6 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
                 );
 		//add(scaleResizer);
 		scaleResizer.setEnabled(false);
-		
-		
-		//Search Option Content Start
-		
-		JPanel searchOptionPanel = new JPanel();
-		
-		MigLayout layout = new MigLayout(new LC().insets("-5 -3 -3 -2"),
-		 new AC().align("left").gap("rel").grow(1f).fill(),
-		 new AC().gap("-1"));
-		searchOptionPanel.setLayout(layout);
-		
-		JPanel onlyShowSearchedPanel = new JPanel();
-		JLabel onlyShowSearchedLabel = new JLabel("only found: ");
-		onlyShowSearchedPanel.add(onlyShowSearchedLabel);
-		onlyShowSearchedPanel.setPreferredSize(new Dimension(10, 10));
-		JCheckBox onlyShowSearchedCheck = new JCheckBox();
-		//onlyShowSearchedCheck.setText("only searched:");
-		onlyShowSearchedCheck.setName("onlyShowSearchedCheck");
-		onlyShowSearchedCheck.addItemListener(this);
-		onlyShowSearchedPanel.add(onlyShowSearchedCheck);
-		
-		searchOptionPanel.add(onlyShowSearchedPanel, "wrap, gaptop 0, gapbottom 0");
-		
-		JComboBox searchType = new JComboBox();
-		searchType.setName("searchType");
-		searchType.addActionListener(this);
-		searchType.addItem("New");
-		searchType.addItem("Union");
-		searchType.addItem("Intersection");
-		searchType.addItem("Minus");
-		searchOptionPanel.add(searchType, "wrap");
-		
-		JPanel colorChooserPanel = new JPanel();
-		
-		JLabel markColorLabel = new JLabel("Mark color: ");
-		colorChooserPanel.add(markColorLabel);
-		
-		
-		final ColorChooser cc = new ColorChooser();
-		cc.setColor(new Color(255, 140, 68));
-		colorChooserPanel.add (cc, "wrap");
-		
-		searchOptionPanel.add(colorChooserPanel, "wrap");
-		
-        cc.addActionListener (new ActionListener() {
-           public void actionPerformed (ActionEvent ae) {
-        	  UiGlobals.setSearchMarkColor(cc.getColor());
-              //something.setColor (cc.getColor());
-           }
-        });
-        
-        //JLabel layerLabel = new JLabel(" Show layer: ");
-        //searchOptionPanel.add(layerLabel, "wrap");
-		JComboBox layerCombo = new JComboBox();
-		UiGlobals.setShowLayerCombo(layerCombo);
-		//layerCombo.addItem(LAYER_ORIGINAL);
-		//layerCombo.addItem(LAYER_ALL);
-		//layerCombo.setName("layer");
-		//layerCombo.setSelectedIndex(0);
-		//layerCombo.addActionListener(this);
-		//layerCombo.addItemListener(this);
-		//searchOptionPanel.add(layerCombo, "wrap, width 100:100:100");
-		
-		
-		JButton showCurrentlySelectedNode = new JButton("<html>Show selected<br>nodes Info.</html>");
-		showCurrentlySelectedNode.setName("ShowSelectedNodeInfo");
-		showCurrentlySelectedNode.setPreferredSize(new Dimension(125, 45));
-		showCurrentlySelectedNode.addActionListener(this);
-		searchOptionPanel.add(showCurrentlySelectedNode, "wrap");
-		
-		
-        /*
-        JLabel viewLayerLabel = new JLabel("Layer: ");
-        //searchLayerPanel.add(viewLayerLabel);
-        JMenuBar searchLayers = new JMenuBar();
-        searchLayers.setMargin(new Insets(0, 0, 0, 0));
-        JMenu searchLayer = new JMenu("All");
-        searchLayer.setMargin(new Insets(0, 0, 0, 0));
-        JRadioButtonMenuItem searchLayer1 = new JRadioButtonMenuItem();
-        searchLayer1.addActionListener(this);
-        //searchLayer1.setName(layerPrefix+"All");
-        searchLayer1.setMargin(new Insets(0, -5, 0, 0));
-        //searchLayer1.setText(layerPrefix+"All");
-        searchLayer1.setSelected(true);
-        searchLayer.add(searchLayer1);
-        searchLayers.add(searchLayer);
-        */
-        
-        
-		
-		//Search Option Content End
 		
 		
 		
@@ -402,77 +203,6 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		
 		
 		
-		
-		
-		
-		
-        
-//        gridResizer.setPreferredSize(new Dimension(leftToolbarWidth, 100));
-//		JPanel resizerPanel = new JPanel();
-//		resizerPanel.setLayout(new GridBagLayout());
-//		resizerPanel.setBorder(BorderFactory.createTitledBorder(""));
-//		//resizerPanel.setBackground(Color.white);
-//		resizerPanel.add(gridResizer);
-		
-//        JXTaskPane gridTask = new JXTaskPane();
-//        Icon gridTaskIcon = ResourceLoader.lookupIconResource("gridTask", "gridTask");
-//        //gridTask.setLayout(new GridBagLayout());
-//		GridBagConstraints gridTaskConstraints = new GridBagConstraints();
-//		gridTaskConstraints.fill = GridBagConstraints.HORIZONTAL;
-//		gridTaskConstraints.anchor = GridBagConstraints.PAGE_START;
-//		gridTaskConstraints.weightx = 1;
-//		gridTaskConstraints.insets = new Insets(-6,-8,-6,-8);  //top padding
-//		gridTaskConstraints.gridx = 0;
-//		gridTaskConstraints.gridy = 0;
-//        gridTask.setTitle("Grid size");
-//        gridTask.setFocusable(false);
-//        gridTask.setCollapsed(true);
-//        gridTask.setIcon(gridTaskIcon);
-//        
-//        gridTaskConstraints.insets = new Insets(-6,-8,-6,-8);  //top padding
-//		gridTaskConstraints.gridx = 0;
-//		gridTaskConstraints.gridy = 0;
-//        gridTask.add(gridSpinner);
-//		
-//        gridTaskConstraints.insets = new Insets(8,-8,-6,-8);  //top padding
-//		gridTaskConstraints.gridx = 0;
-//		gridTaskConstraints.gridy = 1;
-//		gridTask.add(resizerPanel);
-		
-		
-		
-		//mainPanel.add(gridTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
-		
-
-//		JXTaskPane locCtrlTask = new JXTaskPane();
-//		locCtrlTask.setLayout(new GridBagLayout());
-//        Icon locCtrlTaskIcon = ResourceLoader.lookupIconResource("direction_up", "direction_up");
-//        locCtrlTask.setTitle("Grid move");
-//        locCtrlTask.setCollapsed(true);
-//        locCtrlTask.setFocusable(false);
-//        locControlPanel.setBorder(BorderFactory.createTitledBorder(""));
-//        locCtrlTask.setIcon(locCtrlTaskIcon);
-//        
-//        GridBagConstraints locTaskConstraints = new GridBagConstraints();
-//        //locTaskConstraints.fill = GridBagConstraints.HORIZONTAL;
-//        locTaskConstraints.anchor = GridBagConstraints.PAGE_START;
-//        locTaskConstraints.weightx = 1;
-//        locTaskConstraints.insets = new Insets(-4,-8,-6,-8);  //top padding
-//        locTaskConstraints.gridx = 0;
-//        locTaskConstraints.gridy = 0;
-//        locCtrlTask.add(locControlPanel, locTaskConstraints);
-//        locControlPanel.setPreferredSize(new Dimension(75, 55));
-		//mainPanel.add(locCtrlTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
-		
-//		JXTaskPane searchOptionTask = new JXTaskPane();
-//		searchOptionTask.setLayout(new MigLayout("insets -7 -7 -5 -5"));
-//        Icon searchOptionTaskIcon = ResourceLoader.lookupIconResource("searchOption", "searchOption");
-//        searchOptionTask.setTitle("Search Option");
-//        searchOptionTask.setCollapsed(true);
-//        searchOptionTask.setFocusable(false);
-//        searchOptionTask.setIcon(searchOptionTaskIcon);
-//        searchOptionTask.add(searchOptionPanel, "wrap");
-		//mainPanel.add(searchOptionTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		
 		JXTaskPane scaleTask = new JXTaskPane();
 		scaleTask.setLayout(new GridBagLayout());

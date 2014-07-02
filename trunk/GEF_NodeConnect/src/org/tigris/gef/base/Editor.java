@@ -902,6 +902,7 @@ public class Editor implements Serializable, MouseListener,
             _modeManager.mouseReleased(me);
         }
         
+        System.out.println("ms release");
     }
 
     /**

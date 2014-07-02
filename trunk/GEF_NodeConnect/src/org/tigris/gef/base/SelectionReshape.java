@@ -105,6 +105,10 @@ public class SelectionReshape extends Selection implements KeyListener {
         int npoints = fig.getNumPoints();
         int[] xs = fig.getXs();
         int[] ys = fig.getYs();
+        
+        
+       
+        
         g.setColor(Globals.getPrefs().handleColorFor(fig));
         for (int i = 0; i < npoints; ++i) {
             g.fillRect(xs[i] - HAND_SIZE / 2, ys[i] - HAND_SIZE / 2, HAND_SIZE,

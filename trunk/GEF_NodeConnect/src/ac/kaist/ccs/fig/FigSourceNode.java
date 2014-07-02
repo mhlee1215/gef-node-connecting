@@ -53,6 +53,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
@@ -112,9 +113,10 @@ public class FigSourceNode extends FigCCSNode {
         
         CCSSourceData sourceData = (CCSSourceData) this.getOwner();
      
-        int nodeCount = 3;
+        int nodeCount = 5;
         
-        nodeStr = "CO2: "+Float.toString(sourceData.getCo2_amount());
+        nodeStr = "COST: "+Float.toString(sourceData.getCost());
+        nodeStr += "<br>CO2: "+Float.toString(sourceData.getCo2_amount());
         nodeStr += "<br>Industry Type: "+sourceData.getIndustry_typeString();
         nodeStr += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
         
@@ -145,9 +147,9 @@ public class FigSourceNode extends FigCCSNode {
         //NodeDescriptor desc = (NodeDescriptor)this.getOwner();
         JLabel name = new JLabel(prefix+nodeStr+postfix);
         if(nodeCount > 5)
-        	name.setPreferredSize(new Dimension(120, (nodeCount+2)*24));
+        	name.setPreferredSize(new Dimension(200, (nodeCount+2)*24));
         else
-        	name.setPreferredSize(new Dimension(120, (nodeCount)*24));
+        	name.setPreferredSize(new Dimension(200, (nodeCount)*24));
         name.setToolTipText("The source properties are displayed.");
         name.setOpaque(true);
         name.setBackground(new Color(255, 255, 221));
@@ -196,35 +198,23 @@ public class FigSourceNode extends FigCCSNode {
 	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_COST)
 	    		magnitude = sData.getCost();
 	    	
-			if(magnitude < 100){
-				_w = 5;
-				_h = 5;
-			}else if(magnitude < 500){
-				_w = 9;
-				_h = 9;
-			}else if(magnitude < 1000){
-				_w = 13;
-				_h = 13;
-			}else if(magnitude < 3000){
-				_w = 15;
-				_h = 15;
-			}else if(magnitude < 5000){
-				_w = 17;
-				_h = 17;
-			}else if(magnitude < 7000){
-				_w = 19;
-				_h = 19;
-			}else{
-				_w = 21;
-				_h = 21;
-			}
+	    	_w = CCSStatics.getScaledSize(magnitude);
+	    	_h = CCSStatics.getScaledSize(magnitude);
 	    	
-	    	
-	    	g2.fillOval(getX(), getY(), getWidth(), getHeight());
+	    	g2.fillOval(getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight());
 	    	
 	    	g2.setColor(borderColor);
-	    	g2.setStroke(borderStroke);
-	    	g2.drawOval(getX(), getY(), getWidth(), getHeight());
+	    	
+	    	
+	    	final float dash1[] = {1.0f};
+	        final BasicStroke dashed =
+	            new BasicStroke(1.0f,
+	                            BasicStroke.CAP_BUTT,
+	                            BasicStroke.JOIN_MITER,
+	                            10.0f, dash1, 0.0f);
+	    	
+	    	g2.setStroke(dashed);
+	    	g2.drawOval(getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight());
 	    	
 	    	g2.setColor(old);
 	    	
@@ -249,6 +239,8 @@ public class FigSourceNode extends FigCCSNode {
 	    	}
     	}
     }
+	
+	
 
 	
 } /* end class FigCircle */

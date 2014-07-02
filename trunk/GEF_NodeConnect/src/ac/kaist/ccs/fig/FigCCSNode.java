@@ -52,6 +52,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
@@ -273,11 +274,11 @@ public class FigCCSNode extends FigRect implements MouseListener {
 					
 	    	Color old = g2.getColor();
 	    	g2.setColor(coreColor);
-	    	g2.fillOval(getX(), getY(), getWidth(), getHeight());
+	    	g2.fillOval(getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight());
 	    	
 	    	g2.setColor(borderColor);
 	    	g2.setStroke(borderStroke);
-	    	g2.drawOval(getX(), getY(), getWidth(), getHeight());
+	    	g2.drawOval(getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight());
 	    	
 	    	g2.setColor(old);
 	    	
@@ -335,7 +336,13 @@ public class FigCCSNode extends FigRect implements MouseListener {
 				+ borderStroke + ", increased=" + increased + "]";
 	}
     
-    
+    public Rectangle getBounds(Rectangle r) {
+        if (r == null) {
+            return new Rectangle(_x-_w/2, _y-_h/2, _w, _h);
+        }
+        r.setBounds(_x-_w/2, _y-_h/2, _w, _h);
+        return r;
+    }
     
     
 } /* end class FigCircle */

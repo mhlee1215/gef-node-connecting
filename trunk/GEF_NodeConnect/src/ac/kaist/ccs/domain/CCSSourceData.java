@@ -30,6 +30,7 @@ public class CCSSourceData extends CCSNodeData {
 	int dst;
 	int edge;
 	
+	float distanceToDst;
 	List<Integer> childSources;
 	
 	
@@ -41,8 +42,13 @@ public class CCSSourceData extends CCSNodeData {
 
 	public CCSEdgeData connectTo(CCSSourceData dstNode){
 		//this.edge = new CCSEdgeData(this, dstNode);
+		dstNode.addChildSource(this.getIndex());
 		CCSEdgeData e = new CCSEdgeData(this, dstNode);
+		distanceToDst = (float) Math.sqrt((x-dstNode.getX())*(x-dstNode.getX())+(y-dstNode.getY())*(y-dstNode.getY())) * CCSStatics.pixelToDistance;
+		
+		
 		this.dst = dstNode.getIndex();
+		dstNode.childSources.add(this.index);
 		e = UiGlobals.addEdge(e);
 		this.edge = e.getIndex();
 		return e;
@@ -165,11 +171,27 @@ public class CCSSourceData extends CCSNodeData {
 	public float getCost() {
 		return cost;
 	}
-
-
+	
+	public float computeCost(int pipeDiameterType){
+		double childCost = 0;
+		
+		for(Integer childIdx : childSources){
+			CCSSourceData childNode = UiGlobals.getNode(childIdx);
+			childCost += childNode.computeCost(pipeDiameterType);
+		}
+		
+		Double unitTransportCost = CCSStatics.unitTransportCostMap.get(pipeDiameterType);
+		Double transportCapitalCost = CCSStatics.transportCapitalCostMap.get(pipeDiameterType);
+		this.cost = (float) (childCost + (float) (this.co2_amount * unitTransportCost + transportCapitalCost * distanceToDst));
+		return cost;
+	}
 
 	public void setCost(float cost) {
 		this.cost = cost;
+	}
+	
+	public void addCost(float cost) {
+		this.cost += cost;
 	}
 
 

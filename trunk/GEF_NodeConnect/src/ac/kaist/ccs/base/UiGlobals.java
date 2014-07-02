@@ -2,6 +2,7 @@ package ac.kaist.ccs.base;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.tigris.gef.graph.presentation.JGraph;
 import org.tigris.gef.presentation.Fig;
 
 import ac.kaist.ccs.domain.CCSEdgeData;
+import ac.kaist.ccs.domain.CCSHubData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.presentation.JNodeInfoPanel;
@@ -35,8 +37,8 @@ public class UiGlobals extends Globals{
 	
 	private static Font normalFont = new Font("Lucida Grande", Font.PLAIN, 10);
 	private static Font titleFont = new Font("Lucida Grande", Font.BOLD, 25);
-	private static ColorPool constantColor = new ColorPool();
-	private static Color searchMarkColor = null;
+	//private static ColorPool constantColor = new ColorPool();
+	//private static Color searchMarkColor = null;
 	
 	private static Vector<double[]> gridDatas = new Vector<double[]>();
 	private static Vector<CGridState> gridStes = new Vector<CGridState>();
@@ -94,6 +96,45 @@ public class UiGlobals extends Globals{
 	private static int nodeSize = 0;
 	private static Map<Integer, CCSEdgeData> edges = new HashMap<Integer, CCSEdgeData>();
 	private static int edgeSize = 0;
+	
+	
+	public static void disconnectAll(){
+		Map<Integer, CCSSourceData> nodesAll = nodes;
+        for(Integer key : nodesAll.keySet()){
+        	if(nodesAll.get(key) != null)
+        		nodesAll.get(key).getChildSources().clear();
+        }
+	}
+	
+	public static List<CCSSourceData> getLeafNodes(){
+		List<CCSSourceData> leafNodes = new ArrayList<CCSSourceData>();
+		Map<Integer, CCSSourceData> nodesAll = nodes;
+        for(Integer key : nodesAll.keySet()){
+        	CCSSourceData node = nodesAll.get(key);
+        	if(node != null){
+        		if(node.getChildSources().size() == 0 && node.getDst().getIndex() != 0){
+        			leafNodes.add(node);
+        		}
+        	}
+       
+        }
+        return leafNodes;
+	}
+	
+	public static List<CCSSourceData> getHubNodes(){
+		List<CCSSourceData> hubNodes = new ArrayList<CCSSourceData>();
+		Map<Integer, CCSSourceData> nodesAll = nodes;
+        for(Integer key : nodesAll.keySet()){
+        	CCSSourceData node = nodesAll.get(key);
+        	if(node != null){
+        		if(node instanceof CCSHubData){
+        			hubNodes.add(node);
+        		}
+        	}
+       
+        }
+        return hubNodes;
+	}
 	
 	public static Map<Integer, CCSSourceData> getNodes(){
 		return nodes;
@@ -327,20 +368,7 @@ public class UiGlobals extends Globals{
 	}
 
 
-	/**
-	 * @return the searchMarkColor
-	 */
-	public static Color getSearchMarkColor() {
-		return searchMarkColor;
-	}
-
-
-	/**
-	 * @param searchMarkColor the searchMarkColor to set
-	 */
-	public static void setSearchMarkColor(Color searchMarkColor) {
-		UiGlobals.searchMarkColor = searchMarkColor;
-	}
+	
 
 
 	public static void showNodeInfoList(List<Fig> selectedFigList){
@@ -543,15 +571,6 @@ public class UiGlobals extends Globals{
 		UiGlobals.normalFont = normalFont;
 	}
 
-	
-	
-	public static ColorPool getConstantColor() {
-		return constantColor;
-	}
-
-	public static void setConstantColor(ColorPool constantColor) {
-		UiGlobals.constantColor = constantColor;
-	}
 	
 	public static Vector<String> getGridCategories() {
 		return gridCategories;

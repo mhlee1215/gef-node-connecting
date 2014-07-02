@@ -137,6 +137,7 @@ public class SelectionResize extends Selection {
      * bounding box.
      */
     public void paint(Graphics g) {
+    	
         final Fig fig = getContent();
         if (getContent().isResizable()) {
 
