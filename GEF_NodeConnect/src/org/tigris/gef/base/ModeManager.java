@@ -219,6 +219,7 @@ public class ModeManager implements Serializable, MouseListener,
     /** Pass events to all modes in order, until one consumes it. */
     public void mousePressed(MouseEvent me) {
         checkModeTransitions(me);
+        System.out.println(_modes);
         for (int i = _modes.size() - 1; i >= 0; --i) { // && !me.isConsumed()
             if (LOG.isDebugEnabled())
                 LOG.debug("MousePressed testing mode "

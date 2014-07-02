@@ -13,6 +13,10 @@ public class CCSStatics {
 	public static BufferedImage refImg;
 	public static BufferedImage refTerrainImg;
 	
+	public static float pixelToDistance = (float) (51.2 / 71);
+	public static float kilometerToMile = 0.621f;
+	
+	
 	public static int REGION_SEOUL = 1;
 	public static int REGION_INCHEON = 2;
 	public static int REGION_KYUNGKI = 3;
@@ -254,6 +258,24 @@ public class CCSStatics {
 		
 		
 		
+	}
+	
+	public static int getScaledSize(float magnitude){
+		if(magnitude < 100){
+			return 5;
+		}else if(magnitude < 500){
+			return 9;
+		}else if(magnitude < 1000){
+			return 13;
+		}else if(magnitude < 3000){
+			return 15;
+		}else if(magnitude < 5000){
+			return 17;
+		}else if(magnitude < 7000){
+			return 19;
+		}else{
+			return 21;
+		}
 	}
 	
 	public static double convertCostViaTerrain(double cost, int type){

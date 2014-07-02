@@ -447,9 +447,9 @@ public class JGridChartPanel extends JGridPanel  implements ActionListener, ISta
         renderer.setSeriesToolTipGenerator(2, generator);
         
         // 7.�;�� �ٲٱ�
-        renderer.setSeriesPaint(0, UiGlobals.getConstantColor().getColor(0));
-        renderer.setSeriesPaint(1, UiGlobals.getConstantColor().getColor(1));
-        renderer.setSeriesPaint(2, UiGlobals.getConstantColor().getColor(2));
+//        renderer.setSeriesPaint(0, UiGlobals.getConstantColor().getColor(0));
+//        renderer.setSeriesPaint(1, UiGlobals.getConstantColor().getColor(1));
+//        renderer.setSeriesPaint(2, UiGlobals.getConstantColor().getColor(2));
         
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         int overCount = 0;

@@ -219,7 +219,7 @@ public class JGridHistogramPanel extends JGridPanel implements IStatusBar, Clone
 		
 		
 		XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();  // BarRenderer�� ���Ѵ�.
-		renderer.setSeriesPaint(0, UiGlobals.getConstantColor().getColor(0));
+//		renderer.setSeriesPaint(0, UiGlobals.getConstantColor().getColor(0));
 		XYBarPainter painter = new StandardXYBarPainter();
 		
 		renderer.setBarPainter(painter);
@@ -235,7 +235,7 @@ public class JGridHistogramPanel extends JGridPanel implements IStatusBar, Clone
         renderer.setDrawBarOutline(true);// (UiGlobals.getConstantColor().getColor(0));
         //renderer.setSeriesFillPaint(series, paint)
         //renderer.setSeriesFillPaint(0, UiGlobals.getConstantColor().getColor(1));
-        renderer.setSeriesPaint(0, UiGlobals.getConstantColor().getColor(2));
+//        renderer.setSeriesPaint(0, UiGlobals.getConstantColor().getColor(2));
 		//jfreechart.get
 		//XYItemRenderer renderer = plot.getRenderer();
 		//renderer.set

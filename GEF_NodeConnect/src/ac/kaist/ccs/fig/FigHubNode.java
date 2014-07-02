@@ -78,6 +78,7 @@ import ac.kaist.ccs.base.CmdGetNodes;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSSourceData;
+import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.ui.CNodeData;
 
 /**
@@ -115,6 +116,16 @@ public class FigHubNode extends FigCCSNode {
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON);
 			
+			CCSSourceData sData = (CCSSourceData) this.getOwner();
+	    	float magnitude = 0.0f;
+	    	if(sData.viewType == CCSSourceData.VIEW_TYPE_CO2)
+	    		magnitude = sData.getCo2_amount();
+	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_COST)
+	    		magnitude = sData.getCost();
+			
+			_w = CCSStatics.getScaledSize(magnitude);
+	    	_h = CCSStatics.getScaledSize(magnitude);
+			
 			Color old = g2.getColor();
 			g2.setComposite(makeComposite(0.15f));
 	    	g2.setColor(borderColor);
@@ -143,9 +154,12 @@ public class FigHubNode extends FigCCSNode {
         
         CCSSourceData sourceData = (CCSSourceData) this.getOwner();
      
-        int nodeCount = 1;
+        int nodeCount = 5;
         
-        nodeStr = "CO2: "+Float.toString(sourceData.getCo2_amount());
+        nodeStr = "COST: "+Float.toString(sourceData.getCost());
+        nodeStr += "<br>CO2: "+Float.toString(sourceData.getCo2_amount());
+        nodeStr += "<br>Industry Type: "+sourceData.getIndustry_typeString();
+        nodeStr += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
         
 //        for(int count = 0 ; count < list.size() ; count++)
 //        {
@@ -174,10 +188,10 @@ public class FigHubNode extends FigCCSNode {
         //NodeDescriptor desc = (NodeDescriptor)this.getOwner();
         JLabel name = new JLabel(prefix+nodeStr+postfix);
         if(nodeCount > 5)
-        	name.setPreferredSize(new Dimension(120, (nodeCount+2)*24));
+        	name.setPreferredSize(new Dimension(200, (nodeCount+2)*24));
         else
-        	name.setPreferredSize(new Dimension(120, (nodeCount)*24));
-        name.setToolTipText("hihi");
+        	name.setPreferredSize(new Dimension(200, (nodeCount)*24));
+        name.setToolTipText("The source properties are displayed.");
         name.setOpaque(true);
         name.setBackground(new Color(255, 255, 221));
         name.setFocusable(false);

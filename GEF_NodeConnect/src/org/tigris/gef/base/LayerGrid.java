@@ -169,7 +169,6 @@ public class LayerGrid extends Layer {
             return;
         }
         
-        //if(1==1) return;
         System.out.println("???:"+_stamp);
         if (_stamp == null) {
         	System.out.println("STAMP!!: "+_stamp+", "+Globals.curEditor());
