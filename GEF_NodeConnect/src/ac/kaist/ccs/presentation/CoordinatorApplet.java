@@ -1,8 +1,5 @@
 package ac.kaist.ccs.presentation;
 
-import ilog.concert.IloException;
-import ilog.cplex.IloCplex;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -68,10 +65,7 @@ import org.tigris.gef.util.ResourceLoader;
 
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
-import ac.kaist.ccs.domain.CCSHubData;
 import ac.kaist.ccs.domain.CCSSourceData;
-import ac.kaist.ccs.ui.LoadingProgressBarNode;
-import ac.kaist.ccs.ui.LoadingWorker;
 import ac.kaist.ccs.ui.NodePaletteFig;
 import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
@@ -281,8 +275,8 @@ public class CoordinatorApplet extends JApplet implements ModeChangeListener {
     	return (int)((loc)*scale) + padding/2;
     }
 	
-	public Map<Integer, List<CCSSourceData> > makeRandomData(int size, int maxWidth, int maxHeight) throws IloException {
-		 IloCplex cplex = new IloCplex();
+	public Map<Integer, List<CCSSourceData> > makeRandomData(int size, int maxWidth, int maxHeight) {
+		 //IloCplex cplex = new IloCplex();
 		Map<Integer, List<CCSSourceData> > ccsData = new HashMap<Integer, List<CCSSourceData> >();
 		Random random = new Random();
 		

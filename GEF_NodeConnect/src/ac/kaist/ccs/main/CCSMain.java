@@ -1,7 +1,5 @@
 package ac.kaist.ccs.main;
 
-import ilog.concert.IloException;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -522,7 +520,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	}
 
 	public Map<Integer, List<CCSSourceData>> makeRandomData(int size,
-			int maxWidth, int maxHeight) throws IloException {
+			int maxWidth, int maxHeight) {
 		// IloCplex cplex = new IloCplex();
 		Map<Integer, List<CCSSourceData>> ccsData = new HashMap<Integer, List<CCSSourceData>>();
 		Random random = new Random();
