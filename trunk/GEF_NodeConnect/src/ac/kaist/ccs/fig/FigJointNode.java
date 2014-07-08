@@ -107,11 +107,11 @@ public class FigJointNode extends FigCCSNode {
 					
 	    	Color old = g2.getColor();
 	    	g2.setColor(coreColor);
-	    	g2.fillOval(getX(), getY(), getWidth(), getHeight());
+	    	g2.fillOval(getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight());
 	    	
 	    	g2.setColor(borderColor);
 	    	g2.setStroke(borderStroke);
-	    	g2.drawOval(getX(), getY(), getWidth(), getHeight());
+	    	g2.drawOval(getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight());
 	    	
 	    	g2.setColor(old);
 
