@@ -127,7 +127,7 @@ public class FigHubNode extends FigCCSNode {
 	    	_h = CCSStatics.getScaledSize(magnitude);
 			
 			Color old = g2.getColor();
-			g2.setComposite(makeComposite(0.15f));
+			g2.setComposite(makeComposite(0.1f));
 	    	g2.setColor(borderColor);
 	    	g2.setStroke(borderStroke);
 	    	g2.fillOval(getX()-hubRange, getY()-hubRange, hubRange*2, hubRange*2);
