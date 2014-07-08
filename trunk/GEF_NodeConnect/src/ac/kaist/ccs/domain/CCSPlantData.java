@@ -2,6 +2,7 @@ package ac.kaist.ccs.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import ac.kaist.ccs.fig.FigPlantNode;
 
 public class CCSPlantData extends CCSSourceData {
@@ -15,6 +16,13 @@ public class CCSPlantData extends CCSSourceData {
 		node = new FigPlantNode(x, y, size, size);
 		node.setOwner(this);
 		childHub = new ArrayList<Integer>();
+	}
+	
+	@Override
+	public CCSPlantData clone(){
+		CCSPlantData clone = new CCSPlantData(x, y);
+		clone.setIndex(index);
+		return clone;
 	}
 	
 	

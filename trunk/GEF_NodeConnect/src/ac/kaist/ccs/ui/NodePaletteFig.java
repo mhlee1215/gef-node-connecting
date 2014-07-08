@@ -196,6 +196,9 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
 			}else if("ConnectTypeCombo".equals(cb.getName())){
 				ComboItem selectedItem = (ComboItem) cb.getSelectedItem();
 				System.out.println("selectedItem: "+selectedItem);
+				
+				UiGlobals.nodeRenderManager.drawNodes(true, selectedItem.getValue());
+				
 			}else if("CostTypeCombo".equals(cb.getName())){
 				ComboItem selectedItem = (ComboItem) cb.getSelectedItem();
 				System.out.println("selectedItem: "+selectedItem);

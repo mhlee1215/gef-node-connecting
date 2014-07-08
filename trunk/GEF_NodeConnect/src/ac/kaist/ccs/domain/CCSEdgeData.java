@@ -2,6 +2,7 @@ package ac.kaist.ccs.domain;
 
 import java.awt.Color;
 
+import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.fig.FigCCSLine;
 
 public class CCSEdgeData {
@@ -23,6 +24,13 @@ public class CCSEdgeData {
 		Color lineColor = new Color(125, 125, 125);
 		edgeFig = new FigCCSLine(src.x+src.getNode().getWidth()/2, src.y+src.getNode().getHeight()/2, dst.x+dst.getNode().getWidth()/2, dst.y+dst.getNode().getHeight()/2, lineColor);
 		edgeFig.setOwner(this);
+	}
+	
+	@Override
+	public CCSEdgeData clone(){
+		CCSEdgeData clone = new CCSEdgeData(UiGlobals.getNode(src), UiGlobals.getNode(dst));
+		clone.setIndex(index);
+		return clone;
 	}
 	
 	public int getIndex() {
@@ -58,8 +66,8 @@ public class CCSEdgeData {
 
 	@Override
 	public String toString() {
-		return "CCSEdgeData [cost=" + cost + ", src=" + src + ", dst=" + dst
-				+ ", edge=" + edgeFig + "]";
+		return "CCSEdgeData [index=" + index + ", cost=" + cost + ", src="
+				+ src + ", dst=" + dst + ", edgeFig=" + edgeFig + "]";
 	}
 
 	public FigCCSLine getEdgeFig() {

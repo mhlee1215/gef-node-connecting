@@ -31,7 +31,7 @@ public class CCSSourceData extends CCSNodeData {
 	int edge;
 	
 	float distanceToDst;
-	List<Integer> childSources;
+	protected List<Integer> childSources;
 	
 	
 	public static int VIEW_TYPE_CO2 = 0;
@@ -51,6 +51,9 @@ public class CCSSourceData extends CCSNodeData {
 		dstNode.childSources.add(this.index);
 		e = UiGlobals.addEdge(e);
 		this.edge = e.getIndex();
+		
+		UiGlobals.setNode(this);
+		
 		return e;
 	}
 	
@@ -70,6 +73,14 @@ public class CCSSourceData extends CCSNodeData {
 		this.co2_amount = co2_amount;
 		this.terrain_type = terrain_type;
 		childSources = new ArrayList<Integer>();
+	}
+	
+	@Override
+	public CCSSourceData clone(){
+		//System.out.println("CLONE!!!");
+		CCSSourceData clone = new CCSSourceData(x, y, co2_amount, industry_type, terrain_type);
+		clone.setIndex(index);
+		return clone;
 	}
 	
 	public CCSSourceData(int x, int y, float co2_amount, int industry_type, int terrain_type) {
@@ -198,13 +209,15 @@ public class CCSSourceData extends CCSNodeData {
 
 	@Override
 	public String toString() {
-		return "{\"index\":\"" + index + "\", \"co2_amount\":\"" + co2_amount
-				+ "\", \"cost\":\"" + cost + "\", \"rank\":\"" + rank
-				+ "\", \"terrain_type\":\"" + terrain_type
-				+ "\", \"industry_type\":\"" + industry_type
-				+ "\", \"clusterHub\":\"" + clusterHub + "\", \"dst\":\"" + dst
-				+ "\", \"edge\":\"" + edge + "\"}";
+		return "CCSSourceData [index=" + index + ", co2_amount=" + co2_amount
+				+ ", cost=" + cost + ", rank=" + rank + ", terrain_type="
+				+ terrain_type + ", industry_type=" + industry_type
+				+ ", clusterHub=" + clusterHub + ", dst=" + dst + ", edge="
+				+ edge + ", distanceToDst=" + distanceToDst + ", childSources="
+				+ childSources + ", viewType=" + viewType + "]";
 	}
+	
+	
 	
 	
 }

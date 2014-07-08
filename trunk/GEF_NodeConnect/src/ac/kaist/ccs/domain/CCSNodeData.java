@@ -59,6 +59,12 @@ public class CCSNodeData {
 		int size = 7;
 		node = new FigCCSNode(x, y, size, size);
 	}
+	
+	@Override
+	public CCSNodeData clone(){
+		CCSNodeData clone = new CCSNodeData(x, y, type);
+		return clone;
+	}
 
 	public int getX() {
 		return x;
