@@ -60,6 +60,19 @@ public class CCSStatics {
 	public static int PLANT_TYPE_C = PLANT_TYPE_OIL_REFINERY;
 	public static int PLANT_TYPE_D = PLANT_TYPE_PETROCHEMICAL;
 	
+	public static int COST_TYPE_1 = 1;
+	public static int COST_TYPE_2 = 2;
+	public static int COST_TYPE_3 = 3;
+	public static int COST_TYPE_4 = 4;
+	public static int COST_TYPE_5 = 5;
+	public static int COST_TYPE_6 = 6;
+	public static int COST_TYPE_7 = 7;
+	
+	public static int CONNECT_TYPE_STAR = 1;
+	public static int CONNECT_TYPE_TREE = 2;
+	public static int CONNECT_TYPE_BACKBONE = 3;
+	public static int CONNECT_TYPE_HYBRID = 4;
+	
 	public static double UNIT_STORAGE_COST = 0.72;
 	public static double STORAGE_CAPITAL_COST = 10228607.0;
 	

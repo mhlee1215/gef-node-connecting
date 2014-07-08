@@ -179,7 +179,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 //		scaleLableTable.put(new Integer( scaleMax ),
 //				maxLabel );
 		scaleResizer.setLabelTable(scaleLableTable);
-        scaleResizer.setPaintLabels(true);
+        //scaleResizer.setPaintLabels(true);
         scaleResizer.addChangeListener(this);
         //scaleResizer.setPreferredSize(new Dimension(50, 500));
         scaleResizer.setBorder(
@@ -221,9 +221,18 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		scaleTask.setIcon(scaleTaskIcon);
 		
 		scaleTask.add(scaleCombo, taskConstraints);
-		
 		mainPanel.add(scaleTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
-        
+		
+		JXTaskPane experimentTask = new JXTaskPane();
+		experimentTask.setLayout(new GridBagLayout());
+		Icon experimnetTaskIcon = ResourceLoader.lookupIconResource("siGraph", "siGraph");
+		experimentTask.setTitle("Experimnet");
+		experimentTask.setFocusable(false);
+		experimentTask.setCollapsed(false);
+		experimentTask.setIcon(experimnetTaskIcon);
+		
+		experimentTask.add(new JButton("test"), taskConstraints);
+		mainPanel.add(experimentTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		//UiGlobals.set_scaleSlider(scaleResizer);
 	}
 

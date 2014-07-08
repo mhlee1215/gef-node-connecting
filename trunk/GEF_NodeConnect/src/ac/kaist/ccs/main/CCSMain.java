@@ -135,9 +135,15 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		UiGlobals.init();
 		CCSStatics.init();
 
+		
 		try {
-			UIManager
-					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+			String osName = System.getProperty("os.name").toLowerCase();
+			if (!osName.contains("mac")) // if not on mac
+			{
+				UIManager
+				.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+			}
+			
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -205,6 +211,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 	private void jbInit() throws Exception {
 
+		UiGlobals.clearAllNode();
+		UiGlobals.clearAllEdge();
+		
 		long mega = (long) Math.pow(2, 20);
 		// Get current size of heap in bytes
 		long heapSize = Runtime.getRuntime().totalMemory();
@@ -235,18 +244,29 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		if (ccsData == null) {
 			// ccsData = makeRandomData(300, 500, 500);
 			ccsData = makeRefRandomData(refImage, refTerrainImage);
+			UiGlobals.ccsData = ccsData;
 			// return;
 		}
-		if (ccsConData == null) {
+		
+		UiGlobals.saveNodeSnapshot();
+		UiGlobals.loadNodeSnapshot();
+		
+		System.out.println("1"+UiGlobals.ccsData);
+		System.out.println("2"+ccsData);
+		//System.out.println(UiGlobals.ccsData );
+		
+		//if (ccsConData == null) {
 			// ccsConData = makeNaiveCon(ccsData);
-			// ccsConData = makeStarCon(ccsData);
-			// ccsConData = makeTreeCon(ccsData);
+			 //ccsConData = makeStarCon(UiGlobals.ccsData);
+			 //ccsConData = makeTreeCon(ccsData);
 			ccsConData = makeBackboneCon(ccsData);
+			//UiGlobals.ccsConData = ccsConData;
 			// ccsConData = makeHybridCon(ccsData);
 			
 			computeCostAll(CCSStatics.DIAMETER_688);
-		}
+		//}
 		
+			
 		
 		
 		System.out.println("Randering!");
@@ -619,6 +639,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		
+		System.out.println(sourceData);
+		System.out.println(hubData);
 
 		for (int i = 0; i < sourceData.size(); i++) {
 			CCSSourceData curSrc = sourceData.get(i);
@@ -641,16 +664,20 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				}
 			}
 
-			if (minDist <= minRankHub.getRange()) {
+			System.out.println("minDist: "+minDist+",minRankHub.getRange(): "+minRankHub.getRange());
+			if (minDist <= minRankHub.getRange()-10) {
 				curSrc.setClusterHub(minRankHub);
 			}
 		}
 
+		//System.out.println("sourceData.size(): "+sourceData.size());
 		for (int i = 0; i < sourceData.size(); i++) {
 
 			CCSSourceData curSrc = sourceData.get(i);
 			if (curSrc.getClusterHub() != null) {
+				
 				if (curSrc.getClusterHub().getType() == CCSNodeData.TYPE_HUB) {
+					//System.out.println("??"+curSrc.getClusterHub().getType());
 					((CCSHubData) curSrc.getClusterHub()).addChildSource(curSrc
 							.getIndex());
 					// ((CCSHubData)curSrc.getHub()).getChildSources().add(curSrc);
@@ -658,6 +685,12 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			}
 		}
 
+		System.out.println("ccsData CLuster: "+ccsData.get(CCSNodeData.TYPE_HUB));
+		int sum = 0;
+		for(CCSSourceData h : ccsData.get(CCSNodeData.TYPE_HUB)){
+			sum += ((CCSHubData)h).getChildSources().size();
+		}
+		System.out.println(sum);
 		return ccsData;
 	}
 
@@ -688,11 +721,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		// ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 
+		System.out.println("hubData: "+hubData);
+		
 		for (int j = 0; j < hubData.size(); j++) {
 
 			CCSHubData curHub = (CCSHubData) hubData.get(j);
 
-			List<Integer> childIndexList = curHub.getChildSources();
+			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getChildSources());
 			List<Integer> connedtedList = new ArrayList<Integer>();
 			connedtedList.add(curHub.getIndex());
 
@@ -701,15 +736,14 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 				NodePair closestPair = getClosestPair(childIndexList,
 						connedtedList);
-
 				CCSSourceData minDistSrc = closestPair.first;
 				CCSSourceData minDistConnectedSrc = closestPair.second;
-
 				if (minDistSrc != null)
 					minDistSrc.connectTo(minDistConnectedSrc);
 
 				childIndexList.remove((Integer) minDistSrc.getIndex());
 				connedtedList.add(minDistSrc.getIndex());
+				
 			}
 		}
 
@@ -793,19 +827,18 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	}
 
 	public List<CCSEdgeData> makeBackboneCon(
-			Map<Integer, List<CCSSourceData>> ccsData) {
-		ccsData = Clustering(ccsData);
+			Map<Integer, List<CCSSourceData>> ccsDataParam) {
+		Map<Integer, List<CCSSourceData> > ccsData = Clustering(ccsDataParam);
 
-		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
+		//List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 
 		// List<CCSSourceData> sourceData =
 		// ccsData.get(CCSSourceData.TYPE_SOURCE);
 		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
-
 		for (int j = 0; j < hubData.size(); j++) {
 
 			CCSHubData curHub = (CCSHubData) hubData.get(j);
-			List<Integer> childIndexList = curHub.getChildSources();
+			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getChildSources());
 
 			// Grouping by angle = n pieces;
 			float angleNum = 6;
@@ -898,7 +931,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			}
 		}
 
-		return ccsConData;
+		return null;
 	}
 
 	// Joint connection

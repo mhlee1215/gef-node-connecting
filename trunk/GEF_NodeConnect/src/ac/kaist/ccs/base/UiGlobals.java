@@ -96,7 +96,48 @@ public class UiGlobals extends Globals{
 	private static int nodeSize = 0;
 	private static Map<Integer, CCSEdgeData> edges = new HashMap<Integer, CCSEdgeData>();
 	private static int edgeSize = 0;
+	public static Map<Integer, List<CCSSourceData>> ccsData;
+	public static List<CCSEdgeData> ccsConData;
 	
+	private static Map<Integer, CCSSourceData> nodesSnap = null;//new HashMap<Integer, CCSSourceData>();
+	private static int nodeSizeSnap = 0;
+	private static Map<Integer, CCSEdgeData> edgesSnap = null;//new HashMap<Integer, CCSEdgeData>();
+	private static int edgeSizeSnap = 0;
+	public static Map<Integer, List<CCSSourceData>> ccsDataSnap;
+	public static List<CCSEdgeData> ccsConDataSnap;
+	
+	
+	public static void saveNodeSnapshot(){
+		
+		nodesSnap= new HashMap<Integer, CCSSourceData>(nodes);
+		nodeSizeSnap = nodeSize;
+		
+		edgesSnap=new HashMap<Integer, CCSEdgeData>(edges);
+		edgeSizeSnap = edgeSize;
+		
+		ccsDataSnap = new HashMap<Integer, List<CCSSourceData> >(ccsData);//cloner.deepClone(ccsData);
+		//ccsConDataSnap = cloner.deepClone(ccsConData);
+	}
+	
+	public static void loadNodeSnapshot(){
+		nodes= new HashMap<Integer, CCSSourceData>(nodesSnap);
+		nodeSize = nodeSizeSnap;
+		
+		edges=new HashMap<Integer, CCSEdgeData>(edgesSnap);
+		edgeSize = edgeSizeSnap;
+		
+		ccsData = new HashMap<Integer, List<CCSSourceData> >(ccsDataSnap);//cloner.deepClone(ccsData);
+	}
+	
+	public static void clearAllNode(){
+		nodes = new HashMap<Integer, CCSSourceData>();
+		nodeSize = 0;
+	}
+	
+	public static void clearAllEdge(){
+		edges = new HashMap<Integer, CCSEdgeData>();
+		edgeSize = 0;
+	}
 	
 	public static void disconnectAll(){
 		Map<Integer, CCSSourceData> nodesAll = nodes;
@@ -161,9 +202,9 @@ public class UiGlobals extends Globals{
 	}
 	
 	public static CCSSourceData addNode(CCSSourceData sourceData){
-		nodes.put(nodeSize, sourceData);
 		nodeSize++;
-		sourceData.setIndex(nodeSize-1);
+		nodes.put(nodeSize, sourceData);
+		sourceData.setIndex(nodeSize);
 		return sourceData;
 	}
 	

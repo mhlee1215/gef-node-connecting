@@ -29,6 +29,7 @@
 package ac.kaist.ccs.ui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -36,9 +37,11 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.ModeCreateFigCircle;
@@ -53,6 +56,8 @@ import org.tigris.gef.ui.ToolBar;
 import ac.kaist.ccs.base.CmdZoom;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSSourceData;
+import ac.kaist.ccs.domain.CCSStatics;
+import ac.kaist.ccs.ui.NodePaletteFig.ComboItem;
 
 /**
  * A Palette that defines buttons to create lines, rectangles, rounded
@@ -72,6 +77,8 @@ import ac.kaist.ccs.domain.CCSSourceData;
  */
 
 public class NodePaletteFig extends WestToolBar implements ActionListener, PropertyChangeListener{
+	
+	
 
     /**
      * 
@@ -93,8 +100,8 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
      * pressed.
      */
     public void defineButtons() {
-        this.setBackground(Color.black);
-        this.setForeground(Color.black);
+        this.setBackground(Color.white);
+        this.setForeground(Color.white);
         
         //add(new CmdSetMode(ModeCreateFigLine.class, "Line"));
         //add(new CmdSetMode(ModeCreateFigText.class, "Text"));
@@ -109,11 +116,48 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
         //	add(new CmdShowFuncAssociate(), "FuncAssociatie", "funcAssociate", ToolBar.BUTTON_TYPE_TEXT);
         //add(new CmdShowAbout(), "Show About", "about1", ToolBar.BUTTON_TYPE_NO_TEXT);
         
+        JLabel viewTypeLabel = new JLabel("View Type :");
+        add(viewTypeLabel);
+        
         String[] viewTypeStrings = {"CO2 Amount", "Cost"}; 
         JComboBox viewTypeCombo = new JComboBox(viewTypeStrings);
+        //viewTypeCombo.setPreferredSize(new Dimension(200, 30));
         viewTypeCombo.setName("ViewTypeCombo");
         add(viewTypeCombo);
         viewTypeCombo.addActionListener(this);
+        
+        JLabel connectTypeLabel = new JLabel("Connect Type :");
+        add(connectTypeLabel);
+        
+        Vector<ComboItem> connectComboItemList = new Vector<ComboItem>();
+        connectComboItemList.add(new ComboItem("1. Star", CCSStatics.CONNECT_TYPE_STAR));
+        connectComboItemList.add(new ComboItem("2. Tree", CCSStatics.CONNECT_TYPE_TREE));
+        connectComboItemList.add(new ComboItem("3. Backbone", CCSStatics.CONNECT_TYPE_BACKBONE));
+        connectComboItemList.add(new ComboItem("4. Hybrid", CCSStatics.CONNECT_TYPE_HYBRID));
+        
+        JComboBox<ComboItem> connectTypeCombo = new JComboBox<ComboItem>(connectComboItemList);
+     
+        connectTypeCombo.setName("ConnectTypeCombo");
+        add(connectTypeCombo);
+        connectTypeCombo.addActionListener(this);
+        
+        JLabel costTypeLabel = new JLabel("Cost Type :");
+        add(costTypeLabel);
+        
+        Vector<ComboItem> costComboItemList = new Vector<ComboItem>();
+        costComboItemList.add(new ComboItem("1. The Ogden Models", CCSStatics.COST_TYPE_1));
+        costComboItemList.add(new ComboItem("2. MIT model", CCSStatics.COST_TYPE_2));
+        costComboItemList.add(new ComboItem("3. Ecofys Model", CCSStatics.COST_TYPE_3));
+        costComboItemList.add(new ComboItem("4. IEA GHG PH4/6", CCSStatics.COST_TYPE_4));
+        costComboItemList.add(new ComboItem("5. IEA GHG 2005/2", CCSStatics.COST_TYPE_5));
+        costComboItemList.add(new ComboItem("6. IEA GHG 2005/2", CCSStatics.COST_TYPE_6));
+        costComboItemList.add(new ComboItem("7. Parker model", CCSStatics.COST_TYPE_7));
+         
+        JComboBox<ComboItem> costTypeCombo = new JComboBox<ComboItem>(costComboItemList);
+     
+        costTypeCombo.setName("CostTypeCombo");
+        add(costTypeCombo);
+        costTypeCombo.addActionListener(this);
 		//add(resetButton);
 		
 		
@@ -149,7 +193,15 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
 	            }
 				
 	            UiGlobals.graph.getEditor().damageAll();
+			}else if("ConnectTypeCombo".equals(cb.getName())){
+				ComboItem selectedItem = (ComboItem) cb.getSelectedItem();
+				System.out.println("selectedItem: "+selectedItem);
+			}else if("CostTypeCombo".equals(cb.getName())){
+				ComboItem selectedItem = (ComboItem) cb.getSelectedItem();
+				System.out.println("selectedItem: "+selectedItem);
 			}
+			
+			
 		    
 		}
 	}
@@ -158,5 +210,28 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
 	public void propertyChange(PropertyChangeEvent propertychangeevent) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public class ComboItem {
+	    private int value;
+	    private String label;
+
+	    public ComboItem(String label, int value) {
+	        this.value = value;
+	        this.label = label;
+	    }
+
+	    public int getValue() {
+	        return this.value;
+	    }
+
+	    public String getLabel() {
+	        return this.label;
+	    }
+
+	    @Override
+	    public String toString() {
+	        return label;
+	    }
 	}
 } /* end class PaletteFig */
