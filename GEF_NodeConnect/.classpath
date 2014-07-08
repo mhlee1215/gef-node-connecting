@@ -16,6 +16,5 @@
 	<classpathentry kind="lib" path="lib/commons-net-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="lib/JWizardComponent.jar"/>
-	<classpathentry kind="lib" path="lib/objenesis-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

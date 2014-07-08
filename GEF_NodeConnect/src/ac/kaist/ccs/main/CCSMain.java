@@ -239,8 +239,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 
 		// Insert Loading data
-		UiGlobals.ccsData  = makeRandomData(300, 500, 500);
-		//UiGlobals.ccsData = makeRefRandomData(refImage, refTerrainImage);
+		//UiGlobals.ccsData  = makeRandomData(300, 500, 500);
+		UiGlobals.ccsData = makeRefRandomData(refImage, refTerrainImage);
 		
 		UiGlobals.saveNodeSnapshot();
 	
