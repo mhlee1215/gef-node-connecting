@@ -29,6 +29,7 @@ import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.presentation.JNodeInfoPanel;
 import ac.kaist.ccs.ui.CNodeData;
 import ac.kaist.ccs.ui.NodeRenderManager;
+import ac.kaist.ccs.utils.DeepClone;
 
 public class UiGlobals extends Globals{
 	public static JGraph graph;
@@ -103,30 +104,49 @@ public class UiGlobals extends Globals{
 	private static int nodeSizeSnap = 0;
 	private static Map<Integer, CCSEdgeData> edgesSnap = null;//new HashMap<Integer, CCSEdgeData>();
 	private static int edgeSizeSnap = 0;
-	public static Map<Integer, List<CCSSourceData>> ccsDataSnap;
-	public static List<CCSEdgeData> ccsConDataSnap;
+	private static Map<Integer, List<CCSSourceData>> ccsDataSnap;
+	private static List<CCSEdgeData> ccsConDataSnap;
 	
 	
 	public static void saveNodeSnapshot(){
 		
-		nodesSnap= new HashMap<Integer, CCSSourceData>(nodes);
+		//nodesSnap= DeepClone.deepClone(nodes);
 		nodeSizeSnap = nodeSize;
 		
-		edgesSnap=new HashMap<Integer, CCSEdgeData>(edges);
+		//edgesSnap=DeepClone.deepClone(edges);
 		edgeSizeSnap = edgeSize;
 		
-		ccsDataSnap = new HashMap<Integer, List<CCSSourceData> >(ccsData);//cloner.deepClone(ccsData);
+		//ccsDataSnap = new HashMap<Integer, List<CCSSourceData> >(ccsData);//cloner.deepClone(ccsData);
+		
+		
+		ccsDataSnap = DeepClone.deepClone(ccsData);
+		//System.out.println("SAVE - ccsDataSnap:"+ccsDataSnap);
+		
+		
+		
+//		ccsData.get(CCSSourceData.TYPE_HUB).get(0).getChildSources().add(123123);
+//		
+//		System.out.println("TEST - ccsDataSnap:"+ccsDataSnap.get(CCSSourceData.TYPE_HUB));
+//		System.out.println("TEST - ccsData:"+ccsData.get(CCSSourceData.TYPE_HUB));
 		//ccsConDataSnap = cloner.deepClone(ccsConData);
 	}
 	
 	public static void loadNodeSnapshot(){
-		nodes= new HashMap<Integer, CCSSourceData>(nodesSnap);
+		nodes=new HashMap<Integer, CCSSourceData>();//DeepClone.deepClone(nodesSnap);
 		nodeSize = nodeSizeSnap;
+//		
+		//edges=DeepClone.deepClone(edgesSnap);
+		//edgeSize = edgeSizeSnap;
 		
-		edges=new HashMap<Integer, CCSEdgeData>(edgesSnap);
-		edgeSize = edgeSizeSnap;
+		ccsData = DeepClone.deepClone(ccsDataSnap);//cloner.deepClone(ccsData);
+		for(Integer key : ccsData.keySet()){
+			for(CCSSourceData data : ccsData.get(key)){
+				nodes.put(data.getIndex(), data);
+			}
+		}
 		
-		ccsData = new HashMap<Integer, List<CCSSourceData> >(ccsDataSnap);//cloner.deepClone(ccsData);
+		//System.out.println("LOAD - ccsDataSnap:"+ccsDataSnap.get(CCSSourceData.TYPE_HUB));
+		//System.out.println("LOAD - ccsData:"+ccsData.get(CCSSourceData.TYPE_HUB));
 	}
 	
 	public static void clearAllNode(){
@@ -187,6 +207,10 @@ public class UiGlobals extends Globals{
 	
 	public static CCSSourceData getNode(int index){
 		return nodes.get(index);
+	}
+	
+	public static CCSSourceData setNode(CCSSourceData data){
+		return nodes.put(data.getIndex(), data);
 	}
 	
 	public static CCSEdgeData getEdge(int index){
@@ -719,7 +743,10 @@ public class UiGlobals extends Globals{
 	
 	
 	
-	
+	public static void main(String[] argv){
+		
+		
+	}
 	
 	
 	

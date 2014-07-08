@@ -30,6 +30,13 @@ public class CCSHubData extends CCSSourceData {
 		
 	}
 	
+	@Override
+	public CCSHubData clone(){
+		CCSHubData clone = new CCSHubData(x, y, co2_amount, industry_type, terrain_type, range);
+		clone.setIndex(index);
+		return clone;
+	}
+	
 	public int getRange() {
 		return range;
 	}

@@ -475,7 +475,9 @@ public class FigCCSLine extends Fig {
         return rect.intersectsLine(_x1, _y1, _x2, _y2);
     }
 
-    
+    public String toString(){
+    	return "<"+Integer.toString(_x1)+","+Integer.toString(_y1)+">,<"+Integer.toString(_x2)+","+Integer.toString(_y2)+">";
+    }
     
     
 } /* end class FigLine */

@@ -27,6 +27,12 @@ public class CCSJointData extends CCSSourceData {
 		node.setOwner(this);
 	}
 	
+	@Override
+	public CCSJointData clone(){
+		CCSJointData clone = new CCSJointData(x, y);
+		clone.setIndex(index);
+		return clone;
+	}
 	
 
 	public float getCo2_amount() {

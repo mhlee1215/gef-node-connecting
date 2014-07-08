@@ -352,6 +352,7 @@ public class LoadingWorker extends JPanel
                 
                 //fig.reorder(func, lay);
                 if(node.getEdge() != null){
+                	//System.out.println("draw edge!"+node.getEdge().getEdgeFig());
                 	Fig edgeFig = node.getEdge().getEdgeFig();
                 	editor.add(edgeFig);
                 	edgeFig.reorder(ReorderAction.SEND_TO_BACK, editor.getLayerManager().getActiveLayer());
@@ -438,6 +439,7 @@ public class LoadingWorker extends JPanel
             }
             
             max_work += nodeList.size();
+            //System.out.println("nodeList: "+nodeList);
             addNode(nodeList);
             
 //            List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
