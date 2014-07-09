@@ -77,6 +77,7 @@ import org.tigris.gef.util.Localizer;
 import ac.kaist.ccs.base.CmdGetNodes;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.domain.CCSHubData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.ui.CNodeData;
@@ -116,8 +117,8 @@ public class FigHubNode extends FigCCSNode {
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON);
 			
-			CCSSourceData sData = (CCSSourceData) this.getOwner();
-	    	float magnitude = 0.0f;
+			CCSHubData sData = (CCSHubData) this.getOwner();
+	    	double magnitude = 0.0f;
 	    	if(sData.viewType == CCSSourceData.VIEW_TYPE_CO2)
 	    		magnitude = sData.getCo2_amount();
 	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_COST)
@@ -156,7 +157,7 @@ public class FigHubNode extends FigCCSNode {
      
         int nodeCount = 5;
         
-        nodeStr = "COST: "+Float.toString(sourceData.getCost());
+        nodeStr = "COST: "+Double.toString(sourceData.getCost());
         nodeStr += "<br>CO2: "+Float.toString(sourceData.getCo2_amount());
         nodeStr += "<br>Industry Type: "+sourceData.getIndustry_typeString();
         nodeStr += "<br>Terrain Type: "+sourceData.getTerrain_typeString();

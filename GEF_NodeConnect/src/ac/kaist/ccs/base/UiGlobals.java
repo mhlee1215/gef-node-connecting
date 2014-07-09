@@ -107,6 +107,7 @@ public class UiGlobals extends Globals{
 	private static Map<Integer, List<CCSSourceData>> ccsDataSnap;
 	private static List<CCSEdgeData> ccsConDataSnap;
 	
+	public static int viewType = CCSSourceData.VIEW_TYPE_CO2;
 	
 	public static void saveNodeSnapshot(){
 		

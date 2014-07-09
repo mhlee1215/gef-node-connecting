@@ -185,23 +185,28 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
 	            	if(nodesAll.get(key) != null){
 	            		if(cb.getSelectedIndex() == CCSSourceData.VIEW_TYPE_CO2){
 	            			nodesAll.get(key).viewType = CCSSourceData.VIEW_TYPE_CO2;
+	            			UiGlobals.viewType = CCSSourceData.VIEW_TYPE_CO2;
 	    				}else if(cb.getSelectedIndex() == CCSSourceData.VIEW_TYPE_COST){
 	    					nodesAll.get(key).viewType = CCSSourceData.VIEW_TYPE_COST;
+	    					UiGlobals.viewType = CCSSourceData.VIEW_TYPE_COST;
 	    				}
 	            		 
 	            	}
 	            }
 				
 	            UiGlobals.graph.getEditor().damageAll();
+	            
 			}else if("ConnectTypeCombo".equals(cb.getName())){
 				ComboItem selectedItem = (ComboItem) cb.getSelectedItem();
 				System.out.println("selectedItem: "+selectedItem);
 				
-				UiGlobals.nodeRenderManager.drawNodes(true, selectedItem.getValue());
+				UiGlobals.nodeRenderManager.drawNodes(true, selectedItem.getValue(), null);
 				
 			}else if("CostTypeCombo".equals(cb.getName())){
 				ComboItem selectedItem = (ComboItem) cb.getSelectedItem();
 				System.out.println("selectedItem: "+selectedItem);
+				
+				UiGlobals.nodeRenderManager.drawNodes(true, null, selectedItem.getValue());
 			}
 			
 			

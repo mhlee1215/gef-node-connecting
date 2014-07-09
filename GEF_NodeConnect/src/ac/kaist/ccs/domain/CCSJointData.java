@@ -59,7 +59,7 @@ public class CCSJointData extends CCSSourceData {
 
 
 
-	public float getCost() {
+	public double getCost() {
 		return cost;
 	}
 

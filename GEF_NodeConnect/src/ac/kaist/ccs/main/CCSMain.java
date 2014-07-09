@@ -79,6 +79,7 @@ import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.domain.CCSStatics.PlantData;
+import ac.kaist.ccs.domain.CCSStatics.StorageData;
 import ac.kaist.ccs.ui.NodePaletteFig;
 import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
@@ -353,6 +354,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 		List<CCSSourceData> sourceData = new ArrayList<CCSSourceData>();
 		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
+		List<CCSSourceData> storageData = new ArrayList<CCSSourceData>();
 
 		//System.out.println(CCSStatics.terrainColorMap);
 		
@@ -468,10 +470,21 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 //				//node.setIndex(index);
 //			}
 		}
+		
+		
+		for(Integer key : CCSStatics.storageMap.keySet()){
+			System.out.println("ADD STORAGE");
+			StorageData sData = CCSStatics.storageMap.get(key);
+			CCSPlantData storage = new CCSPlantData(sData.x, sData.y, sData.storagecapacity, sData.geological_information);
+			System.out.println(storage);
+			storageData.add(storage);
+			UiGlobals.addNode(storage);
+		}
 	
-		System.out.println("COLOR END!");
+		//System.out.println("COLOR END!");
 		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
 		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
+		ccsData.put(CCSSourceData.TYPE_PLANT, storageData);
 
 		return ccsData;
 	}
@@ -537,7 +550,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		for (int count = 0; count < size / 10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSSourceData node = new CCSPlantData(x, y);
+			CCSSourceData node = new CCSPlantData(x, y, 0, 1);
 			plantData.add(node);
 			UiGlobals.addNode(node);
 			//node.setIndex(index);

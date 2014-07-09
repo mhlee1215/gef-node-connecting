@@ -115,7 +115,7 @@ public class FigSourceNode extends FigCCSNode {
      
         int nodeCount = 5;
         
-        nodeStr = "COST: "+Float.toString(sourceData.getCost());
+        nodeStr = "COST: "+Double.toString(sourceData.getCost());
         nodeStr += "<br>CO2: "+Float.toString(sourceData.getCo2_amount());
         nodeStr += "<br>Industry Type: "+sourceData.getIndustry_typeString();
         nodeStr += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
@@ -192,7 +192,7 @@ public class FigSourceNode extends FigCCSNode {
 	    	
 	    	
 	    	CCSSourceData sData = (CCSSourceData) this.getOwner();
-	    	float magnitude = 0.0f;
+	    	double magnitude = 0.0f;
 	    	if(sData.viewType == CCSSourceData.VIEW_TYPE_CO2)
 	    		magnitude = sData.getCo2_amount();
 	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_COST)

@@ -26,6 +26,8 @@ public class NodeRenderManager {
 	public static final int _PADDING = 50;
 	Map<Integer, List<CCSSourceData> > ccsData;
 	List<CCSEdgeData> ccsConData;
+	int connectType;
+	int costType;
 	
 	public NodeRenderManager(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph)
 	{
@@ -42,26 +44,38 @@ public class NodeRenderManager {
 	
 	public void drawNodes(boolean removeExistedNodes)
 	{
-		drawNodes(removeExistedNodes, CCSStatics.CONNECT_TYPE_TREE);
+		drawNodes(removeExistedNodes, CCSStatics.CONNECT_TYPE_STAR, CCSStatics.COST_TYPE_THE_OGDEN_MODELS);
 	}
 		
-	public void drawNodes(boolean removeExistedNodes, int connectType)
+	public void drawNodes(boolean removeExistedNodes, Integer connectType, Integer costType)
 	{
+		if(connectType != null)
+			this.connectType = connectType;
+		if(costType != null)
+			this.costType = costType;
 		
 		UiGlobals.loadNodeSnapshot();
 		
-		if(connectType == CCSStatics.CONNECT_TYPE_STAR)
+		if(this.connectType == CCSStatics.CONNECT_TYPE_STAR)
 			makeStarCon(UiGlobals.ccsData);
-		else if(connectType == CCSStatics.CONNECT_TYPE_TREE)
+		else if(this.connectType == CCSStatics.CONNECT_TYPE_TREE)
 			makeTreeCon(UiGlobals.ccsData);
-		else if(connectType == CCSStatics.CONNECT_TYPE_BACKBONE)
+		else if(this.connectType == CCSStatics.CONNECT_TYPE_BACKBONE)
 			makeBackboneCon(UiGlobals.ccsData);
-		else if(connectType == CCSStatics.CONNECT_TYPE_HYBRID)
+		else if(this.connectType == CCSStatics.CONNECT_TYPE_HYBRID)
 			makeHybridCon(UiGlobals.ccsData);
 		
 		//System.out.println("UiGlobals.ccsData: "+UiGlobals.ccsData);
 		
-		//computeCostAll(CCSStatics.DIAMETER_688);
+		computeCostAll(this.costType);
+		
+		Map<Integer, CCSSourceData> nodesAll = UiGlobals.getNodes();
+        for(Integer key : nodesAll.keySet()){
+        	if(nodesAll.get(key) != null){
+        		nodesAll.get(key).viewType = UiGlobals.viewType;
+        	}
+        }
+		
 		
 		Editor editor = graph.getEditor();
 		
@@ -92,12 +106,14 @@ public class NodeRenderManager {
 		
 	}
 	
-	public void computeCostAll(int pipeType){
+	public void computeCostAll(int costType){
 		List<CCSSourceData> hubfNodes = UiGlobals.getHubNodes();
 		
 		for(CCSSourceData hub : hubfNodes){
-			hub.computeCost(pipeType);
+			hub.computeCost(costType, 1);
 		}
+		
+		CCSStatics.updateScalingFactor();
 		
 	}
 	
@@ -169,14 +185,14 @@ public class NodeRenderManager {
 			}
 		}
 
-		System.out.println("sourceData.size(): "+sourceData.size());
+		//System.out.println("sourceData.size(): "+sourceData.size());
 		for (int i = 0; i < sourceData.size(); i++) {
 
 			CCSSourceData curSrc = sourceData.get(i);
 			if (curSrc.getClusterHub() != null) {
 				
 				if (curSrc.getClusterHub().getType() == CCSNodeData.TYPE_HUB) {
-					System.out.println("??"+curSrc.getClusterHub().getType());
+					//System.out.println("??"+curSrc.getClusterHub().getType());
 					((CCSHubData) curSrc.getClusterHub()).addChildSource(curSrc
 							.getIndex());
 					// ((CCSHubData)curSrc.getHub()).getChildSources().add(curSrc);
@@ -184,7 +200,7 @@ public class NodeRenderManager {
 			}
 		}
 
-		System.out.println("ccsData CLuster: "+ccsData.get(CCSNodeData.TYPE_HUB));
+		//System.out.println("ccsData CLuster: "+ccsData.get(CCSNodeData.TYPE_HUB));
 		int sum = 0;
 		for(CCSSourceData h : ccsData.get(CCSNodeData.TYPE_HUB)){
 			sum += ((CCSHubData)h).getChildSources().size();
@@ -288,15 +304,27 @@ public class NodeRenderManager {
 		return new NodePair(minDistSrc, minDistConnectedSrc);
 	}
 
-	// public static void main(String[] argv){
-	// int x1 = 50;
-	// int y1 = 50;
-	//
-	// int x2 = 55;
-	// int y2 = 50;
-	//
-	// System.out.println(getAngle(x1, y1, x2, y2));
-	// }
+	 public static void main(String[] argv){
+		 double D = 10;
+		 float lou = 10;
+		 float m = 1000;
+		 float L = 20;
+		 float mu = 10;
+		 float p_outlet = 14;
+		 
+		 for (int i = 0 ; i < 10 ; i++){
+			 double Re =  ((4* (1000 / 24*3600*0.0254)) * (m / Math.PI * mu * D)); 
+			 double F_f = (1 / (4 * Math.pow(-1.8 * Math.log(6.91 / Re + (12*(0.00015 / D)/3.7)), 2)));
+			 D = (1 / 0.0254) * 
+					 Math.pow(
+							 (32*F_f*m*m)*(
+									 (Math.pow((1000 / (double)(24*3600)), 2))/
+									 (Math.PI*Math.PI*lou*((p_outlet - 0.1) / L)*(Math.pow(10, 6)/1000)))
+					 , 0.2);
+			 System.out.println("D:"+D+", RE:"+Re+", F_f:"+F_f);
+			 //System.out.println((Math.pow((1000 / (double)(24*3600)), 2)));
+		 }
+	 }
 
 	public float getAngle(CCSSourceData hub, CCSSourceData ref,
 			CCSSourceData newNode) {
