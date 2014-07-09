@@ -76,6 +76,8 @@ import org.tigris.gef.util.Localizer;
 import ac.kaist.ccs.base.CmdGetNodes;
 import ac.kaist.ccs.base.NodeDescriptor;
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.domain.CCSPlantData;
+import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.ui.CNodeData;
 
 /**
@@ -118,6 +120,40 @@ public class FigPlantNode extends FigCCSNode {
 		
 		
 	}
+	
+	@Override
+	public Vector getPopUpActions(MouseEvent me) {
+        Vector popUpActions = new Vector();
+        
+        Editor editor = UiGlobals.curEditor();
+        //List<Fig> list = editor.getSelectionManager().getSelectedFigs();
+        String nodeStr = "";
+        String prefix = "<html><body style=\"background-color: #ffffdd\"><h3><font color=#000000><span >";
+        String postfix = "</span></font></h3></body></html>";
+        
+        CCSPlantData sourceData = (CCSPlantData) this.getOwner();
+     
+        int nodeCount = 3;
+        System.out.println("sourceData: "+sourceData);
+        //nodeStr = "COST: "+Float.toString(sourceData.getCost());
+        nodeStr = "StorageCapacity(Kco2): "+Integer.toString(sourceData.getCapacity());
+        nodeStr += "<br>Geological Info.: "+sourceData.getGeo_infoString();
+        // += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
+        
+        JLabel name = new JLabel(prefix+nodeStr+postfix);
+        if(nodeCount > 5)
+        	name.setPreferredSize(new Dimension(300, (nodeCount+2)*24));
+        else
+        	name.setPreferredSize(new Dimension(300, (nodeCount)*24));
+        name.setToolTipText("The source properties are displayed.");
+        name.setOpaque(true);
+        name.setBackground(new Color(255, 255, 221));
+        name.setFocusable(false);
+        
+        popUpActions.addElement(name);
+        
+        return popUpActions;
+    }
 
 	
 } /* end class FigCircle */

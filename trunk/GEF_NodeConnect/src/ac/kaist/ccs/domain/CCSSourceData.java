@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.base.UiGlobals;
+import ac.kaist.ccs.domain.CCSStatics.CO2StateData;
 import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.fig.FigSourceNode;
 import ac.kaist.ccs.fig.FigPlantNode;
@@ -21,7 +22,7 @@ public class CCSSourceData extends CCSNodeData {
 
 	int index;
 	float co2_amount;
-	float cost;
+	double cost;
 	float rank;
 	int terrain_type;
 	int industry_type;
@@ -179,22 +180,84 @@ public class CCSSourceData extends CCSNodeData {
 		this.dst = dst.getIndex();
 	}
 
-	public float getCost() {
+	public double getCost() {
 		return cost;
 	}
 	
-	public float computeCost(int pipeDiameterType){
+	public double computeCost(int costType, int co2Type){
 		double childCost = 0;
 		
 		for(Integer childIdx : childSources){
 			CCSSourceData childNode = UiGlobals.getNode(childIdx);
-			childCost += childNode.computeCost(pipeDiameterType);
+			childCost += childNode.computeCost(costType, co2Type);
 		}
 		
-		Double unitTransportCost = CCSStatics.unitTransportCostMap.get(pipeDiameterType);
-		Double transportCapitalCost = CCSStatics.transportCapitalCostMap.get(pipeDiameterType);
-		this.cost = (float) (childCost + (float) (this.co2_amount * unitTransportCost + transportCapitalCost * distanceToDst));
+		double m = (this.co2_amount*1000)/365; // kCo2 -> tone/day
+		double L = distanceToDst;
+		
+		CO2StateData co2Data = CCSStatics.co2StateMap.get(co2Type);
+		
+		if(costType == CCSStatics.COST_TYPE_THE_OGDEN_MODELS){
+			this.cost = childCost + Math.pow((m / 1600), 0.48) * Math.pow((L / 100), 0.24);
+		}else if(costType == CCSStatics.COST_TYPE_MIT_MODEL){
+			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet);
+			this.cost = childCost + (20989 * D * L * 0.15) + 3100*L;
+		}else if(costType == CCSStatics.COST_TYPE_ECOFYS_MODEL){
+			//D^5 -> D 로 바꿔야 하는건지?
+			//TEMP
+			Double unitTransportCost = CCSStatics.unitTransportCostMap.get(1);
+			Double transportCapitalCost = CCSStatics.transportCapitalCostMap.get(1);
+			this.cost = (float) (childCost + (float) (this.co2_amount * unitTransportCost + transportCapitalCost * distanceToDst));
+		}else if(costType == CCSStatics.COST_TYPE_IEA_GHG_PH4_6){
+			//이건 진짜 이해 불가능..
+			//TEMP
+			Double unitTransportCost = CCSStatics.unitTransportCostMap.get(1);
+			Double transportCapitalCost = CCSStatics.transportCapitalCostMap.get(1);
+			this.cost = (float) (childCost + (float) (this.co2_amount * unitTransportCost + transportCapitalCost * distanceToDst));
+		}else if(costType == CCSStatics.COST_TYPE_IEA_GHG_2005_2){
+			double D = Math.pow(0.073*m / co2Data.lou, 0.5)/0.0254;
+			this.cost = childCost + (10.3 * Math.pow(10, 6) *((0.057*L+1.8663)+(0.00129*L)*D+(0.000486*L+0.000007)*D*D)+10.5*350000*L) / 
+						((1.1*1.1 - 1)/Math.pow(1.1, 20));
+		}else if(costType == CCSStatics.COST_TYPE_IEA_GHG_2005_3){
+			//TEMP
+			double D = Math.pow((4*m)/(18.41*Math.PI*co2Data.lou), 0.5);
+			//D 가 사용되지가 않음... 왜구한거지?
+			this.cost = childCost + 4335 * Math.pow(m/24, 0.5) * 1.02;
+		}else if(costType == CCSStatics.COST_TYPE_PARKER_MODEL){
+			//D 는 convergence model로 구하는게 맞는건가..
+			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet);
+			this.cost = childCost + ((673.5*D*D + 11755*D + 234085)*L/1.61 + 355000)/(10*((1.1*1.1 - 1)/Math.pow(1.1, 25)));
+		} 
+		
+		//Double unitTransportCost = CCSStatics.unitTransportCostMap.get(pipeDiameterType);
+		//Double transportCapitalCost = CCSStatics.transportCapitalCostMap.get(pipeDiameterType);
+		//this.cost = (float) (childCost + (float) (this.co2_amount * unitTransportCost + transportCapitalCost * distanceToDst));
 		return cost;
+	}
+	
+	public double getConvergedDiameter(double m, double L, double lou, double mu, double p_outlet){
+		double Dc = 0;
+		double D = 10;
+//		 float lou = 10;
+//		 float m = 1000;
+//		 float L = 20;
+//		 float mu = 10;
+//		 float p_outlet = 14;
+		 
+		 for (int i = 0 ; i < 5 ; i++){
+			 double Re =  ((4* (1000 / 24*3600*0.0254)) * (m / Math.PI * mu * D)); 
+			 double F_f = (1 / (4 * Math.pow(-1.8 * Math.log(6.91 / Re + (12*(0.00015 / D)/3.7)), 2)));
+			 D = (1 / 0.0254) * 
+					 Math.pow(
+							 (32*F_f*m*m)*(
+									 (Math.pow((1000 / (double)(24*3600)), 2))/
+									 (Math.PI*Math.PI*lou*((p_outlet - 0.1) / L)*(Math.pow(10, 6)/1000)))
+					 , 0.2);
+			 //System.out.println("D:"+D+", RE:"+Re+", F_f:"+F_f);
+			 //System.out.println((Math.pow((1000 / (double)(24*3600)), 2)));
+		 }
+		 Dc = D;
+		 return Dc;
 	}
 
 	public void setCost(float cost) {

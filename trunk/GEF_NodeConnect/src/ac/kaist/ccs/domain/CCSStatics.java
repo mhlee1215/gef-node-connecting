@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ac.kaist.ccs.base.UiGlobals;
+
 public class CCSStatics {
 	static boolean isInitialized = false;
 	
@@ -15,6 +17,36 @@ public class CCSStatics {
 	
 	public static float pixelToDistance = (float) (51.2 / 71);
 	public static float kilometerToMile = 0.621f;
+	
+	//초임
+	public static int CO2_STATE_EXTREME = 1;
+	//고밀도
+	public static int CO2_STATE_HIGH = 2;
+	//저온
+	public static int CO2_STATE_LOW = 1;
+	
+	public static Map<Integer, CO2StateData> co2StateMap = null;
+	
+	public static int STORAGE_ONSHORE_CHUNGNAM = 1;
+	public static int STORAGE_ONSHORE_TAEBACKSAN = 2;
+	public static int STORAGE_ONSHORE_MYUNGYEONG = 3;
+	public static int STORAGE_ONSHORE_GYEONGSANG = 4;
+	public static int STORAGE_ONSHORE_BUKPYEONG = 5;
+	
+	public static int STORAGE_OFFSHORE_BOKPYEONG = 6;
+	public static int STORAGE_OFFSHORE_ULLEUNG = 7;
+	public static int STORAGE_OFFSHORE_JEJU = 8;
+	public static int STORAGE_OFFSHORE_GUNSAN = 9;
+	public static int STORAGE_OFFSHORE_HEUKSAN = 10;
+	public static int STORAGE_OFFSHORE_POHANG = 11;
+	
+	public static int GEO_INFO_COALBED = 1;
+	public static int GEO_INFO_SANDSTONE = 2;
+	public static int GEO_INFO_SALINEAQUIFER = 3;
+	public static int GEO_INFO_EOR = 4;
+	
+	
+	public static Map<Integer, StorageData> storageMap = null;
 	
 	
 	public static int REGION_SEOUL = 1;
@@ -68,6 +100,14 @@ public class CCSStatics {
 	public static int COST_TYPE_6 = 6;
 	public static int COST_TYPE_7 = 7;
 	
+	public static int COST_TYPE_THE_OGDEN_MODELS = COST_TYPE_1;
+	public static int COST_TYPE_MIT_MODEL = COST_TYPE_2;
+	public static int COST_TYPE_ECOFYS_MODEL = COST_TYPE_3;
+	public static int COST_TYPE_IEA_GHG_PH4_6 = COST_TYPE_4;
+	public static int COST_TYPE_IEA_GHG_2005_2 = COST_TYPE_5;
+	public static int COST_TYPE_IEA_GHG_2005_3 = COST_TYPE_6;
+	public static int COST_TYPE_PARKER_MODEL = COST_TYPE_7;
+	
 	public static int CONNECT_TYPE_STAR = 1;
 	public static int CONNECT_TYPE_TREE = 2;
 	public static int CONNECT_TYPE_BACKBONE = 3;
@@ -93,9 +133,29 @@ public class CCSStatics {
 	public static void init(){
 		isInitialized = true;
 		
+		co2StateMap = new HashMap<Integer, CO2StateData>();
+		co2StateMap.put(CO2_STATE_EXTREME, new CO2StateData(6.16E-05, 745.5, 14f, 40, 4));
+		co2StateMap.put(CO2_STATE_HIGH, new CO2StateData(9.93E-05, 904.9, 8.5f, 10, 2));
+		co2StateMap.put(CO2_STATE_LOW, new CO2StateData(1.17E-04, 964.5, 6.5f, -20, 1));
+	
+		storageMap = new HashMap<Integer, StorageData>();
+		storageMap.put(STORAGE_ONSHORE_CHUNGNAM, new StorageData(110, 330, 10, GEO_INFO_COALBED));
+		storageMap.put(STORAGE_ONSHORE_TAEBACKSAN, new StorageData(400, 200, 6, GEO_INFO_COALBED));
+		storageMap.put(STORAGE_ONSHORE_MYUNGYEONG, new StorageData(310, 350, 13, GEO_INFO_COALBED));
+		storageMap.put(STORAGE_ONSHORE_GYEONGSANG, new StorageData(330, 415, 535, GEO_INFO_SANDSTONE));
+		storageMap.put(STORAGE_ONSHORE_BUKPYEONG, new StorageData(420, 140, 141, GEO_INFO_SANDSTONE));
+		storageMap.put(STORAGE_OFFSHORE_BOKPYEONG, new StorageData(480, 135, 877, GEO_INFO_SALINEAQUIFER));
+		storageMap.put(STORAGE_OFFSHORE_ULLEUNG, new StorageData(490, 160, 3018, GEO_INFO_EOR));
+		storageMap.put(STORAGE_OFFSHORE_JEJU, new StorageData(100, 695, 95101, GEO_INFO_EOR));
+		storageMap.put(STORAGE_OFFSHORE_GUNSAN, new StorageData(40, 420, 254, GEO_INFO_EOR));
+		storageMap.put(STORAGE_OFFSHORE_HEUKSAN, new StorageData(5, 680, 0, GEO_INFO_EOR));
+		storageMap.put(STORAGE_OFFSHORE_POHANG, new StorageData(480, 440, 38, GEO_INFO_SALINEAQUIFER));
+		
+		
+		
 		terrainAdditiveCost = new HashMap<Integer, Double>();
 		terrainMultiplier = new HashMap<Integer, Double>();
-		
+	
 		terrainAdditiveCost.put(TERRAIN_TYPE_FLAT_DRY, 50000.0);
 		terrainAdditiveCost.put(TERRAIN_TYPE_MOUNTAINOUS, 85000.0);
 		terrainAdditiveCost.put(TERRAIN_TYPE_MARCH_WETLAND, 100000.0);
@@ -273,22 +333,43 @@ public class CCSStatics {
 		
 	}
 	
-	public static int getScaledSize(float magnitude){
-		if(magnitude < 100){
-			return 5;
-		}else if(magnitude < 500){
-			return 9;
-		}else if(magnitude < 1000){
-			return 13;
-		}else if(magnitude < 3000){
-			return 15;
-		}else if(magnitude < 5000){
-			return 17;
-		}else if(magnitude < 7000){
-			return 19;
-		}else{
-			return 21;
+	public static void updateScalingFactor(){
+		double maxCost = 0;
+		for(Integer key : UiGlobals.getNodes().keySet()){
+			CCSSourceData data = UiGlobals.getNodes().get(key);
+			if(maxCost < data.cost){
+				maxCost = data.cost;
+			}
 		}
+		int maxSize = 21;
+		scalingFactor = (float) (maxSize / maxCost);
+		System.out.println("scalingFactor: "+scalingFactor);
+	}
+	
+	public static float scalingFactor = 1.0f;
+	
+	public static int getScaledSize(double magnitude){
+//		int scaledSize = (int)(magnitude * scalingFactor);
+//		if(scaledSize < 5) scaledSize = 5;
+//		return scaledSize;
+		
+		return (int) Math.max(5, Math.log10(magnitude)*3);
+		
+//		if(magnitude < 100){
+//			return 5;
+//		}else if(magnitude < 500){
+//			return 9;
+//		}else if(magnitude < 1000){
+//			return 13;
+//		}else if(magnitude < 3000){
+//			return 15;
+//		}else if(magnitude < 5000){
+//			return 17;
+//		}else if(magnitude < 7000){
+//			return 19;
+//		}else{
+//			return 21;
+//		}
 	}
 	
 	public static double convertCostViaTerrain(double cost, int type){
@@ -308,6 +389,36 @@ public class CCSStatics {
 		}
 		
 		
+	}
+	
+	public static class StorageData {
+		public int x;
+		public int y;
+		public int storagecapacity;
+		public int geological_information;
+		
+		public StorageData(int x, int y, int storagecapacity, int geological_information){		
+			this.x = x;
+			this.y = y;
+			this.storagecapacity = storagecapacity*1000;
+			this.geological_information = geological_information;
+		}
+	}
+	
+	public static class CO2StateData{
+		public double mu;
+		public double lou;
+		public double p_outlet;
+		public int num_pumpstation;
+		public double temperature;
+		
+		public CO2StateData(double mu, double lou, double p_outlet, int num_pumpstation, double temperature){
+			this.mu = mu;
+			this.lou = lou;
+			this.p_outlet = p_outlet;
+			this.num_pumpstation = num_pumpstation;
+			this.temperature = temperature;
+		}
 	}
 	
 	
