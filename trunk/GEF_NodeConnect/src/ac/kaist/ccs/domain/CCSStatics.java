@@ -352,8 +352,8 @@ public class CCSStatics {
 		double maxCost = 0;
 		for(Integer key : UiGlobals.getNodes().keySet()){
 			CCSSourceData data = UiGlobals.getNodes().get(key);
-			if(maxCost < data.cost){
-				maxCost = data.cost;
+			if(maxCost < data.pipelineCost){
+				maxCost = data.pipelineCost;
 			}
 		}
 		int maxSize = 21;
