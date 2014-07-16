@@ -22,7 +22,8 @@ public class CCSSourceData extends CCSNodeData {
 
 	int index;
 	float co2_amount;
-	double cost;
+	double compPumpCost;
+	double pipelineCost;
 	double pipe_diameter;
 	float rank;
 	int terrain_type;
@@ -182,7 +183,73 @@ public class CCSSourceData extends CCSNodeData {
 	}
 
 	public double getCost() {
-		return cost;
+		return pipelineCost;
+	}
+	
+	
+	public double computeCompressorPumtCost(int co2Type){
+		double childCompCost = 0;
+		
+		//System.out.println("childSources: "+childSources);
+		for(Integer childIdx : childSources){
+			CCSSourceData childNode = UiGlobals.getNode(childIdx);
+			childCompCost += childNode.computeCompressorPumtCost(co2Type);
+		}
+		
+		double m = (this.co2_amount*1000)/365; // kCo2 -> tone/day
+		CO2StateData co2Data = CCSStatics.co2StateMap.get(co2Type);
+		
+		double W_stotal = 0.0;
+		double N_train = 0.0;
+		double W_p = 0.0;
+		double m_train = 0.0;
+		double C_comp = 0.0;
+		double C_pump = 0.0;
+		double C_total = 0.0;
+		int N_pump = 0;
+		
+		//초임계
+		if(co2Type == CCSStatics.CO2_STATE_EXTREME){
+			W_stotal = 4.166 * m;
+			N_pump = (int) Math.ceil(this.distanceToDst / 50);
+		}
+		//고밀도
+		else if(co2Type == CCSStatics.CO2_STATE_HIGH){
+			W_stotal = 4.166 * m;
+			N_pump = (int) Math.ceil(this.distanceToDst / 100);
+		}
+		//저온
+		else if(co2Type == CCSStatics.CO2_STATE_LOW){
+			W_stotal = 4.046 * m;
+			N_pump = (int) Math.ceil(this.distanceToDst / 200);
+		}
+		
+		N_train = Math.ceil(W_stotal / 40000);
+		
+		double p_final = co2Data.p_outlet;
+		double p_cut_off = 7.38;
+		double p_initial = 0.1;
+		
+		//초임계 또는 고온
+		if(co2Type == CCSStatics.CO2_STATE_EXTREME || co2Type == CCSStatics.CO2_STATE_HIGH){
+			W_p = ((1000*10)/((double)24*36))*(m*(p_final - p_cut_off)/(0.75 * co2Data.lou));
+		}
+		//저온
+		else if(co2Type == CCSStatics.CO2_STATE_LOW){
+			W_p = 0;
+		}
+		
+		m_train = (1000*m) / (24*3600*N_train);
+		
+		//수식 이함. 대괄호 닫기가 없음.
+		C_comp = m_train * N_train * ((0.13*Math.pow(10, 6))*Math.pow(m_train,-0.71)+(1.40*Math.pow(10, 6))*Math.pow(m_train,-0.6)) * Math.log((p_cut_off)/(p_initial));
+		C_pump = ((1.11 * Math.pow(10, 6))*(W_p / 1000)) + 70000;
+		C_total = 0.19 * (C_comp + C_pump * N_pump);
+		
+		this.compPumpCost = childCompCost + C_total;
+		
+		
+		return this.compPumpCost;
 	}
 	
 	public double computeCost(int costType, int co2Type){
@@ -203,44 +270,44 @@ public class CCSSourceData extends CCSNodeData {
 		//Method 1
 		if(costType == CCSStatics.COST_TYPE_THE_OGDEN_MODELS){
 			double D = Math.pow((5084.5*L *f*m*m) / (co2Data.p_outlet*co2Data.p_outlet-0.01), 0.2);
-			this.cost = childCost + Math.pow((m / 1600), 0.48) * Math.pow((L / 100), 0.24) * 0.15 * L;
+			this.pipelineCost = childCost + Math.pow((m / 1600), 0.48) * Math.pow((L / 100), 0.24) * 0.15 * L;
 			this.pipe_diameter = D;
 		}
 		//Method 2
 		else if(costType == CCSStatics.COST_TYPE_MIT_MODEL){
 			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet);
-			this.cost = childCost + (20989 * D * L * 0.15) + 3100*L;
+			this.pipelineCost = childCost + (20989 * D * L * 0.15) + 3100*L;
 			this.pipe_diameter = D;
-		}else if(costType == CCSStatics.COST_TYPE_ECOFYS_MODEL){
+		}
+		//Method 3
+		else if(costType == CCSStatics.COST_TYPE_ECOFYS_MODEL){
 			double D = Math.pow((1.155*m*m*L)/((co2Data.p_outlet - 0.1)*co2Data.lou), 0.2);
-			this.cost = childCost + 154.7 * D * L;
+			this.pipelineCost = childCost + 154.7 * D * L;
 			this.pipe_diameter = D;
-		}else if(costType == CCSStatics.COST_TYPE_IEA_GHG_PH4_6){
+		}
+		//Method 4
+		else if(costType == CCSStatics.COST_TYPE_IEA_GHG_PH4_6){
 			double D = Math.pow((L*co2Data.lou*m*m) / (25041*(co2Data.p_outlet - 0.1)), 0.2);
 			double capitalCost = Math.pow(10, 6) * ((0.057 * L + 1.8663) + (0.00129 * L)*D + (0.000486 * L + 0.000007) * D*D );
 			double annualPipelineOMCost = 144000 + 0.61*(23213 * D + 899 * L - 259269) + 0.7*(39305 * D + 1694*L - 351355);
-			this.cost = childCost + capitalCost + annualPipelineOMCost;
-			this.pipe_diameter = D;
-		}else if(costType == CCSStatics.COST_TYPE_IEA_GHG_2005_2){
-			double D = Math.pow(0.073*m / co2Data.lou, 0.5)/0.0254;
-			this.cost = childCost + (10.3 * Math.pow(10, 6) *((0.057*L+1.8663)+(0.00129*L)*D+(0.000486*L+0.000007)*D*D)+10.5*350000*L) / 
-						((1.1*1.1 - 1)/Math.pow(1.1, 20));
-			this.pipe_diameter = D;
-		}else if(costType == CCSStatics.COST_TYPE_IEA_GHG_2005_3){
-			double D = Math.pow((4*m)/(18.41*Math.PI*co2Data.lou), 0.5);
-			this.cost = childCost + 4335 * Math.pow(m/24, 0.5) * 1.02;
+			this.pipelineCost = childCost + capitalCost + annualPipelineOMCost;
 			this.pipe_diameter = D;
 		}
-//		else if(costType == CCSStatics.COST_TYPE_PARKER_MODEL){
-//			//D 는 convergence model로 구하는게 맞는건가..
-//			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet);
-//			this.cost = childCost + ((673.5*D*D + 11755*D + 234085)*L/1.61 + 355000)/(10*((1.1*1.1 - 1)/Math.pow(1.1, 25)));
-//		} 
+		//Method 5
+		else if(costType == CCSStatics.COST_TYPE_IEA_GHG_2005_2){
+			double D = Math.pow(0.073*m / co2Data.lou, 0.5)/0.0254;
+			this.pipelineCost = childCost + (10.3 * Math.pow(10, 6) *((0.057*L+1.8663)+(0.00129*L)*D+(0.000486*L+0.000007)*D*D)+10.5*350000*L) / 
+						((1.1*1.1 - 1)/Math.pow(1.1, 20));
+			this.pipe_diameter = D;
+		}
+		//Method 6
+		else if(costType == CCSStatics.COST_TYPE_IEA_GHG_2005_3){
+			double D = Math.pow((4*m)/(18.41*Math.PI*co2Data.lou), 0.5);
+			this.pipelineCost = childCost + 4335 * Math.pow(m/24, 0.5) * 1.02;
+			this.pipe_diameter = D;
+		}
 		
-		//Double unitTransportCost = CCSStatics.unitTransportCostMap.get(pipeDiameterType);
-		//Double transportCapitalCost = CCSStatics.transportCapitalCostMap.get(pipeDiameterType);
-		//this.cost = (float) (childCost + (float) (this.co2_amount * unitTransportCost + transportCapitalCost * distanceToDst));
-		return cost;
+		return pipelineCost;
 	}
 	
 	public double getConvergedDiameter(double m, double L, double lou, double mu, double p_outlet){
@@ -269,11 +336,11 @@ public class CCSSourceData extends CCSNodeData {
 	}
 
 	public void setCost(float cost) {
-		this.cost = cost;
+		this.pipelineCost = cost;
 	}
 	
 	public void addCost(float cost) {
-		this.cost += cost;
+		this.pipelineCost += cost;
 	}
 
 
@@ -281,7 +348,7 @@ public class CCSSourceData extends CCSNodeData {
 	@Override
 	public String toString() {
 		return "CCSSourceData [index=" + index + ", co2_amount=" + co2_amount
-				+ ", cost=" + cost + ", rank=" + rank + ", terrain_type="
+				+ ", cost=" + pipelineCost + ", rank=" + rank + ", terrain_type="
 				+ terrain_type + ", industry_type=" + industry_type
 				+ ", clusterHub=" + clusterHub + ", dst=" + dst + ", edge="
 				+ edge + ", distanceToDst=" + distanceToDst + ", childSources="
