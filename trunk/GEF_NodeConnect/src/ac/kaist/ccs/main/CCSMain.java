@@ -366,10 +366,15 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			List<PlantData> plantList = CCSStatics.plantInfoMap.get(region_idx);
 			List<Dimension> locList = regionIdxMap.get(region_idx);
 			
+			int hub_size = CCSStatics.hubNumberMap.get(region_idx);
+			
+			List<Integer> sourceInThisRegion = new ArrayList<Integer>();
+			
 			for(PlantData plantData : plantList){
 				
 				List<Float> portions = getRandomPortions(plantData.plant_num);
-				int hub_cnt = random.nextInt(plantData.plant_num);
+				
+				
 				
 				for (int plant_count = 0; plant_count < plantData.plant_num; plant_count++) {
 					float cur_co2 = portions.get(plant_count) * plantData.co2_amount;
@@ -388,87 +393,33 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 					}
 
 					
-					if(hub_cnt == plant_count){
-						int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
-						CCSHubData node = new CCSHubData(x, y, cur_co2, plantData.industry_type, loc_terrain_type, range);
-						hubData.add(node);
-						UiGlobals.addNode(node);
-					}else{
-						CCSSourceData node = new CCSSourceData(x, y, cur_co2, plantData.industry_type, loc_terrain_type);
-						sourceData.add(node);
-						UiGlobals.addNode(node);
-					}
+					CCSSourceData node = new CCSSourceData(x, y, cur_co2, plantData.industry_type, loc_terrain_type);
+					sourceData.add(node);
+					UiGlobals.addNode(node);
+					sourceInThisRegion.add(node.getIndex());
 					
 					
 				}
 				
-//				for (int count = 0; count < hubPerEachRegion; count++) {
-//					Dimension curLoc = locList.get(random.nextInt(locList.size()));
-//					locList.remove(curLoc);
-//
-//					Integer loc_terrain_type = terrianTypexMap.get(curLoc);
-//					if(loc_terrain_type == null){
-//						count--;
-//						continue;
-//					}
-//					
-//					int x = cvtLoc((int) curLoc.getWidth());
-//					int y = cvtLoc((int) curLoc.getHeight());
-//					int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
-//					int co2 = random.nextInt(1000);
-//					CCSHubData node = new CCSHubData(x, y, co2, loc_terrain_type, range);
-//					hubData.add(node);
-//					UiGlobals.addNode(node);
-//					//node.setIndex(index);
-//				}
+				System.out.println("hub size:"+hub_size);
+				for(int i = 0 ; i < hub_size ; i++){
+					Integer hub_cnt = random.nextInt(sourceInThisRegion.size());
+					CCSSourceData curSrc = UiGlobals.getNode(sourceInThisRegion.get(hub_cnt));
+					sourceData.remove(curSrc);
+					int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
+					curSrc = new CCSHubData(curSrc, range);
+					hubData.add(curSrc);
+					//UiGlobals.addNode(node);
+					
+					
+					sourceInThisRegion.remove(hub_cnt);
+				}
 			}
 			
 			
 			
-//			for (int count = 0; count < sourcePerEachResgion; count++) {
-//				System.out.println("size :"+locList.size());
-//				
-//				Dimension curLoc = locList.get(random.nextInt(locList.size()));
-//				locList.remove(curLoc);
-//
-//				int x = cvtLoc((int) curLoc.getWidth());
-//				int y = cvtLoc((int) curLoc.getHeight());
-//				int co2 = random.nextInt(100);
-//				
-//				Integer loc_terrain_type = terrianTypexMap.get(curLoc);
-//				if(loc_terrain_type == null){
-//					count--;
-//					continue;
-//				}
-//
-//				CCSSourceData node = new CCSSourceData(x, y, co2, loc_terrain_type);
-//				
-//				node.setCo2_amount(co2);
-//				sourceData.add(node);
-//				UiGlobals.addNode(node);
-//				//node.setIndex(index);
-//
-//			}
-//
-//			for (int count = 0; count < hubPerEachRegion; count++) {
-//				Dimension curLoc = locList.get(random.nextInt(locList.size()));
-//				locList.remove(curLoc);
-//
-//				Integer loc_terrain_type = terrianTypexMap.get(curLoc);
-//				if(loc_terrain_type == null){
-//					count--;
-//					continue;
-//				}
-//				
-//				int x = cvtLoc((int) curLoc.getWidth());
-//				int y = cvtLoc((int) curLoc.getHeight());
-//				int range = 100;
-//				int co2 = random.nextInt(100);
-//				CCSSourceData node = new CCSHubData(x, y, co2, loc_terrain_type, range);
-//				hubData.add(node);
-//				UiGlobals.addNode(node);
-//				//node.setIndex(index);
-//			}
+			
+			
 		}
 		
 		

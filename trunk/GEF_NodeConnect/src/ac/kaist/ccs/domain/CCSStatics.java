@@ -63,6 +63,7 @@ public class CCSStatics {
 	public static int REGION_JEONNAM = 12;
 	public static int REGION_JEONBUK = 13;
 	
+	public static Map<Integer, Integer> hubNumberMap = null;
 	public static Map<Color, Integer> regionColorMap = null;
 	
 	public static Map<Integer, List<PlantData> > plantInfoMap = null;
@@ -201,6 +202,20 @@ public class CCSStatics {
 		
 		List<PlantData> plnatList = null;
 		
+		hubNumberMap = new HashMap<Integer, Integer>();
+		hubNumberMap.put(REGION_SEOUL, 0);
+		hubNumberMap.put(REGION_INCHEON, 3);
+		hubNumberMap.put(REGION_KYUNGKI, 2);
+		hubNumberMap.put(REGION_CHUNGNAM, 3);
+		hubNumberMap.put(REGION_CHUNGBUK, 1);
+		hubNumberMap.put(REGION_KANGWON, 2);
+		hubNumberMap.put(REGION_KYUNGNAM, 0);
+		hubNumberMap.put(REGION_KYUNGBUK, 1);
+		hubNumberMap.put(REGION_DAEGU, 0);
+		hubNumberMap.put(REGION_PUSAN, 1);
+		hubNumberMap.put(REGION_ULSAN, 3);
+		hubNumberMap.put(REGION_JEONNAM, 3);
+		hubNumberMap.put(REGION_JEONBUK, 1);
 		
 		
 		plnatList = new ArrayList<PlantData>();

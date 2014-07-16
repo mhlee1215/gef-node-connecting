@@ -303,6 +303,52 @@ public class NodeRenderManager {
 
 		return new NodePair(minDistSrc, minDistConnectedSrc);
 	}
+	
+	public CCSSourceData getClosestPoint(Integer srcIdx,
+			List<Integer> secondIDList) {
+
+		CCSSourceData minDistSrc = null;
+		// minDistConnectedSrc = null;
+		double minDist = 9999999;
+
+		//System.out.println("firstIDList: "+firstIDList+", secondIDList:"+secondIDList);
+		CCSSourceData curSrc = UiGlobals.getNode(srcIdx);
+		//System.out.println("curSrc:"+curSrc.getIndex()+", childIndex:"+childIndex);
+
+		for (int k = 0; k < secondIDList.size(); k++) {
+			int connectedIndex = secondIDList.get(k);
+			CCSSourceData curConnected = UiGlobals.getNode(connectedIndex);
+
+			double curDist = dist(curSrc, curConnected);
+			if (minDist > curDist) {
+				minDist = curDist;
+				minDistSrc = curSrc;
+				//minDistConnectedSrc = curConnected;
+			}
+		}
+
+		return minDistSrc;
+	}
+	
+	public CCSSourceData getClosestPoint(CCSSourceData curSrc,
+			List<CCSSourceData> secondIDList) {
+
+		//CCSSourceData minDistSrc = null;
+		CCSSourceData minDistConnectedSrc = null;
+		double minDist = 9999999;
+
+		for(CCSSourceData curConnected : secondIDList){
+
+			double curDist = dist(curSrc, curConnected);
+			if (minDist > curDist) {
+				minDist = curDist;
+				//minDistSrc = curSrc;
+				minDistConnectedSrc = curConnected;
+			}
+		}
+
+		return minDistConnectedSrc;
+	}
 
 	 public static void main(String[] argv){
 		 double D = 10;
@@ -511,12 +557,19 @@ public class NodeRenderManager {
 
 		double distMax = dist(ref, hub);
 		double lengthToOrth = (mx * cx + my * cy) / distMax;
+		
+		if(lengthToOrth < 0) return null;
 
 		int ox = (int) (lengthToOrth * mx / distMax);
 		int oy = (int) (lengthToOrth * my / distMax);
 
 		CCSSourceData node = new CCSJointData(hub.getX() + ox, hub.getY() + oy);
-		return node;
+		
+		double distToJoint = dist(hub, node);
+		if(distToJoint > distToRef)
+			return null;
+		else
+			return node;
 	}
 
 	public class NodePair {
@@ -580,9 +633,15 @@ public class NodeRenderManager {
 		for (int j = 0; j < hubData.size(); j++) {
 
 			CCSHubData curHub = (CCSHubData) hubData.get(j);
+			List<CCSSourceData> connectedData = new ArrayList<CCSSourceData>();
+			connectedData.add(curHub);
 
 			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getChildSources());
+			if(childIndexList.size() == 0) continue;
+			
 			List<SortTuple> nodesSortByRank = new ArrayList<SortTuple>();
+			
+			
 
 			// Get Nodes with rank with descending order
 			for (int i = 0; i < childIndexList.size(); i++) {
@@ -594,12 +653,42 @@ public class NodeRenderManager {
 
 			Collections.sort(nodesSortByRank, new NoDecCompare());
 
+			
+			//Add Highest rank node
+			CCSSourceData highestRankSrc = UiGlobals.getNode(nodesSortByRank.get(0).firstId);
+			connectedData.add(highestRankSrc);
+			highestRankSrc.connectTo(curHub);
+			
 			// Add from high rank node
 			// Actual adding routine.
-			for (int i = 0; i < nodesSortByRank.size(); i++) {
+			for (int i = 1; i < nodesSortByRank.size(); i++) {
 				int highRankNodeId = nodesSortByRank.get(i).firstId;
 				CCSSourceData curSrc = UiGlobals.getNode(highRankNodeId);
 
+				//Get shortest length to connected node list
+				CCSSourceData closestPoint = getClosestPoint(curSrc, connectedData);
+				//Get shortest length to projected node list
+				CCSSourceData possibleJoint = getProjectionPoint(curHub, closestPoint, curSrc);
+				if(possibleJoint == null){
+					curSrc.connectTo(closestPoint);
+				}else{
+					double distToClosest = dist(closestPoint, curSrc);
+					double distToJoint = dist(possibleJoint, curSrc);
+					if(distToClosest < distToJoint){
+						//System.out.println("curSrc:"+curSrc+", closestPoint:"+closestPoint);
+						curSrc.connectTo(closestPoint);
+					}else{
+						UiGlobals.addNode(possibleJoint);
+
+						// maxDistSrc : 가장 먼 노드 (이미 연결되있음)
+						// node : joint 노드
+						// curSrc : 연결할 새로운 노드
+						// curHub : 현재 허브 노드
+						jointConnection(closestPoint, possibleJoint, curSrc, closestPoint.getDst());
+					}
+				}
+				
+				connectedData.add(curSrc);
 			}
 
 		}

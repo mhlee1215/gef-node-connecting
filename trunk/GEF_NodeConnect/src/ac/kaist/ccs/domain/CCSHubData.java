@@ -19,6 +19,17 @@ public class CCSHubData extends CCSSourceData {
 		
 	int range;
 	
+
+	public CCSHubData(CCSSourceData data, int range) {
+		super(data.x, data.y, data.co2_amount, data.industry_type, data.terrain_type);
+		this.type = CCSNodeData.TYPE_HUB;
+		this.index = data.index;
+		this.range = range;
+		int size = 7;
+		node = new FigHubNode(x, y, size, size, range);
+		node.setOwner(this);
+		
+	}
 	
 	public CCSHubData(int x, int y, float co2_amount, int industry_type, int terrain_type, int range) {
 		super(x, y, co2_amount, industry_type, terrain_type);
