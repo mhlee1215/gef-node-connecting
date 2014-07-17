@@ -27,7 +27,7 @@ public class CCSHubData extends CCSSourceData {
 		this.range = range;
 		int size = 7;
 		node = new FigHubNode(x, y, size, size, range);
-		node.setOwner(this);
+		//node.setOwner(this);
 		
 	}
 	
@@ -37,7 +37,7 @@ public class CCSHubData extends CCSSourceData {
 		this.range = range;
 		int size = 7;
 		node = new FigHubNode(x, y, size, size, range);
-		node.setOwner(this);
+		//node.setOwner(this);
 		
 	}
 	

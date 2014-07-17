@@ -282,8 +282,8 @@ public class FigCCSNode extends FigRect implements MouseListener {
 	    	
 	    	g2.setColor(old);
 	    	
-	    	if(this.getOwner() instanceof CCSSourceData){
-	    		CCSSourceData owner = (CCSSourceData) getOwner();
+	    	if((int)this.getOwner() > 0){
+	    		CCSSourceData owner = (CCSSourceData) UiGlobals.getNode((int)getOwner());
 	    		Color fontColor = new Color(0, 0, 0);
 	    		g2.setColor(fontColor);
 	    		

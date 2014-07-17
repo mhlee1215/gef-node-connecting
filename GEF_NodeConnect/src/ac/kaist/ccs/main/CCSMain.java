@@ -6,6 +6,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -58,6 +61,7 @@ import org.tigris.gef.base.CmdUngroup;
 import org.tigris.gef.base.CmdUseReshape;
 import org.tigris.gef.base.CmdUseResize;
 import org.tigris.gef.base.CmdUseRotate;
+import org.tigris.gef.base.CmdZoomIn;
 import org.tigris.gef.base.DistributeAction;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.LayerGrid;
@@ -70,6 +74,7 @@ import org.tigris.gef.undo.UndoAction;
 import org.tigris.gef.util.Localizer;
 import org.tigris.gef.util.ResourceLoader;
 
+import ac.kaist.ccs.base.CmdZoom;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSHubData;
@@ -119,6 +124,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 	BufferedImage refImage = null;
 	BufferedImage refTerrainImage = null;
+	
+	JMenuItem showHub = null;
+	JMenuItem showStorage = null;
+	JMenu showConnection = null;
+	
 
 	public CCSMain() throws Exception {
 
@@ -350,11 +360,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		// int pixel = image.getRGB(j, i);
 		// printPixelARGB(pixel);
 
-		int hubPerEachRegion = 1;
 
 		List<CCSSourceData> sourceData = new ArrayList<CCSSourceData>();
 		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
 		List<CCSSourceData> storageData = new ArrayList<CCSSourceData>();
+		List<Integer> hubCandidateList = new ArrayList<Integer>();
 
 		//System.out.println(CCSStatics.terrainColorMap);
 		
@@ -405,29 +415,56 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				for(int i = 0 ; i < hub_size ; i++){
 					Integer hub_cnt = random.nextInt(sourceInThisRegion.size());
 					CCSSourceData curSrc = UiGlobals.getNode(sourceInThisRegion.get(hub_cnt));
-					sourceData.remove(curSrc);
-					int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
-					curSrc = new CCSHubData(curSrc, range);
-					hubData.add(curSrc);
-					//UiGlobals.addNode(node);
+					//curSrc = new CCSSourceData(curSrc, true);
+					hubCandidateList.add(sourceInThisRegion.get(hub_cnt));
+					//System.out.println("index : "+curSrc.getIndex()+" is set as candidate");
+					curSrc.setHubCandidate(true);
+					//UiGlobals.setNode(curSrc);
+					
+					//CCSSourceData test = UiGlobals.getNode(curSrc.getIndex());
+					//System.out.println("test index : "+test.getIndex()+" "+test.isHubCandidate());
+					//System.out.println("11curSrc.isHubCandidate(): "+curSrc.isHubCandidate());
+					//curSrc.setX(10);
+					
+//					sourceData.remove(curSrc);
+//					int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
+//					curSrc = new CCSHubData(curSrc, range);
+//					hubData.add(curSrc);
+//					//UiGlobals.addNode(node);
 					
 					
 					sourceInThisRegion.remove(hub_cnt);
 				}
 			}
+		}
+		
+//		Map<Integer, CCSSourceData> nodesAll = UiGlobals.getNodes();
+//		System.out.println(nodesAll);
+//        for(Integer key : nodesAll.keySet()){
+//        	if(nodesAll.get(key) != null){
+//        		System.out.println("is Hub? ("+key+")"+nodesAll.get(key).isHubCandidate());
+//        	}
+//        }
+		
+		for(int i = 0 ; i < 10 ; i++){
+			Integer hub_cnt = random.nextInt(hubCandidateList.size());
+			CCSSourceData curSrc = UiGlobals.getNode(hubCandidateList.get(hub_cnt));
+			//System.out.println("curSrc.isHubCandidate(): "+curSrc.isHubCandidate());
+			sourceData.remove(curSrc);
+			int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
+			curSrc = new CCSHubData(curSrc, range);
+			hubData.add(curSrc);
+			//UiGlobals.addNode(node);
 			
-			
-			
-			
-			
+			hubCandidateList.remove(hub_cnt);
 		}
 		
 		
 		for(Integer key : CCSStatics.storageMap.keySet()){
-			System.out.println("ADD STORAGE");
+			//System.out.println("ADD STORAGE");
 			StorageData sData = CCSStatics.storageMap.get(key);
 			CCSPlantData storage = new CCSPlantData(sData.x, sData.y, sData.storagecapacity, sData.geological_information);
-			System.out.println(storage);
+			//System.out.println(storage);
 			storageData.add(storage);
 			UiGlobals.addNode(storage);
 		}
@@ -643,142 +680,214 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		// file.add(new CmdClose());
 		exitItem = file.add(new CmdExit());
 
-		JMenu edit = new JMenu(Localizer.localize("GefBase", "Edit"));
-		edit.setMnemonic('E');
-		// _menubar.add(edit);
-
-		JMenuItem undoItem = edit.add(new UndoAction(Localizer.localize(
-				"GefBase", "Undo")));
-		undoItem.setMnemonic(Localizer.localize("GefBase", "UndoMnemonic")
-				.charAt(0));
-		JMenuItem redoItem = edit.add(new RedoAction(Localizer.localize(
-				"GefBase", "Redo")));
-		redoItem.setMnemonic(Localizer.localize("GefBase", "RedoMnemonic")
-				.charAt(0));
-
-		JMenu select = new JMenu(Localizer.localize("GefBase", "Select"));
-		edit.add(select);
-		select.add(new CmdSelectAll());
-		select.add(new CmdSelectNext(false));
-		select.add(new CmdSelectNext(true));
-		select.add(new CmdSelectInvert());
-
-		edit.addSeparator();
-
-		copyItem = edit.add(new CmdCopy());
-		copyItem.setMnemonic('C');
-		pasteItem = edit.add(new CmdPaste());
-		pasteItem.setMnemonic('P');
-
-		deleteItem = edit.add(new CmdRemoveFromGraph());
-		edit.addSeparator();
-		edit.add(new CmdUseReshape());
-		edit.add(new CmdUseResize());
-		edit.add(new CmdUseRotate());
-
 		JMenu view = new JMenu(Localizer.localize("GefBase", "View"));
-		// _menubar.add(view);
-		view.setMnemonic('V');
-		view.add(new CmdSpawn());
-		view.add(new CmdShowProperties());
-		// view.addSeparator();
-		// view.add(new CmdZoomIn());
-		// view.add(new CmdZoomOut());
-		// view.add(new CmdZoomNormal());
-		view.addSeparator();
-		view.add(new CmdAdjustGrid());
-		view.add(new CmdAdjustGuide());
-		view.add(new CmdAdjustPageBreaks());
+		_menubar.add(view);
+		view.add(new CmdZoom(1.2));
+		view.add(new CmdZoom(1/1.2));
+		
+		JMenu experiment = new JMenu(Localizer.localize("GefBase", "Experiment"));
+		_menubar.add(experiment);
+		
+		JMenuItem costExp = new JMenuItem("Cost Experimnet");
+		experiment.add(costExp);
+		costExp.addActionListener(new ActionListener() {
 
-		JMenu arrange = new JMenu(Localizer.localize("GefBase", "Arrange"));
-		// _menubar.add(arrange);
-		arrange.setMnemonic('A');
-		groupItem = arrange.add(new CmdGroup());
-		groupItem.setMnemonic('G');
-		ungroupItem = arrange.add(new CmdUngroup());
-		ungroupItem.setMnemonic('U');
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //JOptionPane.showMessageDialog(jMenuItem, "Successfully pressed a menu item");
+            	UiGlobals.getNodeRenderManager().computeCostExperiment();
+            }
+        });
+		
+		JMenuItem diaExp = new JMenuItem("Diameter Experimnet");
+		experiment.add(diaExp);
+		diaExp.addActionListener(new ActionListener() {
 
-		JMenu align = new JMenu(Localizer.localize("GefBase", "Align"));
-		arrange.add(align);
-		align.add(new AlignAction(AlignAction.ALIGN_TOPS));
-		align.add(new AlignAction(AlignAction.ALIGN_BOTTOMS));
-		align.add(new AlignAction(AlignAction.ALIGN_LEFTS));
-		align.add(new AlignAction(AlignAction.ALIGN_RIGHTS));
-		align.add(new AlignAction(AlignAction.ALIGN_H_CENTERS));
-		align.add(new AlignAction(AlignAction.ALIGN_V_CENTERS));
-		align.add(new AlignAction(AlignAction.ALIGN_TO_GRID));
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //JOptionPane.showMessageDialog(jMenuItem, "Successfully pressed a menu item");
+            	UiGlobals.getNodeRenderManager().computeDiameterExperiment();
+            }
+        });
+		
+		
+		JMenu stepByStep = new JMenu(Localizer.localize("GefBase", "Step-By-Step"));
+		_menubar.add(stepByStep);
+		JMenuItem showCo2Source = new JMenuItem("1. Show co2 source");
+		stepByStep.add(showCo2Source);
+		showCo2Source.addActionListener(new ActionListener() {
 
-		JMenu distribute = new JMenu(
-				Localizer.localize("GefBase", "Distribute"));
-		arrange.add(distribute);
-		distribute.add(new DistributeAction(DistributeAction.H_SPACING));
-		distribute.add(new DistributeAction(DistributeAction.H_CENTERS));
-		distribute.add(new DistributeAction(DistributeAction.V_SPACING));
-		distribute.add(new DistributeAction(DistributeAction.V_CENTERS));
-
-		JMenu reorder = new JMenu(Localizer.localize("GefBase", "Reorder"));
-		arrange.add(reorder);
-		toBackItem = reorder.add(new CmdReorder(CmdReorder.SEND_TO_BACK));
-		toFrontItem = reorder.add(new CmdReorder(CmdReorder.BRING_TO_FRONT));
-		backwardItem = reorder.add(new CmdReorder(CmdReorder.SEND_BACKWARD));
-		forwardItem = reorder.add(new CmdReorder(CmdReorder.BRING_FORWARD));
-
-		JMenu nudge = new JMenu(Localizer.localize("GefBase", "Nudge"));
-		arrange.add(nudge);
-		nudge.add(new NudgeAction(NudgeAction.LEFT));
-		nudge.add(new NudgeAction(NudgeAction.RIGHT));
-		nudge.add(new NudgeAction(NudgeAction.UP));
-		nudge.add(new NudgeAction(NudgeAction.DOWN));
-
-		KeyStroke ctrlO = KeyStroke.getKeyStroke(KeyEvent.VK_O,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlP = KeyStroke.getKeyStroke(KeyEvent.VK_P,
-				KeyEvent.CTRL_MASK);
-		KeyStroke altF4 = KeyStroke.getKeyStroke(KeyEvent.VK_F4,
-				KeyEvent.ALT_MASK);
-
-		KeyStroke delKey = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-		KeyStroke ctrlZ = KeyStroke.getKeyStroke(KeyEvent.VK_Z,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlY = KeyStroke.getKeyStroke(KeyEvent.VK_Y,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlV = KeyStroke.getKeyStroke(KeyEvent.VK_V,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlG = KeyStroke.getKeyStroke(KeyEvent.VK_G,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlU = KeyStroke.getKeyStroke(KeyEvent.VK_U,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B,
-				KeyEvent.CTRL_MASK);
-		KeyStroke ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
-				KeyEvent.CTRL_MASK);
-		KeyStroke sCtrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B,
-				KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK);
-		KeyStroke sCtrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
-				KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK);
-
-		openItem.setAccelerator(ctrlO);
-		saveItem.setAccelerator(ctrlS);
-		printItem.setAccelerator(ctrlP);
-		exitItem.setAccelerator(altF4);
-
-		deleteItem.setAccelerator(delKey);
-		undoItem.setAccelerator(ctrlZ);
-		redoItem.setAccelerator(ctrlY);
-		copyItem.setAccelerator(ctrlC);
-		pasteItem.setAccelerator(ctrlV);
-
-		groupItem.setAccelerator(ctrlG);
-		ungroupItem.setAccelerator(ctrlU);
-
-		toBackItem.setAccelerator(sCtrlB);
-		toFrontItem.setAccelerator(sCtrlF);
-		backwardItem.setAccelerator(ctrlB);
-		forwardItem.setAccelerator(ctrlF);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //JOptionPane.showMessageDialog(jMenuItem, "Successfully pressed a menu item");
+            	//UiGlobals.getNodeRenderManager().computeDiameterExperiment();
+            	int dialogResult = JOptionPane.showConfirmDialog (null, "Currently rendered data will be lost. Would you want to proceed?","Warning",JOptionPane.YES_NO_OPTION);
+            	if(dialogResult == JOptionPane.YES_OPTION){
+            		System.out.println("YES!");
+            	}
+            }
+        });
+		
+		showHub = new JMenuItem("2. Show Hub");
+		showHub.setEnabled(false);
+		stepByStep.add(showHub);
+		
+		showStorage = new JMenuItem("3. Show Storage");
+		showStorage.setEnabled(false);
+		stepByStep.add(showStorage);
+		
+		showConnection = new JMenu("4. Show Connection");
+		showConnection.setEnabled(false);
+		stepByStep.add(showConnection);
+		
+		JMenuItem connectionStar = new JMenuItem("Star connection");
+		showConnection.add(connectionStar);
+		
+		JMenuItem connectionTree = new JMenuItem("Tree connection");
+		showConnection.add(connectionTree);
+		
+		JMenuItem connectionBackbone = new JMenuItem("Backbone connection");
+		showConnection.add(connectionBackbone);
+		
+		JMenuItem connectionHybrid = new JMenuItem("Hybrid connection");
+		showConnection.add(connectionHybrid);
+		
+//		JMenu edit = new JMenu(Localizer.localize("GefBase", "Edit"));
+//		edit.setMnemonic('E');
+//		// _menubar.add(edit);
+//
+//		JMenuItem undoItem = edit.add(new UndoAction(Localizer.localize(
+//				"GefBase", "Undo")));
+//		undoItem.setMnemonic(Localizer.localize("GefBase", "UndoMnemonic")
+//				.charAt(0));
+//		JMenuItem redoItem = edit.add(new RedoAction(Localizer.localize(
+//				"GefBase", "Redo")));
+//		redoItem.setMnemonic(Localizer.localize("GefBase", "RedoMnemonic")
+//				.charAt(0));
+//
+//		JMenu select = new JMenu(Localizer.localize("GefBase", "Select"));
+//		edit.add(select);
+//		select.add(new CmdSelectAll());
+//		select.add(new CmdSelectNext(false));
+//		select.add(new CmdSelectNext(true));
+//		select.add(new CmdSelectInvert());
+//
+//		edit.addSeparator();
+//
+//		copyItem = edit.add(new CmdCopy());
+//		copyItem.setMnemonic('C');
+//		pasteItem = edit.add(new CmdPaste());
+//		pasteItem.setMnemonic('P');
+//
+//		deleteItem = edit.add(new CmdRemoveFromGraph());
+//		edit.addSeparator();
+//		edit.add(new CmdUseReshape());
+//		edit.add(new CmdUseResize());
+//		edit.add(new CmdUseRotate());
+//
+//		JMenu view = new JMenu(Localizer.localize("GefBase", "View"));
+//		// _menubar.add(view);
+//		view.setMnemonic('V');
+//		view.add(new CmdSpawn());
+//		view.add(new CmdShowProperties());
+//		// view.addSeparator();
+//		// view.add(new CmdZoomIn());
+//		// view.add(new CmdZoomOut());
+//		// view.add(new CmdZoomNormal());
+//		view.addSeparator();
+//		view.add(new CmdAdjustGrid());
+//		view.add(new CmdAdjustGuide());
+//		view.add(new CmdAdjustPageBreaks());
+//
+//		JMenu arrange = new JMenu(Localizer.localize("GefBase", "Arrange"));
+//		// _menubar.add(arrange);
+//		arrange.setMnemonic('A');
+//		groupItem = arrange.add(new CmdGroup());
+//		groupItem.setMnemonic('G');
+//		ungroupItem = arrange.add(new CmdUngroup());
+//		ungroupItem.setMnemonic('U');
+//
+//		JMenu align = new JMenu(Localizer.localize("GefBase", "Align"));
+//		arrange.add(align);
+//		align.add(new AlignAction(AlignAction.ALIGN_TOPS));
+//		align.add(new AlignAction(AlignAction.ALIGN_BOTTOMS));
+//		align.add(new AlignAction(AlignAction.ALIGN_LEFTS));
+//		align.add(new AlignAction(AlignAction.ALIGN_RIGHTS));
+//		align.add(new AlignAction(AlignAction.ALIGN_H_CENTERS));
+//		align.add(new AlignAction(AlignAction.ALIGN_V_CENTERS));
+//		align.add(new AlignAction(AlignAction.ALIGN_TO_GRID));
+//
+//		JMenu distribute = new JMenu(
+//				Localizer.localize("GefBase", "Distribute"));
+//		arrange.add(distribute);
+//		distribute.add(new DistributeAction(DistributeAction.H_SPACING));
+//		distribute.add(new DistributeAction(DistributeAction.H_CENTERS));
+//		distribute.add(new DistributeAction(DistributeAction.V_SPACING));
+//		distribute.add(new DistributeAction(DistributeAction.V_CENTERS));
+//
+//		JMenu reorder = new JMenu(Localizer.localize("GefBase", "Reorder"));
+//		arrange.add(reorder);
+//		toBackItem = reorder.add(new CmdReorder(CmdReorder.SEND_TO_BACK));
+//		toFrontItem = reorder.add(new CmdReorder(CmdReorder.BRING_TO_FRONT));
+//		backwardItem = reorder.add(new CmdReorder(CmdReorder.SEND_BACKWARD));
+//		forwardItem = reorder.add(new CmdReorder(CmdReorder.BRING_FORWARD));
+//
+//		JMenu nudge = new JMenu(Localizer.localize("GefBase", "Nudge"));
+//		arrange.add(nudge);
+//		nudge.add(new NudgeAction(NudgeAction.LEFT));
+//		nudge.add(new NudgeAction(NudgeAction.RIGHT));
+//		nudge.add(new NudgeAction(NudgeAction.UP));
+//		nudge.add(new NudgeAction(NudgeAction.DOWN));
+//
+//		KeyStroke ctrlO = KeyStroke.getKeyStroke(KeyEvent.VK_O,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlP = KeyStroke.getKeyStroke(KeyEvent.VK_P,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke altF4 = KeyStroke.getKeyStroke(KeyEvent.VK_F4,
+//				KeyEvent.ALT_MASK);
+//
+//		KeyStroke delKey = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+//		KeyStroke ctrlZ = KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlY = KeyStroke.getKeyStroke(KeyEvent.VK_Y,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlV = KeyStroke.getKeyStroke(KeyEvent.VK_V,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlG = KeyStroke.getKeyStroke(KeyEvent.VK_G,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlU = KeyStroke.getKeyStroke(KeyEvent.VK_U,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+//				KeyEvent.CTRL_MASK);
+//		KeyStroke sCtrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B,
+//				KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK);
+//		KeyStroke sCtrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+//				KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK);
+//
+//		openItem.setAccelerator(ctrlO);
+//		saveItem.setAccelerator(ctrlS);
+//		printItem.setAccelerator(ctrlP);
+//		exitItem.setAccelerator(altF4);
+//
+//		deleteItem.setAccelerator(delKey);
+//		undoItem.setAccelerator(ctrlZ);
+//		redoItem.setAccelerator(ctrlY);
+//		copyItem.setAccelerator(ctrlC);
+//		pasteItem.setAccelerator(ctrlV);
+//
+//		groupItem.setAccelerator(ctrlG);
+//		ungroupItem.setAccelerator(ctrlU);
+//
+//		toBackItem.setAccelerator(sCtrlB);
+//		toFrontItem.setAccelerator(sCtrlF);
+//		backwardItem.setAccelerator(ctrlB);
+//		forwardItem.setAccelerator(ctrlF);
 
 	}
 

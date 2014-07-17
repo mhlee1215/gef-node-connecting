@@ -22,9 +22,13 @@ public class CCSSourceData extends CCSNodeData {
 
 	int index;
 	float co2_amount;
+	float acc_co2_amount;
+	int co2_type;
 	double compPumpCost;
+	double compPumpCostMe;
 	double pipelineCost;
 	double pipe_diameter;
+	double pipe_diameterMe;
 	float rank;
 	int terrain_type;
 	int industry_type;
@@ -32,6 +36,8 @@ public class CCSSourceData extends CCSNodeData {
 	int clusterHub;
 	int dst;
 	int edge;
+	boolean isHubCandidate = false;
+	public int testVal;
 	
 	float distanceToDst;
 	protected List<Integer> childSources;
@@ -39,9 +45,26 @@ public class CCSSourceData extends CCSNodeData {
 	
 	public static int VIEW_TYPE_CO2 = 0;
 	public static int VIEW_TYPE_COST = 1;
+	public static int VIEW_TYPE_ACC_CO2 = 2;
 	public int viewType = VIEW_TYPE_CO2;
 	
-	
+	CCSExpData expData = null;
+
+	public boolean isHubCandidate() {
+		return isHubCandidate;
+	}
+
+	public void setHubCandidate(boolean isHubCandidate) {
+		this.isHubCandidate = isHubCandidate;
+	}
+
+	public CCSExpData getExpData() {
+		return expData;
+	}
+
+	public void setExpData(CCSExpData expData) {
+		this.expData = expData;
+	}
 
 	public CCSEdgeData connectTo(CCSSourceData dstNode){
 		//this.edge = new CCSEdgeData(this, dstNode);
@@ -60,22 +83,33 @@ public class CCSSourceData extends CCSNodeData {
 		return e;
 	}
 	
+	public float getAcc_co2_amount() {
+		return acc_co2_amount;
+	}
+
+	public void setAcc_co2_amount(float acc_co2_amount) {
+		this.acc_co2_amount = acc_co2_amount;
+	}
+
 	public int getIndex() {
 		return index;
 	}
 
 	public void setIndex(int index) {
 		this.index = index;
+		this.node.setOwner(this.index);
 	}
 
 	public CCSSourceData(int x, int y, float co2_amount, int terrain_type) {
 		super(x, y, CCSNodeData.TYPE_SOURCE);		
 		int size = 7;
 		node = new FigSourceNode(x, y, size, size);
-		node.setOwner(this);
+		node.setOwner(this.index);
 		this.co2_amount = co2_amount;
 		this.terrain_type = terrain_type;
 		childSources = new ArrayList<Integer>();
+		expData = new CCSExpData();
+		co2_type = CCSStatics.CO2_STATE_EXTREME;
 	}
 	
 	@Override
@@ -83,6 +117,7 @@ public class CCSSourceData extends CCSNodeData {
 		//System.out.println("CLONE!!!");
 		CCSSourceData clone = new CCSSourceData(x, y, co2_amount, industry_type, terrain_type);
 		clone.setIndex(index);
+		clone.setHubCandidate(this.isHubCandidate);
 		return clone;
 	}
 	
@@ -90,9 +125,14 @@ public class CCSSourceData extends CCSNodeData {
 		//super(x, y, CCSNodeData.TYPE_SOURCE);
 		this(x, y, co2_amount, terrain_type);
 		this.industry_type = industry_type;
-		
-		
 	}
+	
+//	public CCSSourceData(CCSSourceData data, boolean isHub){
+//		this(data.x, data.y, data.co2_amount, data.industry_type, data.terrain_type);
+//		this.index = data.index;
+//		this.isHubCandidate = isHub;
+//		this.testVal = 10;
+//	}
 
 	public List<Integer> getChildSources() {
 		return childSources;
@@ -187,6 +227,9 @@ public class CCSSourceData extends CCSNodeData {
 	}
 	
 	
+	public double computeCompressorPumtCost(){
+		return computeCompressorPumtCost(this.co2_type);
+	}
 	public double computeCompressorPumtCost(int co2Type){
 		double childCompCost = 0;
 		
@@ -199,32 +242,32 @@ public class CCSSourceData extends CCSNodeData {
 		double m = (this.co2_amount*1000)/365; // kCo2 -> tone/day
 		CO2StateData co2Data = CCSStatics.co2StateMap.get(co2Type);
 		
-		double W_stotal = 0.0;
-		double N_train = 0.0;
-		double W_p = 0.0;
+		double w_stotal = 0.0;
+		double n_train = 0.0;
+		double w_p = 0.0;
 		double m_train = 0.0;
-		double C_comp = 0.0;
-		double C_pump = 0.0;
-		double C_total = 0.0;
-		int N_pump = 0;
+		double c_comp = 0.0;
+		double c_pump = 0.0;
+		double c_total = 0.0;
+		int n_pump = 0;
 		
 		//초임계
 		if(co2Type == CCSStatics.CO2_STATE_EXTREME){
-			W_stotal = 4.166 * m;
-			N_pump = (int) Math.ceil(this.distanceToDst / 50);
+			w_stotal = 4.166 * m;
+			n_pump = (int) Math.ceil(this.distanceToDst / 50);
 		}
 		//고밀도
 		else if(co2Type == CCSStatics.CO2_STATE_HIGH){
-			W_stotal = 4.166 * m;
-			N_pump = (int) Math.ceil(this.distanceToDst / 100);
+			w_stotal = 4.166 * m;
+			n_pump = (int) Math.ceil(this.distanceToDst / 100);
 		}
 		//저온
 		else if(co2Type == CCSStatics.CO2_STATE_LOW){
-			W_stotal = 4.046 * m;
-			N_pump = (int) Math.ceil(this.distanceToDst / 200);
+			w_stotal = 4.046 * m;
+			n_pump = (int) Math.ceil(this.distanceToDst / 200);
 		}
 		
-		N_train = Math.ceil(W_stotal / 40000);
+		n_train = Math.ceil(w_stotal / 40000);
 		
 		double p_final = co2Data.p_outlet;
 		double p_cut_off = 7.38;
@@ -232,26 +275,61 @@ public class CCSSourceData extends CCSNodeData {
 		
 		//초임계 또는 고온
 		if(co2Type == CCSStatics.CO2_STATE_EXTREME || co2Type == CCSStatics.CO2_STATE_HIGH){
-			W_p = ((1000*10)/((double)24*36))*(m*(p_final - p_cut_off)/(0.75 * co2Data.lou));
+			w_p = ((1000*10)/((double)24*36))*(m*(p_final - p_cut_off)/(0.75 * co2Data.lou));
 		}
 		//저온
 		else if(co2Type == CCSStatics.CO2_STATE_LOW){
-			W_p = 0;
+			w_p = 0;
 		}
 		
-		m_train = (1000*m) / (24*3600*N_train);
+		m_train = (1000*m) / (24*3600*n_train);
 		
 		//수식 이함. 대괄호 닫기가 없음.
-		C_comp = m_train * N_train * ((0.13*Math.pow(10, 6))*Math.pow(m_train,-0.71)+(1.40*Math.pow(10, 6))*Math.pow(m_train,-0.6)) * Math.log((p_cut_off)/(p_initial));
-		C_pump = ((1.11 * Math.pow(10, 6))*(W_p / 1000)) + 70000;
-		C_total = 0.19 * (C_comp + C_pump * N_pump);
+		c_comp = m_train * n_train * ((0.13*Math.pow(10, 6))*Math.pow(m_train,-0.71)+(1.40*Math.pow(10, 6))*Math.pow(m_train,-0.6)) * Math.log((p_cut_off)/(p_initial));
+		c_pump = ((1.11 * Math.pow(10, 6))*(w_p / 1000)) + 70000;
+		c_total = 0.19 * (c_comp + c_pump * n_pump);
 		
-		this.compPumpCost = childCompCost + C_total;
+		this.compPumpCost = childCompCost + c_total;
 		
+		
+		expData.setW_stotal(w_stotal);
+		expData.setN_train(n_train);
+		expData.setW_p(w_p);
+		expData.setM_train(m_train);
+		expData.setC_comp(c_comp);
+		expData.setC_pump(c_pump);
+		expData.setC_total(c_total);
+		expData.setN_pump(n_pump);
+		expData.setCompPumpCost(compPumpCost);
+		expData.setCompPumpCostMe(c_total);
+//		double W_stotal = 0.0;
+//		double N_train = 0.0;
+//		double W_p = 0.0;
+//		double m_train = 0.0;
+//		double C_comp = 0.0;
+//		double C_pump = 0.0;
+//		double C_total = 0.0;
+//		int N_pump = 0;
 		
 		return this.compPumpCost;
 	}
 	
+	public float computeCo2(){
+		float childCo2 = 0;
+		
+		//System.out.println("childSources: "+childSources);
+		for(Integer childIdx : childSources){
+			CCSSourceData childNode = UiGlobals.getNode(childIdx);
+			childCo2 += childNode.computeCo2();
+		}
+		
+		this.acc_co2_amount = childCo2 + this.co2_amount;
+		return this.acc_co2_amount;
+	}
+	
+	public double computeCost(int costType){
+		return computeCost(costType, this.co2_type);
+	}
 	public double computeCost(int costType, int co2Type){
 		double childCost = 0;
 		
@@ -307,6 +385,10 @@ public class CCSSourceData extends CCSNodeData {
 			this.pipe_diameter = D;
 		}
 		
+		expData.setPipe_diameter(pipe_diameter);
+		expData.setPipelineCost(pipelineCost);
+		expData.setPipelineCostMe(pipelineCost - childCost);
+		
 		return pipelineCost;
 	}
 	
@@ -347,12 +429,22 @@ public class CCSSourceData extends CCSNodeData {
 
 	@Override
 	public String toString() {
-		return "CCSSourceData [index=" + index + ", co2_amount=" + co2_amount
-				+ ", cost=" + pipelineCost + ", rank=" + rank + ", terrain_type="
-				+ terrain_type + ", industry_type=" + industry_type
-				+ ", clusterHub=" + clusterHub + ", dst=" + dst + ", edge="
-				+ edge + ", distanceToDst=" + distanceToDst + ", childSources="
-				+ childSources + ", viewType=" + viewType + "]";
+		return "{\"index\":\"" + index + "\",\"co2_amount\":\"" + co2_amount
+				+ "\",\"acc_co2_amount\":\"" + acc_co2_amount
+				+ "\",\"co2_type\":\"" + co2_type + "\",\"compPumpCost\":\""
+				+ compPumpCost + "\",\"compPumpCostMe\":\"" + compPumpCostMe
+				+ "\",\"pipelineCost\":\"" + pipelineCost
+				+ "\",\"pipe_diameter\":\"" + pipe_diameter
+				+ "\",\"pipe_diameterMe\":\"" + pipe_diameterMe
+				+ "\",\"rank\":\"" + rank + "\",\"terrain_type\":\""
+				+ terrain_type + "\",\"industry_type\":\"" + industry_type
+				+ "\",\"clusterHub\":\"" + clusterHub + "\",\"dst\":\"" + dst
+				+ "\",\"edge\":\"" + edge + "\",\"isHubCandidate\":\""
+				+ isHubCandidate + "\",\"testVal\":\"" + testVal
+				+ "\",\"distanceToDst\":\"" + distanceToDst
+				+ "\",\"childSources\":\"" + childSources
+				+ "\",\"viewType\":\"" + viewType + "\",\"expData\":\""
+				+ expData + "\"}";
 	}
 	
 	

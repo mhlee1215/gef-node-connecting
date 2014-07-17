@@ -117,15 +117,17 @@ public class FigHubNode extends FigCCSNode {
 			RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON);
 			
-			CCSHubData sData = (CCSHubData) this.getOwner();
+			CCSHubData sData = (CCSHubData) UiGlobals.getNode((int)this.getOwner());
 	    	double magnitude = 0.0f;
 	    	if(sData.viewType == CCSSourceData.VIEW_TYPE_CO2)
 	    		magnitude = sData.getCo2_amount();
 	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_COST)
 	    		magnitude = sData.getCost();
+	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_ACC_CO2)
+	    		magnitude = sData.getAcc_co2_amount();
 			
-			_w = CCSStatics.getScaledSize(magnitude);
-	    	_h = CCSStatics.getScaledSize(magnitude);
+			_w = CCSStatics.getScaledSize(magnitude, sData.viewType);
+	    	_h = CCSStatics.getScaledSize(magnitude, sData.viewType);
 			
 			Color old = g2.getColor();
 			g2.setComposite(makeComposite(0.1f));
@@ -153,12 +155,13 @@ public class FigHubNode extends FigCCSNode {
         String prefix = "<html><body style=\"background-color: #ffffdd\"><h3><font color=#000000><span >";
         String postfix = "</span></font></h3></body></html>";
         
-        CCSSourceData sourceData = (CCSSourceData) this.getOwner();
+        CCSSourceData sourceData = (CCSSourceData) UiGlobals.getNode((int)this.getOwner());
      
         int nodeCount = 5;
         
         nodeStr = "COST: "+Double.toString(sourceData.getCost());
         nodeStr += "<br>CO2: "+Float.toString(sourceData.getCo2_amount());
+        nodeStr += "<br>ACC CO2: "+Float.toString(sourceData.getAcc_co2_amount());
         nodeStr += "<br>Industry Type: "+sourceData.getIndustry_typeString();
         nodeStr += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
         

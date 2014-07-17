@@ -1,17 +1,32 @@
 package ac.kaist.ccs.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.graph.presentation.JGraph;
 
+import ac.kaist.ccs.base.CustomCellRenderer;
+import ac.kaist.ccs.base.MyTableModel;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
+import ac.kaist.ccs.domain.CCSExpData;
 import ac.kaist.ccs.domain.CCSHubData;
 import ac.kaist.ccs.domain.CCSJointData;
 import ac.kaist.ccs.domain.CCSNodeData;
@@ -107,14 +122,289 @@ public class NodeRenderManager {
 	}
 	
 	public void computeCostAll(int costType){
+		computeCostAll(costType, 0);
+	}
+	
+	public void computeCostAll(int costType, int co2Type){
 		List<CCSSourceData> hubfNodes = UiGlobals.getHubNodes();
 		
 		for(CCSSourceData hub : hubfNodes){
-			hub.computeCost(costType, 1);
+			if(co2Type == 0){
+				hub.computeCost(costType);
+				hub.computeCompressorPumtCost();
+			}else{
+				hub.computeCost(costType, co2Type);
+				hub.computeCompressorPumtCost(co2Type);
+			}
+			hub.computeCo2();
 		}
 		
-		CCSStatics.updateScalingFactor();
+		CCSStatics.updateScalingFactor(CCSSourceData.VIEW_TYPE_CO2);
 		
+	}
+	
+	public void computeCostExperiment(){
+		
+		
+		List<CCSSourceData> ccsSourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		Vector<Vector> rowData = new Vector<Vector>(ccsSourceData.size());
+		Map<Integer, Integer> rowIndexMap = new HashMap<Integer, Integer>();
+		
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = new Vector();
+			row.add(data.getIndex());
+			for(int i = 0 ; i < 18 ; i++){
+				row.add("N/A");
+			}
+			rowData.add(row);
+			rowIndexMap.put(data.getIndex(), rowData.size()-1);
+		}
+		
+		computeCostAll(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_EXTREME);
+		int offset = 1;
+		String formatStr = "%.3f";
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			
+			//System.out.println(UiGlobals.getNode(data.getIndex()).getExpData());
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			row.set(offset + 3*0, String.format(formatStr, expData.getW_stotal()));
+			row.set(offset + 3*1, String.format(formatStr, expData.getN_train()));
+			row.set(offset + 3*2, String.format(formatStr, expData.getC_comp()));
+			row.set(offset + 3*3, String.format(formatStr, expData.getM_train()));
+			row.set(offset + 3*4, String.format(formatStr, expData.getW_p()));
+			row.set(offset + 3*5, expData.getN_pump());
+			//System.out.println("data.getIndex():"+data.getIndex());
+			//rowData.add(row);
+		}
+		
+		computeCostAll(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_HIGH);
+		offset = 2;
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			
+			//System.out.println(UiGlobals.getNode(data.getIndex()).getExpData());
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			row.set(offset + 3*0, String.format(formatStr, expData.getW_stotal()));
+			row.set(offset + 3*1, String.format(formatStr, expData.getN_train()));
+			row.set(offset + 3*2, String.format(formatStr, expData.getC_comp()));
+			row.set(offset + 3*3, String.format(formatStr, expData.getM_train()));
+			row.set(offset + 3*4, String.format(formatStr, expData.getW_p()));
+			row.set(offset + 3*5, expData.getN_pump());
+			//System.out.println("data.getIndex():"+data.getIndex());
+			//rowData.add(row);
+		}
+		computeCostAll(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_LOW);
+		offset = 3;
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			
+			//System.out.println(UiGlobals.getNode(data.getIndex()).getExpData());
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			row.set(offset + 3*0, String.format(formatStr, expData.getW_stotal()));
+			row.set(offset + 3*1, String.format(formatStr, expData.getN_train()));
+			row.set(offset + 3*2, String.format(formatStr, expData.getC_comp()));
+			row.set(offset + 3*3, String.format(formatStr, expData.getM_train()));
+			row.set(offset + 3*4, String.format(formatStr, expData.getW_p()));
+			row.set(offset + 3*5, expData.getN_pump());
+			//System.out.println("data.getIndex():"+data.getIndex());
+			//rowData.add(row);
+		}
+		
+		
+		
+		Vector<String> columnNames = new Vector<String>();
+ 	    columnNames.addElement("");
+ 	    columnNames.addElement("W_total(EX)");
+ 	    columnNames.addElement("W_total(HI)");
+ 	    columnNames.addElement("W_total(LOW)");
+ 	    columnNames.addElement("N_train(EX)");
+	    columnNames.addElement("N_train(HI)");
+	    columnNames.addElement("N_train(LOW)");
+	    columnNames.addElement("C_comp(EX)");
+ 	    columnNames.addElement("C_comp(HI)");
+ 	    columnNames.addElement("C_comp(LOW)");
+ 	    columnNames.addElement("m_train(EX)");
+	    columnNames.addElement("m_train(HI)");
+	    columnNames.addElement("m_train(LOW)");
+	    columnNames.addElement("W_p(EX)");
+ 	    columnNames.addElement("W_p(HI)");
+ 	    columnNames.addElement("W_p(LOW)");
+ 	    columnNames.addElement("N_pump(EX)");
+	    columnNames.addElement("N_pump(HI)");
+	    columnNames.addElement("N_pump(LOW)");
+ 	    
+ 	    MyTableModel mm = new MyTableModel();
+	    mm.setData(rowData);
+	    mm.setColumnNames(columnNames);
+
+	    JTable table = new JTable(mm)
+	    {
+			 @Override
+			   public TableCellRenderer getCellRenderer(int row, int column) {
+			    // TODO Auto-generated method stub
+			    return new CustomCellRenderer();
+			   }
+		};
+
+	    
+	    table.setAutoCreateRowSorter(true);
+	    table.setRowSelectionAllowed(true);
+	    table.setColumnSelectionAllowed(false);
+	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    
+	    TableColumnModel cm = table.getColumnModel();
+	    
+	    cm.getColumn(0).setPreferredWidth(100);
+
+
+	    
+	    table.getTableHeader().setForeground(Color.white);
+	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+	    
+		
+		JScrollPane scroll = new JScrollPane( table );
+		
+		JPanel m = new JPanel();
+		m.setLayout(new BorderLayout());
+		m.add("Center", scroll);
+		
+		JFrame frame = new JFrame("Cost Result Table");
+			    
+		frame.getContentPane().add( m );
+		frame.setVisible(true);
+		frame.setSize( 1024, 500 ); 
+		
+		
+		
+	}
+	
+	public void computeDiameterExperiment(){
+		
+		List<CCSSourceData> ccsSourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		Vector<Vector> rowData = new Vector<Vector>(ccsSourceData.size());
+		Map<Integer, Integer> rowIndexMap = new HashMap<Integer, Integer>();
+		
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = new Vector();
+			row.add(data.getIndex());
+			for(int i = 0 ; i < 6 ; i++){
+				row.add("N/A");
+			}
+			rowData.add(row);
+			rowIndexMap.put(data.getIndex(), rowData.size()-1);
+		}
+		
+		
+		
+		System.out.println("Compute Type 1");
+		computeCostAll(CCSStatics.COST_TYPE_1);
+		String formatStr = "%.3f";
+		int offset = 1;
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
+			row.set(offset, diameterStr);
+		}
+		
+		System.out.println("Compute Type 2");
+		computeCostAll(CCSStatics.COST_TYPE_2);
+		offset = 2;
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
+			row.set(offset, diameterStr);
+		}
+		System.out.println("Compute Type 3");
+		computeCostAll(CCSStatics.COST_TYPE_3);
+		offset = 3;
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
+			row.set(offset, diameterStr);
+		}
+		System.out.println("Compute Type 4");
+		computeCostAll(CCSStatics.COST_TYPE_4);
+		offset = 4;
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
+			row.set(offset, diameterStr);
+		}
+		System.out.println("Compute Type 5");
+		computeCostAll(CCSStatics.COST_TYPE_5);
+		offset = 5;
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
+			row.set(offset, diameterStr);
+		}
+		System.out.println("Compute Type 6");
+		computeCostAll(CCSStatics.COST_TYPE_6);
+		offset = 6;
+		for(CCSSourceData data : ccsSourceData){
+			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
+			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
+			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
+			row.set(offset, diameterStr);
+		}
+		
+		Vector<String> columnNames = new Vector<String>();
+ 	    columnNames.addElement("Source (Index)");
+ 	    columnNames.addElement("1. The Ogden Models");
+ 	    columnNames.addElement("2. MIT Model");
+ 	    columnNames.addElement("3. Ecofys Model");
+ 	    columnNames.addElement("4. IEA GHG PH4/6");
+	    columnNames.addElement("5. IEA GHG 2005/2");
+	    columnNames.addElement("6.IEA GHG 2005/3");
+ 	    
+ 	    MyTableModel mm = new MyTableModel();
+	    mm.setData(rowData);
+	    mm.setColumnNames(columnNames);
+
+	    JTable table = new JTable(mm)
+	    {
+			 @Override
+			   public TableCellRenderer getCellRenderer(int row, int column) {
+			    // TODO Auto-generated method stub
+			    return new CustomCellRenderer();
+			   }
+		};
+
+	    
+	    table.setAutoCreateRowSorter(true);
+	    table.setRowSelectionAllowed(true);
+	    table.setColumnSelectionAllowed(false);
+	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    
+	    TableColumnModel cm = table.getColumnModel();
+	    
+	    cm.getColumn(0).setPreferredWidth(70);
+
+
+	    
+	    table.getTableHeader().setForeground(Color.white);
+	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+	    
+		
+		JScrollPane scroll = new JScrollPane( table );
+		
+		JPanel m = new JPanel();
+		m.setLayout(new BorderLayout());
+		m.add("Center", scroll);
+		
+		JFrame frame = new JFrame("Pipe Diameter Result Table");
+			    
+		frame.getContentPane().add( m );
+		frame.setVisible(true);
+		frame.setSize( 800, 500 ); 
 	}
 	
 	public List<CCSEdgeData> makeNaiveCon(

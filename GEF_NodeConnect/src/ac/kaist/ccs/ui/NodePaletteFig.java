@@ -119,8 +119,13 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
         JLabel viewTypeLabel = new JLabel("View Type :");
         add(viewTypeLabel);
         
-        String[] viewTypeStrings = {"CO2 Amount", "Cost"}; 
-        JComboBox viewTypeCombo = new JComboBox(viewTypeStrings);
+        Vector<ComboItem> viewComboItemList = new Vector<ComboItem>();
+        viewComboItemList.add(new ComboItem("co2 amount", CCSSourceData.VIEW_TYPE_CO2));
+        viewComboItemList.add(new ComboItem("acc co2 amount", CCSSourceData.VIEW_TYPE_ACC_CO2));
+        viewComboItemList.add(new ComboItem("cost", CCSSourceData.VIEW_TYPE_COST));
+        
+        //String[] viewTypeStrings = {"CO2 Amount", "Cost"}; 
+        JComboBox<ComboItem> viewTypeCombo = new JComboBox<ComboItem>(viewComboItemList);
         //viewTypeCombo.setPreferredSize(new Dimension(200, 30));
         viewTypeCombo.setName("ViewTypeCombo");
         add(viewTypeCombo);
@@ -151,7 +156,6 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
         costComboItemList.add(new ComboItem("4. IEA GHG PH4/6", CCSStatics.COST_TYPE_4));
         costComboItemList.add(new ComboItem("5. IEA GHG 2005/2", CCSStatics.COST_TYPE_5));
         costComboItemList.add(new ComboItem("6. IEA GHG 2005/2", CCSStatics.COST_TYPE_6));
-        costComboItemList.add(new ComboItem("7. Parker model", CCSStatics.COST_TYPE_7));
          
         JComboBox<ComboItem> costTypeCombo = new JComboBox<ComboItem>(costComboItemList);
      
@@ -177,23 +181,17 @@ public class NodePaletteFig extends WestToolBar implements ActionListener, Prope
 		else if(s instanceof JComboBox){
 			JComboBox cb = (JComboBox)s;
 			if("ViewTypeCombo".equals(cb.getName())){
+				ComboItem selectedItem = (ComboItem) cb.getSelectedItem();
+				
 				System.out.println("Selected view type : "+cb.getSelectedIndex());	
 				
 				Map<Integer, CCSSourceData> nodesAll = UiGlobals.getNodes();
-	            List<CCSSourceData> nodeList = new ArrayList<CCSSourceData>();
 	            for(Integer key : nodesAll.keySet()){
 	            	if(nodesAll.get(key) != null){
-	            		if(cb.getSelectedIndex() == CCSSourceData.VIEW_TYPE_CO2){
-	            			nodesAll.get(key).viewType = CCSSourceData.VIEW_TYPE_CO2;
-	            			UiGlobals.viewType = CCSSourceData.VIEW_TYPE_CO2;
-	    				}else if(cb.getSelectedIndex() == CCSSourceData.VIEW_TYPE_COST){
-	    					nodesAll.get(key).viewType = CCSSourceData.VIEW_TYPE_COST;
-	    					UiGlobals.viewType = CCSSourceData.VIEW_TYPE_COST;
-	    				}
-	            		 
+	            		nodesAll.get(key).viewType = selectedItem.getValue();
 	            	}
 	            }
-				
+	            CCSStatics.updateScalingFactor(selectedItem.getValue());
 	            UiGlobals.graph.getEditor().damageAll();
 	            
 			}else if("ConnectTypeCombo".equals(cb.getName())){
