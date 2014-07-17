@@ -329,7 +329,6 @@ public class LoadingWorker extends JPanel
     		for(int i = 0 ; i < nodeData.size() ; i++){
     			
     			CCSSourceData node = nodeData.get(i);
-    			System.out.println("isHub?"+node.isHubCandidate());
     			Fig fig = node.getNode();
     			Point loc = fig.getLocation();
     			loc.x = cvtLoc(loc.x);

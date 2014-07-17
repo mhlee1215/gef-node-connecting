@@ -110,8 +110,8 @@ public class FigPlantNode extends FigCCSNode {
 	    	g2.setColor(borderColor);
 	    	g2.setStroke(borderStroke);
 	    	//g2.fillOval(getX()-hubRange+getWidth()/2, getY()-hubRange+getHeight()/2, hubRange*2, hubRange*2);
-	    	int[] xPoints = {getX()+getWidth()/2, getX(), getX() + getWidth()};
-	    	int[] yPoints = {getY(), getY()+getHeight(), getY()+getHeight()};
+	    	int[] xPoints = {getX(), (int) (getX()+getWidth()*Math.sqrt(3)/2), (int) (getX()-getWidth()*Math.sqrt(3)/2)};//{getX()+getWidth()/2, getX(), getX() + getWidth()};
+	    	int[] yPoints = {getY()-getWidth(), getY()+getWidth()/2, getY()+getWidth()/2};
 	    	g2.fillPolygon(xPoints, yPoints, 3);
 	    	g2.setColor(old);
 		}
@@ -131,12 +131,19 @@ public class FigPlantNode extends FigCCSNode {
         String prefix = "<html><body style=\"background-color: #ffffdd\"><h3><font color=#000000><span >";
         String postfix = "</span></font></h3></body></html>";
         
-        CCSPlantData sourceData = (CCSPlantData) this.getOwner();
+        CCSPlantData sourceData = (CCSPlantData) UiGlobals.getNode((int)this.getOwner());
      
-        int nodeCount = 3;
+        int nodeCount = 5;
         System.out.println("sourceData: "+sourceData);
         //nodeStr = "COST: "+Float.toString(sourceData.getCost());
-        nodeStr = "StorageCapacity(Kco2): "+Integer.toString(sourceData.getCapacity());
+        
+        
+        
+        nodeStr = "COST: "+Double.toString(sourceData.getCost());
+        nodeStr += "<br>StorageCapacity(Kco2): "+Integer.toString(sourceData.getCapacity());
+        nodeStr += "<br>ACC CO2: "+Float.toString(sourceData.getAcc_co2_amount());
+        nodeStr += "<br>Industry Type: "+sourceData.getIndustry_typeString();
+        nodeStr += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
         nodeStr += "<br>Geological Info.: "+sourceData.getGeo_infoString();
         // += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
         

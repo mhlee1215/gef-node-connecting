@@ -24,6 +24,7 @@ import org.tigris.gef.presentation.Fig;
 
 import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSHubData;
+import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.presentation.JNodeInfoPanel;
@@ -196,6 +197,21 @@ public class UiGlobals extends Globals{
        
         }
         return hubNodes;
+	}
+	
+	public static List<CCSSourceData> getPlantNodes(){
+		List<CCSSourceData> plantNodes = new ArrayList<CCSSourceData>();
+		Map<Integer, CCSSourceData> nodesAll = nodes;
+        for(Integer key : nodesAll.keySet()){
+        	CCSSourceData node = nodesAll.get(key);
+        	if(node != null){
+        		if(node instanceof CCSPlantData){
+        			plantNodes.add(node);
+        		}
+        	}
+       
+        }
+        return plantNodes;
 	}
 	
 	public static Map<Integer, CCSSourceData> getNodes(){

@@ -28,10 +28,13 @@
 
 package ac.kaist.ccs.fig;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
 
@@ -41,6 +44,7 @@ import org.tigris.gef.presentation.Fig;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSSourceData;
 
 /** Class to display lines in diagrams. */
 
@@ -370,11 +374,21 @@ public class FigCCSLine extends Fig {
         _x2 = dstNode.getX();
         _y2 = dstNode.getY();
         
+        
+        CCSEdgeData data = (CCSEdgeData) this.getOwner();
+        CCSSourceData srcData = UiGlobals.getNode(data.getSrc());
+        CCSSourceData dstData = UiGlobals.getNode(data.getSrc());
 
-        if (dashed) {
+        if (dashed || srcData.getType() == CCSNodeData.TYPE_SOURCE || srcData.getType() == CCSNodeData.TYPE_JOINT) {
             g.setColor(lineColor);
-            drawDashedLine(g, lineWidth, _x1, _y1, _x2, _y2, 0, _dashes,
-                    _dashPeriod);
+            Stroke dashedStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4}, 0);
+            Graphics2D g2 = (Graphics2D)g.create();
+            Stroke oldStroke = g2.getStroke();
+            g2.setStroke(dashedStroke);
+            g2.drawLine(_x1, _y1, _x2, _y2);
+            g2.setStroke(oldStroke);
+            //drawDashedLine(g, lineWidth, _x1, _y1, _x2, _y2, 0, _dashes,
+                    //_dashPeriod);
         } else {
             g.setColor(lineColor);
             g.drawLine(_x1, _y1, _x2, _y2);
