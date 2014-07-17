@@ -30,6 +30,7 @@ import ac.kaist.ccs.domain.CCSExpData;
 import ac.kaist.ccs.domain.CCSHubData;
 import ac.kaist.ccs.domain.CCSJointData;
 import ac.kaist.ccs.domain.CCSNodeData;
+import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSStatics;
 
@@ -81,6 +82,10 @@ public class NodeRenderManager {
 			makeHybridCon(UiGlobals.ccsData);
 		
 		//System.out.println("UiGlobals.ccsData: "+UiGlobals.ccsData);
+		computeCo2();
+		
+		//Connect to plant
+		makePlantCon(UiGlobals.ccsData);
 		
 		computeCostAll(this.costType);
 		
@@ -126,7 +131,7 @@ public class NodeRenderManager {
 	}
 	
 	public void computeCostAll(int costType, int co2Type){
-		List<CCSSourceData> hubfNodes = UiGlobals.getHubNodes();
+		List<CCSSourceData> hubfNodes = UiGlobals.getPlantNodes();
 		
 		for(CCSSourceData hub : hubfNodes){
 			if(co2Type == 0){
@@ -136,6 +141,17 @@ public class NodeRenderManager {
 				hub.computeCost(costType, co2Type);
 				hub.computeCompressorPumtCost(co2Type);
 			}
+			hub.computeCo2();
+		}
+		
+		CCSStatics.updateScalingFactor(CCSSourceData.VIEW_TYPE_CO2);
+		
+	}
+	
+	public void computeCo2(){
+		List<CCSSourceData> hubfNodes = UiGlobals.getHubNodes();
+		
+		for(CCSSourceData hub : hubfNodes){
 			hub.computeCo2();
 		}
 		
@@ -499,6 +515,43 @@ public class NodeRenderManager {
 		return ccsData;
 	}
 
+	public List<CCSEdgeData> makePlantCon(Map<Integer, List<CCSSourceData>> ccsData){
+		
+		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		List<CCSSourceData> plantData = ccsData.get(CCSSourceData.TYPE_PLANT);
+		
+		List<SortTuple> hubSortList = new ArrayList<SortTuple>();
+		for(CCSSourceData data : hubData){
+			hubSortList.add(new SortTuple(data.getAcc_co2_amount(), data.getIndex(), 0));
+		}
+		
+		for(CCSSourceData data : plantData){
+			System.out.println(data);
+		}
+		
+		Collections.sort(hubSortList, new NoDecCompare());
+		int hubCnt = 0;
+		for(SortTuple data : hubSortList){
+			hubCnt++;
+			//Connect to plant directly
+			if(hubCnt < 5){
+				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(data.firstId);
+				CCSPlantData closestPlant = (CCSPlantData) getClosestPoint(curHub, plantData);
+				curHub.connectTo(closestPlant);	
+			}
+			//Connect to other hub
+			else{
+				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(data.firstId);
+				CCSHubData closestPlant = (CCSHubData) getClosestPoint(curHub, hubData);
+				curHub.connectTo(closestPlant);	
+			}
+			
+		}
+		
+		
+		return null;
+	}
+	
 	public List<CCSEdgeData> makeStarCon(
 			Map<Integer, List<CCSSourceData>> ccsData) {
 		ccsData = Clustering(ccsData);
