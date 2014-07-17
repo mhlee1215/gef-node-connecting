@@ -535,6 +535,7 @@ public class NodeRenderManager {
 			hubCnt++;
 			//Connect to plant directly
 			if(hubCnt < 5){
+				System.out.println("Add to plane!!!!");
 				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(data.firstId);
 				CCSPlantData closestPlant = (CCSPlantData) getClosestPoint(curHub, plantData);
 				curHub.connectTo(closestPlant);	
