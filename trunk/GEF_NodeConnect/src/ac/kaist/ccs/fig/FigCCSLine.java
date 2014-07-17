@@ -381,7 +381,7 @@ public class FigCCSLine extends Fig {
 
         if (dashed || srcData.getType() == CCSNodeData.TYPE_SOURCE || srcData.getType() == CCSNodeData.TYPE_JOINT) {
             g.setColor(lineColor);
-            Stroke dashedStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4}, 0);
+            Stroke dashedStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{3}, 0);
             Graphics2D g2 = (Graphics2D)g.create();
             Stroke oldStroke = g2.getStroke();
             g2.setStroke(dashedStroke);
