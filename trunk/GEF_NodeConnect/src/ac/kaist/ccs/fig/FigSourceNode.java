@@ -111,38 +111,19 @@ public class FigSourceNode extends FigCCSNode {
         String prefix = "<html><body style=\"background-color: #ffffdd\"><h3><font color=#000000><span >";
         String postfix = "</span></font></h3></body></html>";
         
-        CCSSourceData sourceData = (CCSSourceData) this.getOwner();
+        CCSSourceData sourceData = (CCSSourceData) UiGlobals.getNode((int)this.getOwner());
      
-        int nodeCount = 5;
+        int nodeCount = 7;
         
-        nodeStr = "COST: "+Double.toString(sourceData.getCost());
+        nodeStr = "Index: "+Integer.toString(sourceData.getIndex());
+        nodeStr += "<br>LOC: ("+sourceData.getX()+", "+sourceData.getY()+")";
+        nodeStr += "<br>TEST: ("+sourceData.testVal+")";
+        nodeStr += "<br>COST: "+Double.toString(sourceData.getCost());
         nodeStr += "<br>CO2: "+Float.toString(sourceData.getCo2_amount());
+        nodeStr += "<br>ACC CO2: "+Float.toString(sourceData.getAcc_co2_amount());
         nodeStr += "<br>Industry Type: "+sourceData.getIndustry_typeString();
         nodeStr += "<br>Terrain Type: "+sourceData.getTerrain_typeString();
-        
-//        for(int count = 0 ; count < list.size() ; count++)
-//        {
-//        	Fig node = list.get(count);
-//
-//        	Object desc = node.getOwner();
-//        	if(desc instanceof NodeDescriptor)
-//        	{
-//        		
-//        		NodeDescriptor nodeDesc = (NodeDescriptor)desc;
-//        		System.out.println("name : "+nodeDesc.getName()+", "+node.getLocation());
-//        		if(count == 0)
-//        			nodeStr = nodeDesc.getName();
-//        		else if(count < 6)
-//        			nodeStr += "<br>&nbsp;"+nodeDesc.getName();
-//        		else {
-//        			nodeStr += "<br>&nbsp;...<br>&nbsp;...<br>&nbsp;Total "+list.size()+" nodes";
-//        			break;
-//        		}
-//        		nodeCount++;
-//        	}
-//        }
-        
-        
+        nodeStr += "<br>Hub Candidate: "+sourceData.isHubCandidate();
         
         //NodeDescriptor desc = (NodeDescriptor)this.getOwner();
         JLabel name = new JLabel(prefix+nodeStr+postfix);
@@ -188,21 +169,34 @@ public class FigSourceNode extends FigCCSNode {
 			RenderingHints.VALUE_ANTIALIAS_ON);
 					
 	    	Color old = g2.getColor();
+	    	CCSSourceData sData = (CCSSourceData) UiGlobals.getNode((int)this.getOwner());
+	    	
+	    	if(sData.isHubCandidate()){
+	    		//coreColor = new Color(0, 0, 0);//new Color((255+82)/2, (176+255)/2, (41+61)/2);
+	    		borderColor = new Color(255, 176, 41);
+	    		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
+	    	}
 	    	g2.setColor(coreColor);
 	    	
 	    	
-	    	CCSSourceData sData = (CCSSourceData) this.getOwner();
+	    	
 	    	double magnitude = 0.0f;
 	    	if(sData.viewType == CCSSourceData.VIEW_TYPE_CO2)
 	    		magnitude = sData.getCo2_amount();
 	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_COST)
 	    		magnitude = sData.getCost();
+	    	else if(sData.viewType == CCSSourceData.VIEW_TYPE_ACC_CO2)
+	    		magnitude = sData.getAcc_co2_amount();
 	    	
-	    	_w = CCSStatics.getScaledSize(magnitude);
-	    	_h = CCSStatics.getScaledSize(magnitude);
+	    	_w = CCSStatics.getScaledSize(magnitude, sData.viewType);
+	    	_h = CCSStatics.getScaledSize(magnitude, sData.viewType);
 	    	
 	    	g2.fillOval(getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight());
 	    	
+	    	
+//	    	if(sData.isHubCandidate()){
+//	    		borderColor = new Color((255+82)/2, (176+255)/2, (41+61)/2);
+//	    	}
 	    	g2.setColor(borderColor);
 	    	
 	    	
@@ -218,11 +212,11 @@ public class FigSourceNode extends FigCCSNode {
 	    	
 	    	g2.setColor(old);
 	    	
-	    	if(this.getOwner() instanceof CCSSourceData){
+	    	if((int)this.getOwner() > 0){
 	    		Font oldFont = g2.getFont();
 	    		
 	    		g2.setFont(new Font("TimesRoman", Font.PLAIN, 5)); 
-	    		CCSSourceData owner = (CCSSourceData) getOwner();
+	    		CCSSourceData owner = (CCSSourceData) UiGlobals.getNode((int)getOwner());
 	    		Color fontColor = new Color(0, 0, 0);
 	    		g2.setColor(fontColor);
 	    		

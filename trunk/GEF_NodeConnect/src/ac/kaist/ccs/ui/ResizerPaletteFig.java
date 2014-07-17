@@ -30,11 +30,15 @@ package ac.kaist.ccs.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -212,7 +216,7 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		taskConstraints.weightx = 1;
 		taskConstraints.insets = new Insets(-6,-8,-6,-8);  //top padding
 		taskConstraints.gridx = 0;
-		taskConstraints.gridy = 0;
+		taskConstraints.gridy = 1;
         
 		Icon scaleTaskIcon = ResourceLoader.lookupIconResource("scaleTask1", "scaleTask1");
 		scaleTask.setTitle("Scale");
@@ -231,7 +235,26 @@ public class ResizerPaletteFig extends WestToolBar implements ChangeListener, Ac
 		experimentTask.setCollapsed(false);
 		experimentTask.setIcon(experimnetTaskIcon);
 		
-		experimentTask.add(new JButton("test"), taskConstraints);
+		JButton btnShowPipelineDiameter = new JButton("Do experimnet");
+		btnShowPipelineDiameter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Do experiment");
+				UiGlobals.getNodeRenderManager().computeCostExperiment();
+				
+			}});
+		
+//		JButton btnShowCost = new JButton("Show Cost");
+//		btnShowPipelineDiameter.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				System.out.println("hi");
+//			}});
+		
+		JPanel btnPanel = new JPanel();
+		btnPanel.setLayout(new FlowLayout());
+		btnPanel.add(btnShowPipelineDiameter);
+		//btnPanel.add(btnShowCost);
+		
+		experimentTask.add(btnPanel, taskConstraints);
 		mainPanel.add(experimentTask, "wrap, width "+taskWidth+"::"+taskWidth+"");
 		//UiGlobals.set_scaleSlider(scaleResizer);
 	}

@@ -99,7 +99,6 @@ public class CCSStatics {
 	public static int COST_TYPE_4 = 4;
 	public static int COST_TYPE_5 = 5;
 	public static int COST_TYPE_6 = 6;
-	public static int COST_TYPE_7 = 7;
 	
 	public static int COST_TYPE_THE_OGDEN_MODELS = COST_TYPE_1;
 	public static int COST_TYPE_MIT_MODEL = COST_TYPE_2;
@@ -107,7 +106,6 @@ public class CCSStatics {
 	public static int COST_TYPE_IEA_GHG_PH4_6 = COST_TYPE_4;
 	public static int COST_TYPE_IEA_GHG_2005_2 = COST_TYPE_5;
 	public static int COST_TYPE_IEA_GHG_2005_3 = COST_TYPE_6;
-	public static int COST_TYPE_PARKER_MODEL = COST_TYPE_7;
 	
 	public static int CONNECT_TYPE_STAR = 1;
 	public static int CONNECT_TYPE_TREE = 2;
@@ -348,27 +346,44 @@ public class CCSStatics {
 		
 	}
 	
-	public static void updateScalingFactor(){
+	public static void updateScalingFactor(int viewType){
 		double maxCost = 0;
 		for(Integer key : UiGlobals.getNodes().keySet()){
 			CCSSourceData data = UiGlobals.getNodes().get(key);
-			if(maxCost < data.pipelineCost){
-				maxCost = data.pipelineCost;
+			
+			double elementValue = 0;//data.pipelineCost;
+			
+			if(viewType == CCSSourceData.VIEW_TYPE_CO2)
+				elementValue = data.co2_amount;
+			else if(viewType == CCSSourceData.VIEW_TYPE_ACC_CO2)
+				elementValue = data.acc_co2_amount;
+			else if(viewType == CCSSourceData.VIEW_TYPE_COST)
+				elementValue = Math.pow(data.pipelineCost, 1);	
+			
+			if(maxCost < elementValue){
+				maxCost = elementValue;
 			}
 		}
 		int maxSize = 21;
 		scalingFactor = (float) (maxSize / maxCost);
-		System.out.println("scalingFactor: "+scalingFactor);
+		System.out.println("scalingFactor: "+scalingFactor+", maxCost: "+maxCost);
 	}
 	
 	public static float scalingFactor = 1.0f;
 	
-	public static int getScaledSize(double magnitude){
+	public static int getScaledSize(double magnitude, int viewType){
 //		int scaledSize = (int)(magnitude * scalingFactor);
 //		if(scaledSize < 5) scaledSize = 5;
 //		return scaledSize;
 		
-		return (int) Math.max(5, Math.log10(magnitude)*3);
+		if(viewType == CCSSourceData.VIEW_TYPE_CO2)
+			return (int) Math.max(5, Math.log10(magnitude)*3);
+		else if(viewType == CCSSourceData.VIEW_TYPE_ACC_CO2)
+			return (int) Math.max(5, Math.log10(magnitude)*3);
+		else if(viewType == CCSSourceData.VIEW_TYPE_COST)
+			return 5+(int)(magnitude * scalingFactor);
+		else return 0;
+		
 		
 //		if(magnitude < 100){
 //			return 5;
