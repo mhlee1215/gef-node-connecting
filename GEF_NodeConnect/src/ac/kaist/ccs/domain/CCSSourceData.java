@@ -37,7 +37,6 @@ public class CCSSourceData extends CCSNodeData {
 	int dst;
 	int edge;
 	boolean isHubCandidate = false;
-	public int testVal;
 	
 	float distanceToDst;
 	protected List<Integer> childSources;
@@ -440,8 +439,7 @@ public class CCSSourceData extends CCSNodeData {
 				+ terrain_type + "\",\"industry_type\":\"" + industry_type
 				+ "\",\"clusterHub\":\"" + clusterHub + "\",\"dst\":\"" + dst
 				+ "\",\"edge\":\"" + edge + "\",\"isHubCandidate\":\""
-				+ isHubCandidate + "\",\"testVal\":\"" + testVal
-				+ "\",\"distanceToDst\":\"" + distanceToDst
+				+ isHubCandidate + "\",\"distanceToDst\":\"" + distanceToDst
 				+ "\",\"childSources\":\"" + childSources
 				+ "\",\"viewType\":\"" + viewType + "\",\"expData\":\""
 				+ expData + "\"}";

@@ -415,47 +415,21 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				for(int i = 0 ; i < hub_size ; i++){
 					Integer hub_cnt = random.nextInt(sourceInThisRegion.size());
 					CCSSourceData curSrc = UiGlobals.getNode(sourceInThisRegion.get(hub_cnt));
-					//curSrc = new CCSSourceData(curSrc, true);
 					hubCandidateList.add(sourceInThisRegion.get(hub_cnt));
-					//System.out.println("index : "+curSrc.getIndex()+" is set as candidate");
 					curSrc.setHubCandidate(true);
-					//UiGlobals.setNode(curSrc);
-					
-					//CCSSourceData test = UiGlobals.getNode(curSrc.getIndex());
-					//System.out.println("test index : "+test.getIndex()+" "+test.isHubCandidate());
-					//System.out.println("11curSrc.isHubCandidate(): "+curSrc.isHubCandidate());
-					//curSrc.setX(10);
-					
-//					sourceData.remove(curSrc);
-//					int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
-//					curSrc = new CCSHubData(curSrc, range);
-//					hubData.add(curSrc);
-//					//UiGlobals.addNode(node);
-					
 					
 					sourceInThisRegion.remove(hub_cnt);
 				}
 			}
 		}
 		
-//		Map<Integer, CCSSourceData> nodesAll = UiGlobals.getNodes();
-//		System.out.println(nodesAll);
-//        for(Integer key : nodesAll.keySet()){
-//        	if(nodesAll.get(key) != null){
-//        		System.out.println("is Hub? ("+key+")"+nodesAll.get(key).isHubCandidate());
-//        	}
-//        }
-		
 		for(int i = 0 ; i < 10 ; i++){
 			Integer hub_cnt = random.nextInt(hubCandidateList.size());
 			CCSSourceData curSrc = UiGlobals.getNode(hubCandidateList.get(hub_cnt));
-			//System.out.println("curSrc.isHubCandidate(): "+curSrc.isHubCandidate());
 			sourceData.remove(curSrc);
 			int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
 			curSrc = new CCSHubData(curSrc, range);
 			hubData.add(curSrc);
-			//UiGlobals.addNode(node);
-			
 			hubCandidateList.remove(hub_cnt);
 		}
 		
