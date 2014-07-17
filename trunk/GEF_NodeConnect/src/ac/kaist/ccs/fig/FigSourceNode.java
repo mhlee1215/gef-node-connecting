@@ -117,7 +117,6 @@ public class FigSourceNode extends FigCCSNode {
         
         nodeStr = "Index: "+Integer.toString(sourceData.getIndex());
         nodeStr += "<br>LOC: ("+sourceData.getX()+", "+sourceData.getY()+")";
-        nodeStr += "<br>TEST: ("+sourceData.testVal+")";
         nodeStr += "<br>COST: "+Double.toString(sourceData.getCost());
         nodeStr += "<br>CO2: "+Float.toString(sourceData.getCo2_amount());
         nodeStr += "<br>ACC CO2: "+Float.toString(sourceData.getAcc_co2_amount());
@@ -175,6 +174,17 @@ public class FigSourceNode extends FigCCSNode {
 	    		//coreColor = new Color(0, 0, 0);//new Color((255+82)/2, (176+255)/2, (41+61)/2);
 	    		borderColor = new Color(255, 176, 41);
 	    		coreColor = new Color(Math.max(borderColor.getRed()-borderColorDiff, 0), Math.max(borderColor.getGreen()-borderColorDiff, 0), Math.max(borderColor.getBlue()-borderColorDiff, 0));
+	    		
+	    		final float dash1[] = {1.0f};
+		        final BasicStroke dashed =
+		            new BasicStroke(1.0f,
+		                            BasicStroke.CAP_BUTT,
+		                            BasicStroke.JOIN_MITER,
+		                            10.0f, dash1, 0.0f);
+		    	
+		    	g2.setStroke(dashed);
+	    	}else{
+	    		g2.setStroke(borderStroke);
 	    	}
 	    	g2.setColor(coreColor);
 	    	
@@ -200,14 +210,7 @@ public class FigSourceNode extends FigCCSNode {
 	    	g2.setColor(borderColor);
 	    	
 	    	
-	    	final float dash1[] = {1.0f};
-	        final BasicStroke dashed =
-	            new BasicStroke(1.0f,
-	                            BasicStroke.CAP_BUTT,
-	                            BasicStroke.JOIN_MITER,
-	                            10.0f, dash1, 0.0f);
 	    	
-	    	g2.setStroke(dashed);
 	    	g2.drawOval(getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight());
 	    	
 	    	g2.setColor(old);
