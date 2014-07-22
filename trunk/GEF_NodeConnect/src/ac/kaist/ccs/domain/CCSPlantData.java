@@ -7,6 +7,7 @@ import ac.kaist.ccs.fig.FigPlantNode;
 
 public class CCSPlantData extends CCSSourceData {
 		
+	int nameKey;
 	int capacity;
 	int geo_info;
 	List<Integer> childHub;
@@ -33,24 +34,16 @@ public class CCSPlantData extends CCSSourceData {
 	}
 	
 	public String getGeo_infoString() {
-		if(geo_info == CCSStatics.GEO_INFO_COALBED)
-			return "Coal bed";
-		else if(geo_info == CCSStatics.GEO_INFO_SANDSTONE)
-			return "Sandstone";
-		else if(geo_info == CCSStatics.GEO_INFO_SALINEAQUIFER)
-			return "Saline Aquifer";
-		else if(geo_info == CCSStatics.GEO_INFO_EOR)
-			return "EOR";
-		else
-			return "GEO_INFO_DUMMY";
+		return CCSStatics.geoInfoStringMap.get(this.geo_info);
 	}
 
 	public void setGeo_info(int geo_info) {
 		this.geo_info = geo_info;
 	}
 
-	public CCSPlantData(int x, int y, int capacity, int geo_info) {
+	public CCSPlantData(int x, int y, int key, int capacity, int geo_info) {
 		super(x, y, 0, 0);
+		this.nameKey = key;
 		this.type = CCSNodeData.TYPE_PLANT;
 		this.capacity = capacity;
 		this.geo_info = geo_info;
@@ -62,7 +55,7 @@ public class CCSPlantData extends CCSSourceData {
 	
 	@Override
 	public CCSPlantData clone(){
-		CCSPlantData clone = new CCSPlantData(x, y, capacity, geo_info);
+		CCSPlantData clone = new CCSPlantData(x, y, nameKey, capacity, geo_info);
 		clone.setIndex(index);
 		return clone;
 	}
@@ -84,5 +77,15 @@ public class CCSPlantData extends CCSSourceData {
 				+ ", childHub=" + childHub + "]";
 	}
 	
+	@Override
+	public String getNodeType(){
+		return "PLANT";
+	}
+	
+	public String getNameString(){
+		return CCSStatics.storageNameStringMap.get(this.nameKey);
+	}
+	
+
 	
 }

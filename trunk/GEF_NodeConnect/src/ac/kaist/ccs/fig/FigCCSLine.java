@@ -377,7 +377,7 @@ public class FigCCSLine extends Fig {
         
         CCSEdgeData data = (CCSEdgeData) this.getOwner();
         CCSSourceData srcData = UiGlobals.getNode(data.getSrc());
-        CCSSourceData dstData = UiGlobals.getNode(data.getSrc());
+        CCSSourceData dstData = UiGlobals.getNode(data.getDst());
 
         if (dashed || srcData.getType() == CCSNodeData.TYPE_SOURCE || srcData.getType() == CCSNodeData.TYPE_JOINT) {
             g.setColor(lineColor);
@@ -389,8 +389,18 @@ public class FigCCSLine extends Fig {
             g2.setStroke(oldStroke);
             //drawDashedLine(g, lineWidth, _x1, _y1, _x2, _y2, 0, _dashes,
                     //_dashPeriod);
-        } else {
-            g.setColor(lineColor);
+        } else if(srcData.getType() == CCSNodeData.TYPE_HUB && dstData.getType() != CCSNodeData.TYPE_PLANT){
+        	System.out.println("1 src:"+srcData.getNodeType()+", dst:"+dstData.getNodeType());
+        	System.out.println(_x1+", "+_y1+", "+_x2+", "+_y2);
+            g.setColor(new Color(255, 50, 50));
+            g.drawLine(_x1, _y1, _x2, _y2);
+        } else if(srcData.getType() == CCSNodeData.TYPE_HUB && dstData.getType() == CCSNodeData.TYPE_PLANT){
+        	System.out.println("2 src:"+srcData.getNodeType()+", dst:"+dstData.getNodeType());
+        	g.setColor(new Color(255, 0, 255));
+            g.drawLine(_x1, _y1, _x2, _y2);
+            System.out.println(_x1+", "+_y1+", "+_x2+", "+_y2);
+        } else{
+        	g.setColor(lineColor);
             g.drawLine(_x1, _y1, _x2, _y2);
         }
 

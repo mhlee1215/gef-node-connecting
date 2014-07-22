@@ -11,6 +11,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -92,6 +95,7 @@ import ac.kaist.ccs.ui.WestToolBar;
 
 public class CCSMain extends JApplet implements ModeChangeListener {
 
+	
 	public static final int _PADDING = 100;
 
 	int _width = 2000;
@@ -131,7 +135,6 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	
 
 	public CCSMain() throws Exception {
-
 		Localizer.addResource("GefBase",
 				"org.tigris.gef.base.BaseResourceBundle");
 		Localizer.addResource("GefPres",
@@ -254,7 +257,32 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		UiGlobals.ccsData = makeRefRandomData(refImage, refTerrainImage);
 		
 		UiGlobals.saveNodeSnapshot();
+		
+		Random random = new Random();
+		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
+		List<Integer> hubData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+		List<Integer> sourceData = UiGlobals.ccsData.get(CCSNodeData.TYPE_SOURCE);
+		
+		for(int i = 0 ; i < 10 ; i++){
+			Integer hub_cnt = random.nextInt(hubCandidateData.size());
+			CCSSourceData curSrc = UiGlobals.getNode(hubCandidateData.get(hub_cnt));
+			int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
+			System.out.println("range : "+(60 / CCSStatics.kilometerToMile));
+			curSrc = new CCSHubData(curSrc, range);
+			UiGlobals.setNode(curSrc);
+			hubData.add(curSrc.getIndex());
+			sourceData.remove(curSrc.getIndex());
+			hubCandidateData.remove((int)hub_cnt);
+			System.out.println("hubCandidateData :"+hubCandidateData);
+		}
+		
+		//UiGlobals.loadNodeSnapshot();
+		
+		UiGlobals.saveNodeSnapshot();
 	
+		//List<Integer> hubList = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
+		UiGlobals.loadNodeSnapshot();
+		
 		
 		System.out.println("Randering!");
 		NodeRenderManager nodeRenderManager = new NodeRenderManager(UiGlobals.ccsData,
@@ -303,10 +331,10 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		return resultBin;
 	}
 
-	public Map<Integer, List<CCSSourceData>> makeRefRandomData(
+	public Map<Integer, List<Integer>> makeRefRandomData(
 			BufferedImage refImage, BufferedImage refTerrainImage) {
 
-		Map<Integer, List<CCSSourceData>> ccsData = new HashMap<Integer, List<CCSSourceData>>();
+		Map<Integer, List<Integer>> ccsData = new HashMap<Integer, List<Integer>>();
 		Random random = new Random();
 
 		int h = refImage.getHeight();
@@ -361,10 +389,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		// printPixelARGB(pixel);
 
 
-		List<CCSSourceData> sourceData = new ArrayList<CCSSourceData>();
-		List<CCSSourceData> hubData = new ArrayList<CCSSourceData>();
-		List<CCSSourceData> storageData = new ArrayList<CCSSourceData>();
-		List<Integer> hubCandidateList = new ArrayList<Integer>();
+		List<Integer> sourceData = new ArrayList<Integer>();
+		List<Integer> hubData = new ArrayList<Integer>();
+		List<Integer> hubCandidateData = new ArrayList<Integer>();
+		List<Integer> storageData = new ArrayList<Integer>();
+		//List<Integer> hubCandidateList = new ArrayList<Integer>();
 
 		//System.out.println(CCSStatics.terrainColorMap);
 		
@@ -404,49 +433,38 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 					
 					CCSSourceData node = new CCSSourceData(x, y, cur_co2, plantData.industry_type, loc_terrain_type);
-					sourceData.add(node);
 					UiGlobals.addNode(node);
+					sourceData.add(node.getIndex());
 					sourceInThisRegion.add(node.getIndex());
 					
 					
 				}
-				
-				System.out.println("hub size:"+hub_size);
-				for(int i = 0 ; i < hub_size ; i++){
-					Integer hub_cnt = random.nextInt(sourceInThisRegion.size());
-					CCSSourceData curSrc = UiGlobals.getNode(sourceInThisRegion.get(hub_cnt));
-					hubCandidateList.add(sourceInThisRegion.get(hub_cnt));
-					curSrc.setHubCandidate(true);
-					
-					sourceInThisRegion.remove(hub_cnt);
-				}
 			}
-		}
-		
-		for(int i = 0 ; i < 10 ; i++){
-			Integer hub_cnt = random.nextInt(hubCandidateList.size());
-			CCSSourceData curSrc = UiGlobals.getNode(hubCandidateList.get(hub_cnt));
-			sourceData.remove(curSrc);
-			int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
-			curSrc = new CCSHubData(curSrc, range);
-			hubData.add(curSrc);
-			hubCandidateList.remove(hub_cnt);
+			
+			System.out.println("hub size:"+hub_size+", sourceInThisRegion:"+sourceInThisRegion);
+			for(int i = 0 ; i < hub_size ; i++){
+				Integer hub_cnt = random.nextInt(sourceInThisRegion.size());
+				CCSSourceData curSrc = UiGlobals.getNode(sourceInThisRegion.get(hub_cnt));
+				//hubCandidateList.add(sourceInThisRegion.get(hub_cnt));
+				hubCandidateData.add(curSrc.getIndex());
+				curSrc.setHubCandidate(true);
+				
+				sourceInThisRegion.remove((int)hub_cnt);
+			}
 		}
 		
 		
 		for(Integer key : CCSStatics.storageMap.keySet()){
-			//System.out.println("ADD STORAGE");
 			StorageData sData = CCSStatics.storageMap.get(key);
-			CCSPlantData storage = new CCSPlantData(sData.x, sData.y, sData.storagecapacity, sData.geological_information);
-			//System.out.println(storage);
-			storageData.add(storage);
+			CCSPlantData storage = new CCSPlantData(sData.x, sData.y, key, sData.storagecapacity, sData.geological_information);
 			UiGlobals.addNode(storage);
+			storageData.add(storage.getIndex());
 		}
 	
-		//System.out.println("COLOR END!");
 		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
 		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
 		ccsData.put(CCSSourceData.TYPE_PLANT, storageData);
+		ccsData.put(CCSSourceData.TYPE_HUB_CANDIDATE, hubCandidateData);
 
 		return ccsData;
 	}
@@ -512,7 +530,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		for (int count = 0; count < size / 10; count++) {
 			int x = cvtLoc(random.nextInt(maxWidth));
 			int y = cvtLoc(random.nextInt(maxHeight));
-			CCSSourceData node = new CCSPlantData(x, y, 0, 1);
+			CCSSourceData node = new CCSPlantData(x, y, 1, 0, 1);
 			plantData.add(node);
 			UiGlobals.addNode(node);
 			//node.setIndex(index);
@@ -910,6 +928,41 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			UIManager.put(applyList[i], font);
 		}
 
+	}
+	
+	public static void main(String[] artv){
+		Class<CCSSourceData> a = CCSSourceData.class;
+		for(Method b : a.getMethods()){
+			System.out.println(b.getName());
+		}
+		
+		CCSSourceData b = new CCSSourceData();
+		try {
+			int aa = 10;
+			try {
+				Method bbb = CCSSourceData.class.getMethod("setIndex", int.class);
+				bbb.setAccessible(true);
+				try {
+					bbb.invoke(b, aa);
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("b.index :"+b.getIndex());
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

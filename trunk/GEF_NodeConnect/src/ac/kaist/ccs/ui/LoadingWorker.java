@@ -107,7 +107,7 @@ public class LoadingWorker extends JPanel
     private JFrame frame = null;
     private JGraph graph = null;
     
-    private Map<Integer, List<CCSSourceData> > ccsData;
+    private Map<Integer, List<Integer> > ccsData;
     private List<CCSEdgeData> ccsConData;
     
     private HashMap<String, FigCCSNode> nodeHash = new HashMap<String, FigCCSNode>();
@@ -118,7 +118,7 @@ public class LoadingWorker extends JPanel
     int scale;
     
     
-    public LoadingWorker(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale) {
+    public LoadingWorker(Map<Integer, List<Integer> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph, int scale) {
         super();
         
         this.ccsData = ccsData;
@@ -298,7 +298,7 @@ public class LoadingWorker extends JPanel
     
     class NodeTask extends SwingWorker<Void, Void> {
     	boolean progressFlag = true;
-    	Map<Integer, List<CCSSourceData> > ccsData = null;
+    	Map<Integer, List<Integer> > ccsData = null;
     	List<CCSEdgeData> ccsConData = null;
     	float minLocx = 0;
     	float minLocy = 0;
@@ -311,7 +311,7 @@ public class LoadingWorker extends JPanel
     	int padding = 50;
     	
 
-    	public NodeTask(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JPanel panel, JGraph graph, int scale)
+    	public NodeTask(Map<Integer, List<Integer> > ccsData, List<CCSEdgeData> ccsConData, JPanel panel, JGraph graph, int scale)
     	{
     		this.ccsData = ccsData;
     		this.ccsConData = ccsConData;

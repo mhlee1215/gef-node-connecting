@@ -40,12 +40,12 @@ public class NodeRenderManager {
 	private int width = 0;
 	private int height = 0;
 	public static final int _PADDING = 50;
-	Map<Integer, List<CCSSourceData> > ccsData;
+	Map<Integer, List<Integer> > ccsData;
 	List<CCSEdgeData> ccsConData;
 	int connectType;
 	int costType;
 	
-	public NodeRenderManager(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph)
+	public NodeRenderManager(Map<Integer, List<Integer> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph)
 	{
 		this.ccsData = ccsData;
 		this.ccsConData = ccsConData;
@@ -70,7 +70,23 @@ public class NodeRenderManager {
 		if(costType != null)
 			this.costType = costType;
 		
+		{
+			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+			for(int i = 0 ; i < hubList.size() ; i++){
+				CCSHubData hubData1 = (CCSHubData) UiGlobals.getNode(hubList.get(i));
+				System.out.println("before laod kkk:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
+			}
+		}
+		
 		UiGlobals.loadNodeSnapshot();
+		
+		{
+			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+			for(int i = 0 ; i < hubList.size() ; i++){
+				CCSHubData hubData1 = (CCSHubData) UiGlobals.getNode(hubList.get(i));
+				System.out.println("21kkk:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
+			}
+		}
 		
 		if(this.connectType == CCSStatics.CONNECT_TYPE_STAR)
 			makeStarCon(UiGlobals.ccsData);
@@ -105,7 +121,7 @@ public class NodeRenderManager {
 		//Node load
 		//스케일이 바뀔때마다 로드해야 함.
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			Map<Integer, List<CCSSourceData> > ccsData;
+			Map<Integer, List<Integer> > ccsData;
 			List<CCSEdgeData> ccsConData;
 			JGraph graph;
 			
@@ -115,7 +131,7 @@ public class NodeRenderManager {
 				new LoadingWorker(ccsData, ccsConData, graph, UiGlobals.getGrid_scale());
 			}
 			
-			public Runnable init(Map<Integer, List<CCSSourceData> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph){
+			public Runnable init(Map<Integer, List<Integer> > ccsData, List<CCSEdgeData> ccsConData, JGraph graph){
 				this.ccsData = ccsData;
 				this.ccsConData = ccsConData;
 				this.graph = graph;
@@ -162,11 +178,12 @@ public class NodeRenderManager {
 	public void computeCostExperiment(){
 		
 		
-		List<CCSSourceData> ccsSourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<Integer> ccsSourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
 		Vector<Vector> rowData = new Vector<Vector>(ccsSourceData.size());
 		Map<Integer, Integer> rowIndexMap = new HashMap<Integer, Integer>();
 		
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = new Vector();
 			row.add(data.getIndex());
 			for(int i = 0 ; i < 18 ; i++){
@@ -179,7 +196,8 @@ public class NodeRenderManager {
 		computeCostAll(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_EXTREME);
 		int offset = 1;
 		String formatStr = "%.3f";
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			
 			//System.out.println(UiGlobals.getNode(data.getIndex()).getExpData());
@@ -196,7 +214,8 @@ public class NodeRenderManager {
 		
 		computeCostAll(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_HIGH);
 		offset = 2;
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			
 			//System.out.println(UiGlobals.getNode(data.getIndex()).getExpData());
@@ -212,7 +231,8 @@ public class NodeRenderManager {
 		}
 		computeCostAll(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_LOW);
 		offset = 3;
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			
 			//System.out.println(UiGlobals.getNode(data.getIndex()).getExpData());
@@ -298,11 +318,12 @@ public class NodeRenderManager {
 	
 	public void computeDiameterExperiment(){
 		
-		List<CCSSourceData> ccsSourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<Integer> ccsSourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
 		Vector<Vector> rowData = new Vector<Vector>(ccsSourceData.size());
 		Map<Integer, Integer> rowIndexMap = new HashMap<Integer, Integer>();
 		
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = new Vector();
 			row.add(data.getIndex());
 			for(int i = 0 ; i < 6 ; i++){
@@ -318,7 +339,8 @@ public class NodeRenderManager {
 		computeCostAll(CCSStatics.COST_TYPE_1);
 		String formatStr = "%.3f";
 		int offset = 1;
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
 			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
@@ -328,7 +350,8 @@ public class NodeRenderManager {
 		System.out.println("Compute Type 2");
 		computeCostAll(CCSStatics.COST_TYPE_2);
 		offset = 2;
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
 			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
@@ -337,7 +360,8 @@ public class NodeRenderManager {
 		System.out.println("Compute Type 3");
 		computeCostAll(CCSStatics.COST_TYPE_3);
 		offset = 3;
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
 			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
@@ -346,7 +370,8 @@ public class NodeRenderManager {
 		System.out.println("Compute Type 4");
 		computeCostAll(CCSStatics.COST_TYPE_4);
 		offset = 4;
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
 			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
@@ -355,7 +380,8 @@ public class NodeRenderManager {
 		System.out.println("Compute Type 5");
 		computeCostAll(CCSStatics.COST_TYPE_5);
 		offset = 5;
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
 			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
@@ -364,7 +390,8 @@ public class NodeRenderManager {
 		System.out.println("Compute Type 6");
 		computeCostAll(CCSStatics.COST_TYPE_6);
 		offset = 6;
-		for(CCSSourceData data : ccsSourceData){
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = rowData.get(rowIndexMap.get(data.getIndex()));
 			CCSExpData expData = UiGlobals.getNode(data.getIndex()).getExpData();
 			String diameterStr = String.format(formatStr, expData.getPipe_diameter()).toString();
@@ -454,25 +481,27 @@ public class NodeRenderManager {
 		return ccsConData;
 	}
 
-	public Map<Integer, List<CCSSourceData>> Clustering(
-			Map<Integer, List<CCSSourceData>> ccsData) {
+	public Map<Integer, List<Integer>> Clustering(
+			Map<Integer, List<Integer>> ccsData) {
 		// List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 
-		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
-		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		List<Integer> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<Integer> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 		
-		//System.out.println(sourceData);
-		//System.out.println(hubData);
+		System.out.println("SOURCE:"+sourceData);
+		System.out.println("HUB:"+hubData);
 
 		for (int i = 0; i < sourceData.size(); i++) {
-			CCSSourceData curSrc = sourceData.get(i);
+			CCSSourceData curSrc = UiGlobals.getNode(sourceData.get(i));
 
 			CCSHubData minRankHub = null;
 			double minDist = 999999999;
 			double minRank = 999999999;
 
+			System.out.println("hubData.size:"+hubData.size());
 			for (int j = 0; j < hubData.size(); j++) {
-				CCSHubData curHub = (CCSHubData) hubData.get(j);
+				//System.out.println("bbbb:"+UiGlobals.getNode(hubData.get(j)));
+				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(hubData.get(j));
 
 				// System.out.println(curHub);
 				double curDist = dist(curSrc, curHub);
@@ -486,7 +515,7 @@ public class NodeRenderManager {
 			}
 
 			//System.out.println("minDist: "+minDist+",minRankHub.getRange(): "+minRankHub.getRange());
-			if (minDist <= minRankHub.getRange()-10) {
+			if (minDist <= minRankHub.getRange()) {
 				curSrc.setClusterHub(minRankHub);
 			}
 		}
@@ -494,12 +523,12 @@ public class NodeRenderManager {
 		//System.out.println("sourceData.size(): "+sourceData.size());
 		for (int i = 0; i < sourceData.size(); i++) {
 
-			CCSSourceData curSrc = sourceData.get(i);
+			CCSSourceData curSrc = UiGlobals.getNode(sourceData.get(i));
 			if (curSrc.getClusterHub() != null) {
 				
 				if (curSrc.getClusterHub().getType() == CCSNodeData.TYPE_HUB) {
 					//System.out.println("??"+curSrc.getClusterHub().getType());
-					((CCSHubData) curSrc.getClusterHub()).addChildSource(curSrc
+					((CCSHubData) curSrc.getClusterHub()).addClusterSource(curSrc
 							.getIndex());
 					// ((CCSHubData)curSrc.getHub()).getChildSources().add(curSrc);
 				}
@@ -508,45 +537,55 @@ public class NodeRenderManager {
 
 		//System.out.println("ccsData CLuster: "+ccsData.get(CCSNodeData.TYPE_HUB));
 		int sum = 0;
-		for(CCSSourceData h : ccsData.get(CCSNodeData.TYPE_HUB)){
-			sum += ((CCSHubData)h).getChildSources().size();
+		for(Integer hIndex : ccsData.get(CCSNodeData.TYPE_HUB)){
+			sum += ((CCSHubData)UiGlobals.getNode(hIndex)).getChildSources().size();
 		}
 		System.out.println(sum);
 		return ccsData;
 	}
 
-	public List<CCSEdgeData> makePlantCon(Map<Integer, List<CCSSourceData>> ccsData){
+	public List<CCSEdgeData> makePlantCon(Map<Integer, List<Integer>> ccsData){
 		
-		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
-		List<CCSSourceData> plantData = ccsData.get(CCSSourceData.TYPE_PLANT);
+		List<Integer> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		for(int i = 0 ; i < hubData.size() ; i++)
+			System.out.println("a::"+(CCSHubData)UiGlobals.getNode(hubData.get(i))+">>");
+		List<Integer> plantData = ccsData.get(CCSSourceData.TYPE_PLANT);
 		
 		List<SortTuple> hubSortList = new ArrayList<SortTuple>();
-		for(CCSSourceData data : hubData){
+		for(Integer index : hubData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			hubSortList.add(new SortTuple(data.getAcc_co2_amount(), data.getIndex(), 0));
 		}
 		
-		for(CCSSourceData data : plantData){
+		for(Integer index : plantData){
+			CCSSourceData data = UiGlobals.getNode(index);
 			System.out.println(data);
 		}
 		
 		Collections.sort(hubSortList, new NoDecCompare());
 		int hubCnt = 0;
+		List<Integer> connectedHub = new ArrayList<Integer>();
+		
 		for(SortTuple data : hubSortList){
-			hubCnt++;
+			
 			//Connect to plant directly
 			if(hubCnt < 5){
-				System.out.println("Add to plane!!!!");
+				System.out.println("Add to plant!!!!.. index:"+data.firstId);
 				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(data.firstId);
-				CCSPlantData closestPlant = (CCSPlantData) getClosestPoint(curHub, plantData);
+				CCSPlantData closestPlant = (CCSPlantData) getClosestPoint(curHub.getIndex(), plantData);
+				System.out.println(closestPlant.getNodeType());
 				curHub.connectTo(closestPlant);	
+				connectedHub.add(curHub.getIndex());
 			}
 			//Connect to other hub
 			else{
+				System.out.println("Add to another hub!!!!.. index:"+data.firstId);
 				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(data.firstId);
-				CCSHubData closestPlant = (CCSHubData) getClosestPoint(curHub, hubData);
+				CCSHubData closestPlant = (CCSHubData) getClosestPoint(curHub.getIndex(), connectedHub);
 				curHub.connectTo(closestPlant);	
+				connectedHub.add(curHub.getIndex());
 			}
-			
+			hubCnt++;
 		}
 		
 		
@@ -554,49 +593,72 @@ public class NodeRenderManager {
 	}
 	
 	public List<CCSEdgeData> makeStarCon(
-			Map<Integer, List<CCSSourceData>> ccsData) {
+			Map<Integer, List<Integer>> ccsData) {
 		ccsData = Clustering(ccsData);
 
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
-		List<CCSSourceData> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<Integer> sourceData = ccsData.get(CCSSourceData.TYPE_SOURCE);
 
+		{
+			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+			for(int i = 0 ; i < hubList.size() ; i++){
+				CCSHubData hubData = (CCSHubData) UiGlobals.getNode(hubList.get(i));
+				System.out.println("11kkk:"+hubData.getIndex()+", children:"+hubData.getChildSources());
+			}
+		}
 		
 		for (int i = 0; i < sourceData.size(); i++) {
-			CCSSourceData curSrc = sourceData.get(i);
+			CCSSourceData curSrc = UiGlobals.getNode(sourceData.get(i));
 			//System.out.println("curSrc.getClusterHub(): "+curSrc.getClusterHub());
 			if (curSrc.getClusterHub() != null) {
 				//System.out.println("Connect!"+curSrc.getIndex()+","+curSrc.getClusterHub().getIndex());
 				curSrc.connectTo(curSrc.getClusterHub());
-				//System.out.println(curSrc);
+			}
+		}
+		
+		{
+			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+			for(int i = 0 ; i < hubList.size() ; i++){
+				CCSHubData hubData = (CCSHubData) UiGlobals.getNode(hubList.get(i));
+				System.out.println("22kkk:"+hubData.getIndex()+", children:"+hubData.getChildSources());
 			}
 		}
 
+		int a = 1;
 		//System.out.println("11ccsData: "+ccsData);
 		
 		return ccsConData;
 	}
 
 	public List<CCSEdgeData> makeTreeCon(
-			Map<Integer, List<CCSSourceData>> ccsDataParam) {
-		Map<Integer, List<CCSSourceData>> ccsData = Clustering(ccsDataParam);
+			Map<Integer, List<Integer>> ccsDataParam) {
+		Map<Integer, List<Integer>> ccsData = Clustering(ccsDataParam);
 
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 
 		// List<CCSSourceData> sourceData =
 		// ccsData.get(CCSSourceData.TYPE_SOURCE);
-		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		List<Integer> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 
-		System.out.println("hubData("+hubData.size()+"): "+hubData);
+		System.out.println("tree con hubData("+hubData.size()+"): "+hubData);
+		
+		{
+			List<Integer> hubList = ccsData.get(CCSNodeData.TYPE_HUB);
+			for(int i = 0 ; i < hubList.size() ; i++){
+				CCSHubData hubData1 = (CCSHubData) UiGlobals.getNode(hubList.get(i));
+				System.out.println("11kkk:"+hubData1.getIndex()+", children:"+hubData1.getClusterSources());
+			}
+		}
 		
 		for (int j = 0; j < hubData.size(); j++) {
 
-			CCSHubData curHub = (CCSHubData) hubData.get(j);
+			CCSHubData curHub = (CCSHubData) UiGlobals.getNode(hubData.get(j));
 
-			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getChildSources());
+			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getClusterSources());
 			List<Integer> connedtedList = new ArrayList<Integer>();
 			connedtedList.add(curHub.getIndex());
 			//System.out.println("connedtedList("+connedtedList.size()+"):"+connedtedList);
-			//System.out.println("childIndexList("+childIndexList.size()+"):"+childIndexList);
+			System.out.println("childIndexList("+childIndexList.size()+"):"+childIndexList);
 			// Add until remained node list is empty
 			for (int ii = 0; ii < childIndexList.size();) {
 
@@ -613,6 +675,14 @@ public class NodeRenderManager {
 				childIndexList.remove((Integer) minDistSrc.getIndex());
 				connedtedList.add(minDistSrc.getIndex());
 				
+			}
+		}
+		
+		{
+			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+			for(int i = 0 ; i < hubList.size() ; i++){
+				CCSHubData hubData1 = (CCSHubData) UiGlobals.getNode(hubList.get(i));
+				System.out.println("21kkk:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
 			}
 		}
 
@@ -666,7 +736,7 @@ public class NodeRenderManager {
 			double curDist = dist(curSrc, curConnected);
 			if (minDist > curDist) {
 				minDist = curDist;
-				minDistSrc = curSrc;
+				minDistSrc = curConnected;
 				//minDistConnectedSrc = curConnected;
 			}
 		}
@@ -755,18 +825,18 @@ public class NodeRenderManager {
 	}
 
 	public List<CCSEdgeData> makeBackboneCon(
-			Map<Integer, List<CCSSourceData>> ccsDataParam) {
-		Map<Integer, List<CCSSourceData> > ccsData = Clustering(ccsDataParam);
+			Map<Integer, List<Integer>> ccsDataParam) {
+		Map<Integer, List<Integer> > ccsData = Clustering(ccsDataParam);
 
 		//List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
 
 		// List<CCSSourceData> sourceData =
 		// ccsData.get(CCSSourceData.TYPE_SOURCE);
-		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		List<Integer> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 		for (int j = 0; j < hubData.size(); j++) {
 
-			CCSHubData curHub = (CCSHubData) hubData.get(j);
-			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getChildSources());
+			CCSHubData curHub = (CCSHubData) UiGlobals.getNode(hubData.get(j));
+			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getClusterSources());
 
 			// Grouping by angle = n pieces;
 			float angleNum = 6;
@@ -964,7 +1034,7 @@ public class NodeRenderManager {
 	}
 
 	public List<CCSEdgeData> makeHybridCon(
-			Map<Integer, List<CCSSourceData>> ccsData) {
+			Map<Integer, List<Integer>> ccsData) {
 
 		ccsData = Clustering(ccsData);
 
@@ -972,15 +1042,15 @@ public class NodeRenderManager {
 
 		// List<CCSSourceData> sourceData =
 		// ccsData.get(CCSSourceData.TYPE_SOURCE);
-		List<CCSSourceData> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
+		List<Integer> hubData = ccsData.get(CCSSourceData.TYPE_HUB);
 
 		for (int j = 0; j < hubData.size(); j++) {
 
-			CCSHubData curHub = (CCSHubData) hubData.get(j);
+			CCSHubData curHub = (CCSHubData) UiGlobals.getNode(hubData.get(j));
 			List<CCSSourceData> connectedData = new ArrayList<CCSSourceData>();
 			connectedData.add(curHub);
 
-			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getChildSources());
+			List<Integer> childIndexList = new ArrayList<Integer>(curHub.getClusterSources());
 			if(childIndexList.size() == 0) continue;
 			
 			List<SortTuple> nodesSortByRank = new ArrayList<SortTuple>();

@@ -1,26 +1,16 @@
 package ac.kaist.ccs.domain;
 
-import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
-import java.util.Vector;
 
-import ac.kaist.ccs.base.DoublePair;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSStatics.CO2StateData;
-import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.fig.FigSourceNode;
-import ac.kaist.ccs.fig.FigPlantNode;
-import ac.kaist.ccs.fig.FigHubNode;
-import ac.kaist.ccs.fig.FigJointNode;
 
 public class CCSSourceData extends CCSNodeData {
 	
 
-	int index;
+	Integer index;
 	float co2_amount;
 	float acc_co2_amount;
 	int co2_type;
@@ -40,6 +30,7 @@ public class CCSSourceData extends CCSNodeData {
 	
 	float distanceToDst;
 	protected List<Integer> childSources;
+	protected List<Integer> clusterSources;
 	
 	
 	public static int VIEW_TYPE_CO2 = 0;
@@ -70,10 +61,7 @@ public class CCSSourceData extends CCSNodeData {
 		dstNode.addChildSource(this.getIndex());
 		CCSEdgeData e = new CCSEdgeData(this, dstNode);
 		distanceToDst = (float) Math.sqrt((x-dstNode.getX())*(x-dstNode.getX())+(y-dstNode.getY())*(y-dstNode.getY())) * CCSStatics.pixelToDistance;
-		
-		
 		this.dst = dstNode.getIndex();
-		dstNode.childSources.add(this.index);
 		e = UiGlobals.addEdge(e);
 		this.edge = e.getIndex();
 		
@@ -90,15 +78,19 @@ public class CCSSourceData extends CCSNodeData {
 		this.acc_co2_amount = acc_co2_amount;
 	}
 
-	public int getIndex() {
+	public Integer getIndex() {
 		return index;
 	}
 
-	public void setIndex(int index) {
+	public void setIndex(Integer index) {
 		this.index = index;
 		this.node.setOwner(this.index);
 	}
 
+	public CCSSourceData(){
+		super(0, 0, TYPE_SOURCE);
+	}
+	
 	public CCSSourceData(int x, int y, float co2_amount, int terrain_type) {
 		super(x, y, CCSNodeData.TYPE_SOURCE);		
 		int size = 7;
@@ -107,6 +99,7 @@ public class CCSSourceData extends CCSNodeData {
 		this.co2_amount = co2_amount;
 		this.terrain_type = terrain_type;
 		childSources = new ArrayList<Integer>();
+		clusterSources = new ArrayList<Integer>();
 		expData = new CCSExpData();
 		co2_type = CCSStatics.CO2_STATE_EXTREME;
 	}
@@ -117,6 +110,8 @@ public class CCSSourceData extends CCSNodeData {
 		CCSSourceData clone = new CCSSourceData(x, y, co2_amount, industry_type, terrain_type);
 		clone.setIndex(index);
 		clone.setHubCandidate(this.isHubCandidate);
+		clone.setChildSources(new ArrayList<Integer>(childSources));
+		clone.setClusterSources(new ArrayList<Integer>(clusterSources));
 		return clone;
 	}
 	
@@ -143,6 +138,18 @@ public class CCSSourceData extends CCSNodeData {
 	
 	public void addChildSource(int childIndex){
 		this.childSources.add(childIndex);
+	}
+	
+	public List<Integer> getClusterSources() {
+		return clusterSources;
+	}
+
+	public void setClusterSources(List<Integer> clusterSources) {
+		this.clusterSources = clusterSources;
+	}
+	
+	public void addClusterSource(int sourceIndex){
+		this.clusterSources.add(sourceIndex);
 	}
 	
 	public float getRank() {
@@ -316,7 +323,7 @@ public class CCSSourceData extends CCSNodeData {
 	public float computeCo2(){
 		float childCo2 = 0;
 		
-		//System.out.println("childSources: "+childSources);
+		System.out.println("compute co2 "+this.index+", childSources: "+childSources);
 		for(Integer childIdx : childSources){
 			CCSSourceData childNode = UiGlobals.getNode(childIdx);
 			childCo2 += childNode.computeCo2();
@@ -332,9 +339,13 @@ public class CCSSourceData extends CCSNodeData {
 	public double computeCost(int costType, int co2Type){
 		double childCost = 0;
 		
-		//System.out.println("childSources: "+childSources);
+		System.out.println("compute cost "+this.index+", childSources: "+childSources);
 		for(Integer childIdx : childSources){
 			CCSSourceData childNode = UiGlobals.getNode(childIdx);
+			if(childNode.getIndex() == this.index){
+				System.err.println("ERROR!! cycle!, childNode.getIndex():"+childNode.getIndex()+", this.index:"+this.index);
+				System.exit(0);
+			}
 			childCost += childNode.computeCost(costType, co2Type);
 		}
 		
@@ -446,6 +457,8 @@ public class CCSSourceData extends CCSNodeData {
 	}
 	
 	
-	
+	public String getNodeType(){
+		return "SOURCE";
+	}
 	
 }

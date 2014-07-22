@@ -62,6 +62,11 @@ public class CCSJointData extends CCSSourceData {
 	public double getCost() {
 		return cost;
 	}
+	
+	@Override
+	public String getNodeType(){
+		return "JOINT";
+	}
 
 
 
