@@ -24,6 +24,7 @@ import org.tigris.gef.presentation.Fig;
 
 import ac.kaist.ccs.domain.CCSEdgeData;
 import ac.kaist.ccs.domain.CCSHubData;
+import ac.kaist.ccs.domain.CCSNodeData;
 import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.fig.FigCCSNode;
@@ -98,24 +99,24 @@ public class UiGlobals extends Globals{
 	private static int nodeSize = 0;
 	private static Map<Integer, CCSEdgeData> edges = new HashMap<Integer, CCSEdgeData>();
 	private static int edgeSize = 0;
-	public static Map<Integer, List<CCSSourceData>> ccsData;
+	public static Map<Integer, List<Integer>> ccsData;
 	public static List<CCSEdgeData> ccsConData;
 	
 	private static Map<Integer, CCSSourceData> nodesSnap = null;//new HashMap<Integer, CCSSourceData>();
 	private static int nodeSizeSnap = 0;
 	private static Map<Integer, CCSEdgeData> edgesSnap = null;//new HashMap<Integer, CCSEdgeData>();
 	private static int edgeSizeSnap = 0;
-	private static Map<Integer, List<CCSSourceData>> ccsDataSnap;
+	private static Map<Integer, List<Integer>> ccsDataSnap;
 	private static List<CCSEdgeData> ccsConDataSnap;
 	
 	public static int viewType = CCSSourceData.VIEW_TYPE_CO2;
 	
 	public static void saveNodeSnapshot(){
 		
-		//nodesSnap= DeepClone.deepClone(nodes);
+		nodesSnap= DeepClone.deepClone(nodes);
 		nodeSizeSnap = nodeSize;
 		
-		//edgesSnap=DeepClone.deepClone(edges);
+		edgesSnap=DeepClone.deepClone(edges);
 		edgeSizeSnap = edgeSize;
 		
 		//ccsDataSnap = new HashMap<Integer, List<CCSSourceData> >(ccsData);//cloner.deepClone(ccsData);
@@ -124,6 +125,35 @@ public class UiGlobals extends Globals{
 		ccsDataSnap = DeepClone.deepClone(ccsData);
 		//System.out.println("SAVE - ccsDataSnap:"+ccsDataSnap);
 		
+		
+//		{
+//			System.out.println(ccsDataSnap);
+//			List<Integer> hubList = ccsDataSnap.get(CCSNodeData.TYPE_HUB);
+//			for(int i = 0 ; i < hubList.size() ; i++){
+//				CCSHubData hubData1 = (CCSHubData) nodesSnap.get(hubList.get(i));
+//				System.out.println("in save1:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
+//			}
+//		}
+//		
+//		{
+//			System.out.println(ccsDataSnap);
+//			List<Integer> hubList = ccsData.get(CCSNodeData.TYPE_HUB);
+//			for(int i = 0 ; i < hubList.size() ; i++){
+//				CCSHubData hubData1 = (CCSHubData) nodes.get(hubList.get(i));
+//				hubData1.addChildSource(1);
+//				//System.out.println("in save1:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
+//			}
+//		}
+//		
+//		
+//		{
+//			System.out.println(ccsDataSnap);
+//			List<Integer> hubList = ccsDataSnap.get(CCSNodeData.TYPE_HUB);
+//			for(int i = 0 ; i < hubList.size() ; i++){
+//				CCSHubData hubData1 = (CCSHubData) nodesSnap.get(hubList.get(i));
+//				System.out.println("in save2:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
+//			}
+//		}
 		
 		
 //		ccsData.get(CCSSourceData.TYPE_HUB).get(0).getChildSources().add(123123);
@@ -134,18 +164,27 @@ public class UiGlobals extends Globals{
 	}
 	
 	public static void loadNodeSnapshot(){
-		nodes=new HashMap<Integer, CCSSourceData>();//DeepClone.deepClone(nodesSnap);
+		nodes=DeepClone.deepClone(nodesSnap);
 		nodeSize = nodeSizeSnap;
 //		
 		//edges=DeepClone.deepClone(edgesSnap);
 		//edgeSize = edgeSizeSnap;
 		
+//		{
+//			System.out.println(ccsDataSnap);
+//			List<Integer> hubList = ccsDataSnap.get(CCSNodeData.TYPE_HUB);
+//			for(int i = 0 ; i < hubList.size() ; i++){
+//				CCSHubData hubData1 = (CCSHubData) nodesSnap.get(hubList.get(i));
+//				System.out.println("in load:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
+//			}
+//		}
+		
 		ccsData = DeepClone.deepClone(ccsDataSnap);//cloner.deepClone(ccsData);
-		for(Integer key : ccsData.keySet()){
-			for(CCSSourceData data : ccsData.get(key)){
-				nodes.put(data.getIndex(), data);
-			}
-		}
+//		for(Integer key : ccsData.keySet()){
+//			for(Integer nodeIndex : ccsData.get(key)){
+//				nodes.put(nodeIndex, nodesSnap.get(nodeIndex));
+//			}
+//		}
 		
 		//System.out.println("LOAD - ccsDataSnap:"+ccsDataSnap.get(CCSSourceData.TYPE_HUB));
 		//System.out.println("LOAD - ccsData:"+ccsData.get(CCSSourceData.TYPE_HUB));

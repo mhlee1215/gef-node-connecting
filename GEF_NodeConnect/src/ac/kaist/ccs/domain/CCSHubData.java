@@ -45,6 +45,7 @@ public class CCSHubData extends CCSSourceData {
 	public CCSHubData clone(){
 		CCSHubData clone = new CCSHubData(x, y, co2_amount, industry_type, terrain_type, range);
 		clone.setIndex(index);
+		clone.setChildSources(new ArrayList<Integer>(childSources));
 		return clone;
 	}
 	
@@ -64,5 +65,8 @@ public class CCSHubData extends CCSSourceData {
 				+ "]";
 	}
 	
-	
+	@Override
+	public String getNodeType(){
+		return "HUB";
+	}
 }

@@ -49,6 +49,7 @@ package ac.kaist.ccs.fig;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -114,6 +115,26 @@ public class FigPlantNode extends FigCCSNode {
 	    	int[] yPoints = {getY()-getWidth(), getY()+getWidth()/2, getY()+getWidth()/2};
 	    	g2.fillPolygon(xPoints, yPoints, 3);
 	    	g2.setColor(old);
+	    	
+	    	if((int)this.getOwner() > 0){
+	    		Font oldFont = g2.getFont();
+	    		
+	    		g2.setFont(new Font("TimesRoman", Font.PLAIN, 5)); 
+	    		CCSPlantData owner = (CCSPlantData) UiGlobals.getNode((int)getOwner());
+	    		Color fontColor = new Color(0, 0, 0);
+	    		g2.setColor(fontColor);
+	    		
+	    		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		        RenderingHints.VALUE_ANTIALIAS_ON);
+
+	    		String propertyStr = owner.getNameString()+","+owner.getGeo_infoString();
+	    		//String propertyStr = Integer.toString(owner.getIndustry_type())+","+CCSStatics.terrainTypeStringMap.get(owner.getTerrain_type());
+	    		
+		        g2.drawString(propertyStr,getX()+4,getY()-4);
+		        
+		        g2.setColor(old);
+		        g2.setFont(oldFont);
+	    	}
 		}
 		
 		//super.paint(g);

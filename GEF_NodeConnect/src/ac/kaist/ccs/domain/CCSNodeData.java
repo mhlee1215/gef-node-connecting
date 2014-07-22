@@ -22,8 +22,9 @@ public class CCSNodeData {
 	
 	public final static int TYPE_SOURCE = 1;
 	public final static int TYPE_HUB = 2;
-	public final static int TYPE_JOINT = 3;
-	public final static int TYPE_PLANT = 4;
+	public final static int TYPE_HUB_CANDIDATE = 3;
+	public final static int TYPE_JOINT = 4;
+	public final static int TYPE_PLANT = 5;
 
 
 	

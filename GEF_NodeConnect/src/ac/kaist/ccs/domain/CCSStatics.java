@@ -45,6 +45,9 @@ public class CCSStatics {
 	public static int GEO_INFO_SALINEAQUIFER = 3;
 	public static int GEO_INFO_EOR = 4;
 	
+	public static Map<Integer, String> geoInfoStringMap = null;
+	public static Map<Integer, String> storageNameStringMap = null;
+	
 	
 	public static Map<Integer, StorageData> storageMap = null;
 	
@@ -131,6 +134,26 @@ public class CCSStatics {
 
 	public static void init(){
 		isInitialized = true;
+		
+		
+		storageNameStringMap = new HashMap<Integer, String>();
+		storageNameStringMap.put(STORAGE_ONSHORE_CHUNGNAM, "Onshore Chungnam");
+		storageNameStringMap.put(STORAGE_ONSHORE_TAEBACKSAN, "Onshore Taebacksan");
+		storageNameStringMap.put(STORAGE_ONSHORE_MYUNGYEONG, "Onshore Myungyeong");
+		storageNameStringMap.put(STORAGE_ONSHORE_GYEONGSANG, "Onshore Gyeongsang");
+		storageNameStringMap.put(STORAGE_ONSHORE_BUKPYEONG, "Onshore Bukpyeong");
+		storageNameStringMap.put(STORAGE_OFFSHORE_BOKPYEONG, "Offshore Bokpyeong");
+		storageNameStringMap.put(STORAGE_OFFSHORE_ULLEUNG, "Offshore Ulleung");
+		storageNameStringMap.put(STORAGE_OFFSHORE_JEJU, "Offshore Jeju");
+		storageNameStringMap.put(STORAGE_OFFSHORE_GUNSAN, "Offshore Gunsan");
+		storageNameStringMap.put(STORAGE_OFFSHORE_HEUKSAN, "Offshore Heuksan");
+		storageNameStringMap.put(STORAGE_OFFSHORE_POHANG, "Offshore Pohang");
+		
+		geoInfoStringMap = new HashMap<Integer, String>();
+		geoInfoStringMap.put(GEO_INFO_COALBED, "Coal Bed");
+		geoInfoStringMap.put(GEO_INFO_SANDSTONE, "Sandstone");
+		geoInfoStringMap.put(GEO_INFO_SALINEAQUIFER, "Saline Aquifer");
+		geoInfoStringMap.put(GEO_INFO_EOR, "EOR");
 		
 		co2StateMap = new HashMap<Integer, CO2StateData>();
 		co2StateMap.put(CO2_STATE_EXTREME, new CO2StateData(6.16E-05, 745.5, 14f, 40, 4));
