@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Application-Library-Allowable-Codebase: *
+Trusted-Library: false
+Application-Name: Co2 Collection Topology Analyzer
+Permissions: all-permissions
+Caller-Allowable-Codebase: *
+Codebase: *

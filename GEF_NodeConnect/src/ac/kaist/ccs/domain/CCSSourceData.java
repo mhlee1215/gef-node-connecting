@@ -10,6 +10,9 @@ import ac.kaist.ccs.fig.FigSourceNode;
 public class CCSSourceData extends CCSNodeData {
 	
 
+	
+
+
 	Integer index;
 	float co2_amount;
 	float acc_co2_amount;
@@ -19,6 +22,7 @@ public class CCSSourceData extends CCSNodeData {
 	double pipelineCost;
 	double pipe_diameter;
 	double pipe_diameterMe;
+	double openCost;
 	float rank;
 	int terrain_type;
 	int industry_type;
@@ -29,8 +33,12 @@ public class CCSSourceData extends CCSNodeData {
 	boolean isHubCandidate = false;
 	
 	float distanceToDst;
+	//연결되 자식 소스
 	protected List<Integer> childSources;
+	//클러스터링 했을때 허브가 포함하는 소스
 	protected List<Integer> clusterSources;
+	//소스에서 연결가능한 허브들의 허브 
+	protected List<Integer> outgoingHub;
 	
 	
 	public static int VIEW_TYPE_CO2 = 0;
@@ -39,7 +47,29 @@ public class CCSSourceData extends CCSNodeData {
 	public int viewType = VIEW_TYPE_CO2;
 	
 	CCSExpData expData = null;
+	
+	boolean isValid = true;
 
+	public boolean isValid() {
+		return isValid;
+	}
+
+	public void setValid(boolean isValid) {
+		this.isValid = isValid;
+	}
+
+	public double getUnitCaptureCost(){
+		return CCSStatics.unitCaptureCostMap.get(this.industry_type);
+	}
+	
+	public double getOpenCost() {
+		return openCost;
+	}
+
+	public void setOpenCost(double openCost) {
+		this.openCost = openCost;
+	}
+	
 	public boolean isHubCandidate() {
 		return isHubCandidate;
 	}
@@ -100,6 +130,7 @@ public class CCSSourceData extends CCSNodeData {
 		this.terrain_type = terrain_type;
 		childSources = new ArrayList<Integer>();
 		clusterSources = new ArrayList<Integer>();
+		outgoingHub = new ArrayList<Integer>();
 		expData = new CCSExpData();
 		co2_type = CCSStatics.CO2_STATE_EXTREME;
 	}
@@ -112,13 +143,27 @@ public class CCSSourceData extends CCSNodeData {
 		clone.setHubCandidate(this.isHubCandidate);
 		clone.setChildSources(new ArrayList<Integer>(childSources));
 		clone.setClusterSources(new ArrayList<Integer>(clusterSources));
+		clone.setOutgoingHub(new ArrayList<Integer>(outgoingHub));
 		return clone;
 	}
 	
+	public void addOutgoingHub(int hubIndex){
+		outgoingHub.add(hubIndex);
+	}
+	
+	public List<Integer> getOutgoingHub() {
+		return outgoingHub;
+	}
+
+	public void setOutgoingHub(List<Integer> outgoingHub) {
+		this.outgoingHub = outgoingHub;
+	}
+
 	public CCSSourceData(int x, int y, float co2_amount, int industry_type, int terrain_type) {
 		//super(x, y, CCSNodeData.TYPE_SOURCE);
 		this(x, y, co2_amount, terrain_type);
 		this.industry_type = industry_type;
+		this.openCost = CCSStatics.captureCapitalCostMap.get(industry_type);
 	}
 	
 //	public CCSSourceData(CCSSourceData data, boolean isHub){
@@ -336,6 +381,7 @@ public class CCSSourceData extends CCSNodeData {
 	public double computeCost(int costType){
 		return computeCost(costType, this.co2_type);
 	}
+	
 	public double computeCost(int costType, int co2Type){
 		double childCost = 0;
 		
@@ -349,6 +395,12 @@ public class CCSSourceData extends CCSNodeData {
 			childCost += childNode.computeCost(costType, co2Type);
 		}
 		
+		//System.out.println("this.industry_type: "+this.industry_type+", this.type :"+this.type);
+		if(this.industry_type > 0){
+			childCost += CCSStatics.captureCapitalCostMap.get(this.industry_type);	
+		}
+		
+		
 		double m = (this.co2_amount*1000)/365; // kCo2 -> tone/day
 		double L = distanceToDst;
 		double f = 1.0;
@@ -358,24 +410,28 @@ public class CCSSourceData extends CCSNodeData {
 		//Method 1
 		if(costType == CCSStatics.COST_TYPE_THE_OGDEN_MODELS){
 			double D = Math.pow((5084.5*L *f*m*m) / (co2Data.p_outlet*co2Data.p_outlet-0.01), 0.2);
+			D *= CCSStatics.COST_TYPE_1_TEMP_SCALE;
 			this.pipelineCost = childCost + Math.pow((m / 1600), 0.48) * Math.pow((L / 100), 0.24) * 0.15 * L;
 			this.pipe_diameter = D;
 		}
 		//Method 2
 		else if(costType == CCSStatics.COST_TYPE_MIT_MODEL){
 			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet);
+			D *= CCSStatics.COST_TYPE_2_TEMP_SCALE;
 			this.pipelineCost = childCost + (20989 * D * L * 0.15) + 3100*L;
 			this.pipe_diameter = D;
 		}
 		//Method 3
 		else if(costType == CCSStatics.COST_TYPE_ECOFYS_MODEL){
 			double D = Math.pow((1.155*m*m*L)/((co2Data.p_outlet - 0.1)*co2Data.lou), 0.2);
+			D *= CCSStatics.COST_TYPE_3_TEMP_SCALE;
 			this.pipelineCost = childCost + 154.7 * D * L;
 			this.pipe_diameter = D;
 		}
 		//Method 4
 		else if(costType == CCSStatics.COST_TYPE_IEA_GHG_PH4_6){
 			double D = Math.pow((L*co2Data.lou*m*m) / (25041*(co2Data.p_outlet - 0.1)), 0.2);
+			D *= CCSStatics.COST_TYPE_4_TEMP_SCALE;
 			double capitalCost = Math.pow(10, 6) * ((0.057 * L + 1.8663) + (0.00129 * L)*D + (0.000486 * L + 0.000007) * D*D );
 			double annualPipelineOMCost = 144000 + 0.61*(23213 * D + 899 * L - 259269) + 0.7*(39305 * D + 1694*L - 351355);
 			this.pipelineCost = childCost + capitalCost + annualPipelineOMCost;
@@ -384,6 +440,7 @@ public class CCSSourceData extends CCSNodeData {
 		//Method 5
 		else if(costType == CCSStatics.COST_TYPE_IEA_GHG_2005_2){
 			double D = Math.pow(0.073*m / co2Data.lou, 0.5)/0.0254;
+			D *= CCSStatics.COST_TYPE_5_TEMP_SCALE;
 			this.pipelineCost = childCost + (10.3 * Math.pow(10, 6) *((0.057*L+1.8663)+(0.00129*L)*D+(0.000486*L+0.000007)*D*D)+10.5*350000*L) / 
 						((1.1*1.1 - 1)/Math.pow(1.1, 20));
 			this.pipe_diameter = D;
@@ -391,6 +448,7 @@ public class CCSSourceData extends CCSNodeData {
 		//Method 6
 		else if(costType == CCSStatics.COST_TYPE_IEA_GHG_2005_3){
 			double D = Math.pow((4*m)/(18.41*Math.PI*co2Data.lou), 0.5);
+			D *= CCSStatics.COST_TYPE_6_TEMP_SCALE;
 			this.pipelineCost = childCost + 4335 * Math.pow(m/24, 0.5) * 1.02;
 			this.pipe_diameter = D;
 		}
@@ -435,7 +493,85 @@ public class CCSSourceData extends CCSNodeData {
 		this.pipelineCost += cost;
 	}
 
+	public int getCo2_type() {
+		return co2_type;
+	}
 
+	public void setCo2_type(int co2_type) {
+		this.co2_type = co2_type;
+	}
+
+	public double getCompPumpCost() {
+		return compPumpCost;
+	}
+
+	public void setCompPumpCost(double compPumpCost) {
+		this.compPumpCost = compPumpCost;
+	}
+
+	public double getCompPumpCostMe() {
+		return compPumpCostMe;
+	}
+
+	public void setCompPumpCostMe(double compPumpCostMe) {
+		this.compPumpCostMe = compPumpCostMe;
+	}
+
+	public double getPipelineCost() {
+		return pipelineCost;
+	}
+
+	public void setPipelineCost(double pipelineCost) {
+		this.pipelineCost = pipelineCost;
+	}
+
+	public double getPipe_diameter() {
+		return pipe_diameter;
+	}
+
+	public void setPipe_diameter(double pipe_diameter) {
+		this.pipe_diameter = pipe_diameter;
+	}
+
+	public double getPipe_diameterMe() {
+		return pipe_diameterMe;
+	}
+
+	public void setPipe_diameterMe(double pipe_diameterMe) {
+		this.pipe_diameterMe = pipe_diameterMe;
+	}
+
+	public float getDistanceToDst() {
+		return distanceToDst;
+	}
+	
+	public float getDistanceToDstKM(){
+		return distanceToDst * CCSStatics.pixelToDistance;
+	}
+
+	public void setDistanceToDst(float distanceToDst) {
+		this.distanceToDst = distanceToDst;
+	}
+
+	public int getViewType() {
+		return viewType;
+	}
+
+	public void setViewType(int viewType) {
+		this.viewType = viewType;
+	}
+
+	public void setClusterHub(int clusterHub) {
+		this.clusterHub = clusterHub;
+	}
+
+	public void setDst(int dst) {
+		this.dst = dst;
+	}
+
+	public void setEdge(int edge) {
+		this.edge = edge;
+	}
 
 	@Override
 	public String toString() {
@@ -459,6 +595,62 @@ public class CCSSourceData extends CCSNodeData {
 	
 	public String getNodeType(){
 		return "SOURCE";
+	}
+	
+	public double getUnitStorageCost(){
+		return CCSStatics.UNIT_STORAGE_COST;
+	}
+	
+	public double getHubOpenCost(){
+		return this.openCost + CCSStatics.STORAGE_CAPITAL_COST;
+	}
+	
+	public double computeHubSelectionCost(){
+		double s_selection = 0.0;
+		double acc_co2 = 0.0;
+		
+		for(int childIndex : this.getChildSources()){
+			CCSSourceData sData = UiGlobals.getNode(childIndex);
+			System.out.println("outGoing : "+sData.getOutgoingHub());
+			s_selection += (sData.getCo2_amount() / CCSUtils.dist(this, sData)) * (1 / (double)sData.getOutgoingHub().size());
+			acc_co2 += sData.getCo2_amount();
+		}
+		
+		this.expData.setS_selection(s_selection);
+		this.acc_co2_amount = (float) (acc_co2 + this.getCo2_amount());
+		return s_selection * this.getChildSources().size();
+	}
+	
+	public double computeHubCost(int costType, int co2Type){
+		double s_cost = 0.0;
+		double co2_capture_facility_open_cost = 0.0;
+		double co2_capture_cost = 0.0;
+		double pipeline_cost = 0.0;
+		double hub_open_cost = getHubOpenCost();
+		double hub_storage_cost = 0.0;
+		double co2_acc_amount = this.getCo2_amount();
+		
+		for(int childIndex : this.childSources){
+			CCSSourceData childNode = UiGlobals.getNode(childIndex);
+			childNode.computeCost(costType, co2Type);
+			co2_capture_facility_open_cost+= childNode.getOpenCost();
+			co2_capture_cost += childNode.getUnitCaptureCost()*childNode.getCo2_amount();
+			pipeline_cost += childNode.getPipelineCost();
+			co2_acc_amount += childNode.getCo2_amount();
+		}
+		
+		hub_storage_cost = co2_acc_amount * getUnitStorageCost();
+		
+		s_cost = co2_capture_facility_open_cost + co2_capture_cost + pipeline_cost + hub_open_cost + hub_storage_cost;
+		
+		this.expData.setS_cost(s_cost);
+		this.expData.setCo2_capture_facility_open_cost(co2_capture_facility_open_cost);
+		this.expData.setCo2_capture_cost(co2_capture_cost);
+		this.expData.setPipeline_cost(pipeline_cost);
+		this.expData.setHub_open_cost(hub_open_cost);
+		this.expData.setHub_storage_cost(hub_storage_cost);
+		
+		return s_cost;
 	}
 	
 }

@@ -18,11 +18,13 @@ public class CCSJointData extends CCSSourceData {
 	float co2_amount;
 	CCSSourceData hub;
 	float cost;
+	double storageCapitalCost;
 
 	public CCSJointData(int x, int y) {
 		super(x, y, 0, 0);
 		this.type = CCSNodeData.TYPE_JOINT;
 		int size = 5;
+		this.storageCapitalCost = CCSStatics.STORAGE_CAPITAL_COST;
 		node = new FigJointNode(x, y, size, size);
 		node.setOwner(this);
 	}
