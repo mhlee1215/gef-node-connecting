@@ -2,6 +2,9 @@ package ac.kaist.ccs.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,6 +38,8 @@ import ac.kaist.ccs.domain.CCSNodeData;
 import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSStatics;
+import ac.kaist.ccs.domain.CCSUtils;
+import ac.kaist.ccs.domain.CCSUtils.*;
 
 public class NodeRenderManager {
 
@@ -306,6 +313,31 @@ public class NodeRenderManager {
 		m.setLayout(new BorderLayout());
 		m.add("Center", scroll);
 		
+		JPanel buttonPanel = new JPanel();
+		JButton exportButton = new JButton("Export");
+		exportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	JFileChooser fileChooser = new JFileChooser();
+            	
+            	 /* Enabling Multiple Selection */
+                //fileChooser.setMultiSelectionEnabled(true);
+
+                /* Setting Current Directory */
+                fileChooser.setCurrentDirectory(new File("E:/ext_work/respace/workspace/CTS_analysis/input"));
+                
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
+                
+                //JFrame parent = new MenuMain();
+                
+                
+                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+            }
+		});
+		buttonPanel.add(exportButton);
+		
+		m.add("South", buttonPanel);
+		
 		JFrame frame = new JFrame("Cost Result Table");
 			    
 		frame.getContentPane().add( m );
@@ -467,7 +499,7 @@ public class NodeRenderManager {
 
 				CCSSourceData curHub = hubData.get(j);
 
-				double curDist = dist(curSrc, curHub);
+				double curDist = CCSUtils.dist(curSrc, curHub);
 				if (minDist > curDist) {
 					minDist = curDist;
 					minDistHub = curHub;
@@ -504,7 +536,7 @@ public class NodeRenderManager {
 				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(hubData.get(j));
 
 				// System.out.println(curHub);
-				double curDist = dist(curSrc, curHub);
+				double curDist = CCSUtils.dist(curSrc, curHub);
 				float curRank = (float) (curSrc.getCo2_amount() / minDist);
 				curSrc.setRank(curRank);
 				if (minDist > curDist) {
@@ -571,7 +603,7 @@ public class NodeRenderManager {
 			//Connect to plant directly
 			if(hubCnt < 5){
 				System.out.println("Add to plant!!!!.. index:"+data.firstId);
-				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(data.firstId);
+				CCSHubData curHub = (CCSHubData) UiGlobals.getNode((int) data.firstId);
 				CCSPlantData closestPlant = (CCSPlantData) getClosestPoint(curHub.getIndex(), plantData);
 				System.out.println(closestPlant.getNodeType());
 				curHub.connectTo(closestPlant);	
@@ -580,7 +612,7 @@ public class NodeRenderManager {
 			//Connect to other hub
 			else{
 				System.out.println("Add to another hub!!!!.. index:"+data.firstId);
-				CCSHubData curHub = (CCSHubData) UiGlobals.getNode(data.firstId);
+				CCSHubData curHub = (CCSHubData) UiGlobals.getNode((int) data.firstId);
 				CCSHubData closestPlant = (CCSHubData) getClosestPoint(curHub.getIndex(), connectedHub);
 				curHub.connectTo(closestPlant);	
 				connectedHub.add(curHub.getIndex());
@@ -706,7 +738,7 @@ public class NodeRenderManager {
 				int connectedIndex = secondIDList.get(k);
 				CCSSourceData curConnected = UiGlobals.getNode(connectedIndex);
 
-				double curDist = dist(curSrc, curConnected);
+				double curDist = CCSUtils.dist(curSrc, curConnected);
 				if (minDist > curDist) {
 					minDist = curDist;
 					minDistSrc = curSrc;
@@ -733,7 +765,7 @@ public class NodeRenderManager {
 			int connectedIndex = secondIDList.get(k);
 			CCSSourceData curConnected = UiGlobals.getNode(connectedIndex);
 
-			double curDist = dist(curSrc, curConnected);
+			double curDist = CCSUtils.dist(curSrc, curConnected);
 			if (minDist > curDist) {
 				minDist = curDist;
 				minDistSrc = curConnected;
@@ -753,7 +785,7 @@ public class NodeRenderManager {
 
 		for(CCSSourceData curConnected : secondIDList){
 
-			double curDist = dist(curSrc, curConnected);
+			double curDist = CCSUtils.dist(curSrc, curConnected);
 			if (minDist > curDist) {
 				minDist = curDist;
 				//minDistSrc = curSrc;
@@ -872,7 +904,7 @@ public class NodeRenderManager {
 					int childIndex = binNodeList.get(k);
 					CCSSourceData curSrc = UiGlobals.getNode(childIndex);
 
-					double curDist = dist(curSrc, curHub);
+					double curDist = CCSUtils.dist(curSrc, curHub);
 					if (maxDist < curDist) {
 						maxDist = curDist;
 						maxDistSrc = curSrc;
@@ -940,7 +972,7 @@ public class NodeRenderManager {
 
 		while (justBeforeJoint.getDst() != null) {
 			if(ref.getDst().getIndex() == justBeforeJoint.getDst().getIndex()) break;
-			if (dist(justBeforeJoint.getDst(), hub) < dist(joint, hub))
+			if (CCSUtils.dist(justBeforeJoint.getDst(), hub) < CCSUtils.dist(joint, hub))
 				break;
 			justBeforeJoint = justBeforeJoint.getDst();
 			//System.out.println("HUL>..."+justBeforeJoint.getIndex()+", D1:"+dist(justBeforeJoint.getDst(), hub)+", D2"+dist(joint, hub));
@@ -957,8 +989,8 @@ public class NodeRenderManager {
 	public CCSSourceData getProjectionPoint(CCSSourceData hub,
 			CCSSourceData ref, CCSSourceData newNode) {
 
-		double distToRef = dist(hub, ref);
-		double distToNew = dist(hub, newNode);
+		double distToRef = CCSUtils.dist(hub, ref);
+		double distToNew = CCSUtils.dist(hub, newNode);
 
 		if (distToRef < distToNew)
 			return null;
@@ -969,7 +1001,7 @@ public class NodeRenderManager {
 		int cx = newNode.getX() - hub.getX();
 		int cy = newNode.getY() - hub.getY();
 
-		double distMax = dist(ref, hub);
+		double distMax = CCSUtils.dist(ref, hub);
 		double lengthToOrth = (mx * cx + my * cy) / distMax;
 		
 		if(lengthToOrth < 0) return null;
@@ -979,59 +1011,14 @@ public class NodeRenderManager {
 
 		CCSSourceData node = new CCSJointData(hub.getX() + ox, hub.getY() + oy);
 		
-		double distToJoint = dist(hub, node);
+		double distToJoint = CCSUtils.dist(hub, node);
 		if(distToJoint > distToRef)
 			return null;
 		else
 			return node;
 	}
 
-	public class NodePair {
-		CCSSourceData first;
-		CCSSourceData second;
-
-		public NodePair(CCSSourceData first, CCSSourceData second) {
-			this.first = first;
-			this.second = second;
-		}
-	}
-
-	public class SortTuple {
-		double dist;
-		int firstId;
-		int secondId;
-
-		public SortTuple(double dist, int firstId, int secondId) {
-			this.dist = dist;
-			this.firstId = firstId;
-			this.secondId = secondId;
-		}
-
-	}
-
-	static class NoAscCompare implements Comparator<SortTuple> {
-
-		/**
-		 * 오름차순(ASC)
-		 */
-		@Override
-		public int compare(SortTuple arg0, SortTuple arg1) {
-			// TODO Auto-generated method stub
-			return arg0.dist < arg1.dist ? -1 : arg0.dist > arg1.dist ? 1 : 0;
-		}
-	}
-
-	static class NoDecCompare implements Comparator<SortTuple> {
-
-		/**
-		 * 오름차순(ASC)
-		 */
-		@Override
-		public int compare(SortTuple arg0, SortTuple arg1) {
-			// TODO Auto-generated method stub
-			return arg0.dist > arg1.dist ? -1 : arg0.dist < arg1.dist ? 1 : 0;
-		}
-	}
+	
 
 	public List<CCSEdgeData> makeHybridCon(
 			Map<Integer, List<Integer>> ccsData) {
@@ -1069,14 +1056,14 @@ public class NodeRenderManager {
 
 			
 			//Add Highest rank node
-			CCSSourceData highestRankSrc = UiGlobals.getNode(nodesSortByRank.get(0).firstId);
+			CCSSourceData highestRankSrc = UiGlobals.getNode((int) nodesSortByRank.get(0).firstId);
 			connectedData.add(highestRankSrc);
 			highestRankSrc.connectTo(curHub);
 			
 			// Add from high rank node
 			// Actual adding routine.
 			for (int i = 1; i < nodesSortByRank.size(); i++) {
-				int highRankNodeId = nodesSortByRank.get(i).firstId;
+				int highRankNodeId = (int) nodesSortByRank.get(i).firstId;
 				CCSSourceData curSrc = UiGlobals.getNode(highRankNodeId);
 
 				//Get shortest length to connected node list
@@ -1086,8 +1073,8 @@ public class NodeRenderManager {
 				if(possibleJoint == null){
 					curSrc.connectTo(closestPoint);
 				}else{
-					double distToClosest = dist(closestPoint, curSrc);
-					double distToJoint = dist(possibleJoint, curSrc);
+					double distToClosest = CCSUtils.dist(closestPoint, curSrc);
+					double distToJoint = CCSUtils.dist(possibleJoint, curSrc);
 					if(distToClosest < distToJoint){
 						//System.out.println("curSrc:"+curSrc+", closestPoint:"+closestPoint);
 						curSrc.connectTo(closestPoint);
@@ -1115,16 +1102,8 @@ public class NodeRenderManager {
 	}
 
 	public double getRank(CCSSourceData hub, CCSSourceData ref) {
-		return ref.getCo2_amount() / dist(hub, ref);
+		return ref.getCo2_amount() / CCSUtils.dist(hub, ref);
 	}
 
-	public double dist(CCSSourceData src1, CCSSourceData src2) {
-		double dist = 0;
-
-		dist = Math.sqrt((src1.getX() - src2.getX())
-				* (src1.getX() - src2.getX()) + (src1.getY() - src2.getY())
-				* (src1.getY() - src2.getY()));
-
-		return dist;
-	}
+	
 }

@@ -110,13 +110,23 @@ public class CCSStatics {
 	public static int COST_TYPE_IEA_GHG_2005_2 = COST_TYPE_5;
 	public static int COST_TYPE_IEA_GHG_2005_3 = COST_TYPE_6;
 	
+	public static float COST_TYPE_1_TEMP_SCALE = 1/30.0f;
+	public static float COST_TYPE_2_TEMP_SCALE = 1.0f;
+	public static float COST_TYPE_3_TEMP_SCALE = 1/2.0f;
+	public static float COST_TYPE_4_TEMP_SCALE = 1/3.0f;
+	public static float COST_TYPE_5_TEMP_SCALE = 1/3.0f;
+	public static float COST_TYPE_6_TEMP_SCALE = 10.0f;
+	
+	public static Map<Integer, String> costTypeStringMap = null;
+	
 	public static int CONNECT_TYPE_STAR = 1;
 	public static int CONNECT_TYPE_TREE = 2;
 	public static int CONNECT_TYPE_BACKBONE = 3;
 	public static int CONNECT_TYPE_HYBRID = 4;
 	
 	public static double UNIT_STORAGE_COST = 0.72;
-	public static double STORAGE_CAPITAL_COST = 10228607.0;
+	public static double STORAGE_CAPITAL_COST = 752657.0;
+	public static int HUB_SELECTION_RANGE = 100;
 	
 	public static Map<Integer, Double> terrainAdditiveCost = null;//new HashMap<Integer, Double>();
 	public static Map<Integer, Double> terrainMultiplier = null;//new HashMap<Integer, Double>();
@@ -135,6 +145,13 @@ public class CCSStatics {
 	public static void init(){
 		isInitialized = true;
 		
+		costTypeStringMap = new HashMap<Integer, String>();
+		costTypeStringMap.put(COST_TYPE_1, "THE_OGDEN_MODELS");
+		costTypeStringMap.put(COST_TYPE_2, "COST_TYPE_MIT_MODEL");
+		costTypeStringMap.put(COST_TYPE_3, "COST_TYPE_ECOFYS_MODEL");
+		costTypeStringMap.put(COST_TYPE_4, "COST_TYPE_IEA_GHG_PH4_6");
+		costTypeStringMap.put(COST_TYPE_5, "COST_TYPE_IEA_GHG_2005_2");
+		costTypeStringMap.put(COST_TYPE_6, "COST_TYPE_IEA_GHG_2005_3");
 		
 		storageNameStringMap = new HashMap<Integer, String>();
 		storageNameStringMap.put(STORAGE_ONSHORE_CHUNGNAM, "Onshore Chungnam");
@@ -214,10 +231,10 @@ public class CCSStatics {
 		unitCaptureCostMap.put(PLANT_TYPE_OIL_REFINERY, 80.26);
 		unitCaptureCostMap.put(PLANT_TYPE_PETROCHEMICAL, 58.85);
 		
-		captureCapitalCostMap.put(PLANT_TYPE_POWER, 333.0);
-		captureCapitalCostMap.put(PLANT_TYPE_IRON_AND_STEEL, 639.0);
-		captureCapitalCostMap.put(PLANT_TYPE_OIL_REFINERY, 283.0);
-		captureCapitalCostMap.put(PLANT_TYPE_PETROCHEMICAL, 558.0);
+		captureCapitalCostMap.put(PLANT_TYPE_POWER, 24500000.0);
+		captureCapitalCostMap.put(PLANT_TYPE_IRON_AND_STEEL, 47000000.0);
+		captureCapitalCostMap.put(PLANT_TYPE_OIL_REFINERY, 20800000.0);
+		captureCapitalCostMap.put(PLANT_TYPE_PETROCHEMICAL, 41100000.0);
 		
 		plantInfoMap = new HashMap<Integer, List<PlantData> >();
 		
@@ -390,6 +407,21 @@ public class CCSStatics {
 		int maxSize = 21;
 		scalingFactor = (float) (maxSize / maxCost);
 		System.out.println("scalingFactor: "+scalingFactor+", maxCost: "+maxCost);
+	}
+	
+	public static List<Integer> getCostTypeList(){
+		List<Integer> costTypeList = new ArrayList<Integer>();
+		costTypeList.add(CCSStatics.COST_TYPE_1);
+		costTypeList.add(CCSStatics.COST_TYPE_2);
+		costTypeList.add(CCSStatics.COST_TYPE_3);
+		costTypeList.add(CCSStatics.COST_TYPE_4);
+		costTypeList.add(CCSStatics.COST_TYPE_5);
+		costTypeList.add(CCSStatics.COST_TYPE_6);
+		return costTypeList;
+	}
+	
+	public static String getCostTypeString(int costType){
+		return costTypeStringMap.get(costType);
 	}
 	
 	public static float scalingFactor = 1.0f;

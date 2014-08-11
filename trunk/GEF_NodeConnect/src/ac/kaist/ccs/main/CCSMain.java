@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -22,22 +23,32 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.JApplet;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EtchedBorder;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.jfree.ui.RefineryUtilities;
 import org.tigris.gef.base.AlignAction;
 import org.tigris.gef.base.CmdAdjustGrid;
 import org.tigris.gef.base.CmdAdjustGuide;
@@ -78,20 +89,29 @@ import org.tigris.gef.util.Localizer;
 import org.tigris.gef.util.ResourceLoader;
 
 import ac.kaist.ccs.base.CmdZoom;
+import ac.kaist.ccs.base.CustomCellRenderer;
+import ac.kaist.ccs.base.MyTableModel;
 import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.domain.CCSEdgeData;
+import ac.kaist.ccs.domain.CCSExpData;
 import ac.kaist.ccs.domain.CCSHubData;
 import ac.kaist.ccs.domain.CCSJointData;
 import ac.kaist.ccs.domain.CCSNodeData;
 import ac.kaist.ccs.domain.CCSPlantData;
 import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSStatics;
+import ac.kaist.ccs.domain.CCSUtils;
 import ac.kaist.ccs.domain.CCSStatics.PlantData;
 import ac.kaist.ccs.domain.CCSStatics.StorageData;
+import ac.kaist.ccs.domain.CCSUtils.SortTuple;
+import ac.kaist.ccs.presentation.CCSHubSelectionCo2Coverage;
+import ac.kaist.ccs.presentation.CCSHubSelectionCost;
+import ac.kaist.ccs.presentation.CCSHubSelectionCoverage;
 import ac.kaist.ccs.ui.NodePaletteFig;
 import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
 import ac.kaist.ccs.ui.WestToolBar;
+import ac.kaist.ccs.domain.CCSUtils.*;
 
 public class CCSMain extends JApplet implements ModeChangeListener {
 
@@ -258,6 +278,561 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		UiGlobals.saveNodeSnapshot();
 		
+		List<Integer> hubIndexList = new ArrayList<Integer>();
+		
+		//selectRandomHubNodes();
+		Vector<Vector> tableContentAll = new Vector<Vector>();
+		
+		for(int i = 0 ; i < 10 ; i++){
+			hubClustering();
+			List<SortTuple> s = computeS_selAll();
+			Vector<Vector> tableContent = convertSortTupleToTable(s);
+			
+			Vector separator = new Vector();
+			for(int j = 0 ; j < tableContent.get(0).size(); j++){
+				separator.add("");
+			}
+			tableContent.add(separator);
+			
+			for(Vector row : tableContent){
+				tableContentAll.add(row);	
+			}
+			
+			
+			hubIndexList.add((int) s.get(0).firstId);
+			//hubIndexList.add(10);
+			System.out.println("sort tuple list :"+s.size());
+			createHubNode((int) s.get(0).firstId);
+		}
+		
+		
+		
+		
+		
+		Vector<String> columnNames = new Vector<String>();
+ 	    columnNames.addElement("");
+ 	    columnNames.addElement("S_sel");
+ 	    columnNames.addElement("Connected Node #");
+ 	    columnNames.addElement("Acc CO2 amount");
+ 	    
+ 	    MyTableModel mm = new MyTableModel();
+	    mm.setData(tableContentAll);
+	    mm.setColumnNames(columnNames);
+
+	    JTable table = new JTable(mm)
+	    {
+			 @Override
+			   public TableCellRenderer getCellRenderer(int row, int column) {
+			    // TODO Auto-generated method stub
+			    return new CustomCellRenderer();
+			   }
+		};
+
+	    
+	    table.setAutoCreateRowSorter(true);
+	    table.setRowSelectionAllowed(true);
+	    table.setColumnSelectionAllowed(false);
+	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    
+	    TableColumnModel cm = table.getColumnModel();
+	    
+	    cm.getColumn(0).setPreferredWidth(100);
+
+
+	    
+	    table.getTableHeader().setForeground(Color.white);
+	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+	    
+		
+		JScrollPane scroll = new JScrollPane( table );
+		
+		JPanel m = new JPanel();
+		m.setLayout(new BorderLayout());
+		m.add("Center", scroll);
+		
+		JPanel buttonPanel = new JPanel();
+		JButton exportButton = new JButton("Export");
+		exportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	JFileChooser fileChooser = new JFileChooser();
+            	
+            	 /* Enabling Multiple Selection */
+                //fileChooser.setMultiSelectionEnabled(true);
+
+                /* Setting Current Directory */
+                fileChooser.setCurrentDirectory(new File("E:/ext_work/respace/workspace/CTS_analysis/input"));
+                
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
+                
+                //JFrame parent = new MenuMain();
+                
+                
+                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+            }
+		});
+		buttonPanel.add(exportButton);
+		
+		m.add("South", buttonPanel);
+		
+		JFrame frame = new JFrame("Cost Result Table");
+			    
+		frame.getContentPane().add( m );
+		frame.setVisible(true);
+		frame.setSize( 1024, 500 ); 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		//System.out.println("hubIndexList: "+hubIndexList);
+		
+		showSourceData();
+		showCombinedData(hubIndexList);
+		List<Double> coverageList = getCoverage(hubIndexList);
+		List<Double> coverageAmountList = getCoverageAmount(hubIndexList);
+		
+		UiGlobals.loadNodeSnapshot();
+		
+		//selectHubNodes(hubIndexList);
+		List<Integer> costTypeList = CCSStatics.getCostTypeList();
+		Map<Integer, List<Double> > totalCostList = new HashMap<Integer, List<Double>>();
+		for(Integer hub_cnt : hubIndexList){
+			selectHubNode(hub_cnt);
+			for(int costType : costTypeList){
+				if(totalCostList.get(costType) == null)
+					totalCostList.put(costType, new ArrayList<Double>());
+				
+				double totalCost = computeHubCostAll(costType, CCSStatics.CO2_STATE_EXTREME);
+				totalCostList.get(costType).add(totalCost);
+			}
+		}
+		
+		CCSHubSelectionCost costFrame = new CCSHubSelectionCost("Hub Selection - COST", totalCostList);
+        costFrame.pack();
+        RefineryUtilities.centerFrameOnScreen(costFrame);
+        costFrame.setVisible(true);
+		
+        
+       
+        CCSHubSelectionCoverage coverageFrame = new CCSHubSelectionCoverage("Hub Selection - COVERAGE", coverageList);
+        coverageFrame.pack();
+        RefineryUtilities.centerFrameOnScreen(coverageFrame);
+        coverageFrame.setVisible(true);
+        
+        CCSHubSelectionCo2Coverage coverageAmountFrame = new CCSHubSelectionCo2Coverage("Hub Selection - COVERAGE AMOUNT", coverageAmountList);
+        coverageAmountFrame.pack();
+        RefineryUtilities.centerFrameOnScreen(coverageAmountFrame);
+        coverageAmountFrame.setVisible(true);
+		
+		//System.out.println(">>>>>>>>"+totalCostList);
+		
+		UiGlobals.saveNodeSnapshot();
+	
+		//List<Integer> hubList = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
+		UiGlobals.loadNodeSnapshot();
+		
+		
+		System.out.println("Randering!");
+		NodeRenderManager nodeRenderManager = new NodeRenderManager(UiGlobals.ccsData,
+				null, _graph);
+		nodeRenderManager.init(_width, _height);
+		nodeRenderManager.drawNodes(true);
+		UiGlobals.setNodeRenderManager(nodeRenderManager);
+
+	}
+	
+	public List<Double> getCoverage(List<Integer> hubIndexList){
+		int total = UiGlobals.ccsData.get(CCSSourceData.TYPE_SOURCE).size()+UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB).size();
+		List<Double> coverage = new ArrayList<Double>();
+		
+		int curentCoverNodeNum = 0;
+		for(int index : hubIndexList){
+			CCSSourceData sData = UiGlobals.getNode(index);
+			curentCoverNodeNum += sData.getChildSources().size();
+			coverage.add(100*curentCoverNodeNum / (double) total );
+		}
+		
+		return coverage;
+	}
+	
+	public List<Double> getCoverageAmount(List<Integer> hubIndexList){
+		List<Integer> sourceData = UiGlobals.ccsData.get(CCSSourceData.TYPE_SOURCE);
+		List<Integer> hubData = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
+		
+		double totalCo2Amount = 0.0;
+		
+		for(int index : sourceData){
+			CCSSourceData sData = UiGlobals.getNode(index);
+			totalCo2Amount += sData.getCo2_amount();
+		}
+		
+		for(int index : hubData){
+			CCSSourceData sData = UiGlobals.getNode(index);
+			totalCo2Amount += sData.getCo2_amount();
+		}
+		
+		List<Double> coverageCo2Amount = new ArrayList<Double>();
+		
+		double curentCoverCo2Amount = 0;
+		for(int index : hubIndexList){
+			CCSSourceData sData = UiGlobals.getNode(index);
+			//sData.computeCo2();
+			curentCoverCo2Amount += sData.getAcc_co2_amount();
+			coverageCo2Amount.add(curentCoverCo2Amount);// / (double) totalCo2Amount );
+		}
+		
+		System.out.println(">>>>>>>>>"+coverageCo2Amount);
+		return coverageCo2Amount;
+	}
+	
+	public void hubClustering(){
+		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
+		List<Integer> sourceData = UiGlobals.ccsData.get(CCSNodeData.TYPE_SOURCE);
+		
+		//Clear Connection
+		for(int sourceIndex : sourceData){
+			CCSSourceData sData = UiGlobals.getNode(sourceIndex);
+			sData.getOutgoingHub().clear();
+		}
+		
+		for(int hubCandidateIndex : hubCandidateData){
+			CCSSourceData hCandidateData = UiGlobals.getNode(hubCandidateIndex);
+			hCandidateData.getChildSources().clear();
+		}
+		
+		for(int hubCandidateIndex : hubCandidateData){
+			CCSSourceData hCandidateData = UiGlobals.getNode(hubCandidateIndex);
+			
+			for(int sourceIndex : sourceData){
+				if(hubCandidateData.contains((Integer)sourceIndex)) continue;
+				CCSSourceData sData = UiGlobals.getNode(sourceIndex);
+				
+				if(sData.isValid() && CCSUtils.dist(sData, hCandidateData) < (CCSStatics.HUB_SELECTION_RANGE / CCSStatics.pixelToDistance)){
+					hCandidateData.addChildSource(sData.getIndex());
+					sData.addOutgoingHub(hCandidateData.getIndex());
+				}
+			}
+		}
+	}
+	
+	public List<SortTuple> computeS_selAll(){
+		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
+		List<SortTuple> nodesSortByS_sel = new ArrayList<SortTuple>();
+		for(int hubCandidateIndex : hubCandidateData){
+			CCSSourceData hCandidateData = UiGlobals.getNode(hubCandidateIndex);
+			double s_sel = hCandidateData.computeHubSelectionCost();
+			Vector row = new Vector();
+			row.add("hub "+hubCandidateIndex);
+			row.add(s_sel);
+			row.add(hCandidateData.getChildSources().size());
+			row.add(hCandidateData.getAcc_co2_amount());
+			
+			nodesSortByS_sel.add(new SortTuple(s_sel, hCandidateData.getIndex(), row));
+		}
+		
+		Collections.sort(nodesSortByS_sel, new NoDecCompare());
+		
+//		Vector<Vector> tableContent = new Vector<Vector>();
+//		for(SortTuple tuple : nodesSortByS_sel){
+//			tableContent.add((Vector) tuple.secondId);
+//		}
+		return nodesSortByS_sel;
+	}
+	
+	public Vector<Vector>convertSortTupleToTable(List<SortTuple> nodesSortByS_sel){
+		Vector<Vector> tableContent = new Vector<Vector>();
+		for(SortTuple tuple : nodesSortByS_sel){
+			tableContent.add((Vector) tuple.secondId);
+		}
+		return tableContent;
+	}
+	
+	public void createHubNode(int hub_cnt){
+		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
+		
+		CCSSourceData curSrc = UiGlobals.getNode(hub_cnt);
+		hubCandidateData.remove((Integer)hub_cnt);
+		
+		for(int childIndex : curSrc.getChildSources()){
+			CCSSourceData sData = UiGlobals.getNode(childIndex);
+			sData.setDistanceToDst((float) CCSUtils.dist(sData, curSrc));
+			sData.setDst(hub_cnt);
+			sData.setValid(false);
+		}
+	}
+	
+	public void showCombinedData(List<Integer> hubIndexList){
+		//List<Integer> ccsHubData = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
+		
+		Vector<Vector> tableContentAll = new Vector<Vector>();
+		for(Integer index : hubIndexList){
+			CCSSourceData toBeHub = UiGlobals.getNode(index);
+			toBeHub.computeHubCost(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_EXTREME);
+			//System.out.println(">>>>>>"+toBeHub.getChildSources());
+			
+			for(int i = 0 ; i < toBeHub.getChildSources().size() ; i++){
+				Vector row = new Vector();
+				int sIndex = toBeHub.getChildSources().get(i);
+				CCSSourceData sData = UiGlobals.getNode(sIndex);
+				if(i == 0){
+					row.add("Hub "+index);
+					row.add(toBeHub.getTerrain_typeStringShort());
+					row.add(toBeHub.getCo2_type());
+					row.add(toBeHub.getExpData().getS_selection());
+					row.add(toBeHub.getExpData().getS_cost());
+					row.add("");
+				}else{
+					row.add("");
+					row.add("");
+					row.add("");
+					row.add("");
+					row.add("");
+					row.add("");
+				}
+				
+				row.add("Node "+sData.getIndex());
+				row.add(sData.getX()+", "+sData.getY());
+				row.add(sData.getIndustry_typeString());
+				row.add(sData.getDistanceToDstKM());
+				row.add(sData.getCo2_amount());
+				row.add(sData.getExpData().getPipe_diameter());
+				tableContentAll.add(row);	
+			}
+			
+		}
+		
+		Vector<String> columnNames = new Vector<String>();
+
+		columnNames.addElement("");
+		columnNames.addElement("terrain");
+		columnNames.addElement("co2 status");
+		columnNames.addElement("S_sel");
+		columnNames.addElement("S_cost");
+		columnNames.addElement("");
+		columnNames.addElement("Node");
+		columnNames.addElement("Location");
+		columnNames.addElement("Industry (Plant)");
+		columnNames.addElement("Distance (soure to hub)");
+		columnNames.addElement("Co2 amount");
+		columnNames.addElement("Diameter");
+ 	    
+ 	    MyTableModel mm = new MyTableModel();
+	    mm.setData(tableContentAll);
+	    mm.setColumnNames(columnNames);
+
+	    JTable table = new JTable(mm)
+	    {
+			 @Override
+			   public TableCellRenderer getCellRenderer(int row, int column) {
+			    // TODO Auto-generated method stub
+			    return new CustomCellRenderer();
+			   }
+		};
+
+	    
+	    table.setAutoCreateRowSorter(true);
+	    table.setRowSelectionAllowed(true);
+	    table.setColumnSelectionAllowed(false);
+	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    
+	    TableColumnModel cm = table.getColumnModel();
+	    
+	    cm.getColumn(0).setPreferredWidth(100);
+
+
+	    
+	    table.getTableHeader().setForeground(Color.white);
+	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+	    
+		
+		JScrollPane scroll = new JScrollPane( table );
+		
+		JPanel m = new JPanel();
+		m.setLayout(new BorderLayout());
+		m.add("Center", scroll);
+		
+		JFrame frame = new JFrame("Hub&Source Info Table");
+			    
+		frame.getContentPane().add( m );
+		frame.setVisible(true);
+		frame.setSize( 1024, 500 ); 
+		
+	}
+	
+	public double computeHubCostAll(int costType, int co2Type){
+		List<Integer> hubNodes = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
+		
+		double totalCost = 0.0;
+		
+		for(Integer index : hubNodes){
+			//List<CCSSourceData> hubfNodes = UiGlobals.getHubNodes();
+			
+			CCSHubData hubNode = (CCSHubData) UiGlobals.getNode(index);
+			
+			if(co2Type == 0){
+				totalCost += hubNode.computeCost(costType);
+			}else{
+				totalCost += hubNode.computeCost(costType, co2Type);
+			}
+		}
+		
+		
+		List<Integer> sourceNodes = UiGlobals.ccsData.get(CCSSourceData.TYPE_SOURCE);
+		for(Integer index : sourceNodes){
+			CCSSourceData src = UiGlobals.getNode(index);
+			if(src.getDst() == null){
+				totalCost += 100 * src.getCo2_amount() + src.getOpenCost();
+			}
+		}
+		
+		return totalCost;
+	}
+	
+	public void showSourceData(){
+		List<Integer> ccsSourceData = UiGlobals.ccsData.get(CCSSourceData.TYPE_SOURCE);
+		Vector<Vector> rowData = new Vector<Vector>(ccsSourceData.size());
+		
+		for(Integer index : ccsSourceData){
+			CCSSourceData data = UiGlobals.getNode(index);
+			Vector row = new Vector();
+			row.add("Source "+data.getIndex());
+			
+			row.add(data.getCo2_amount());
+			row.add(data.getIndustry_typeString());
+			
+			if(data.getDst() != null)
+				row.add(data.getDistanceToDstKM());
+			else
+				row.add("Not Connected");
+			
+			rowData.add(row);
+		}
+		
+		
+		Vector<String> columnNames = new Vector<String>();
+ 	    columnNames.addElement("Source");
+ 	    columnNames.addElement("Co2 Amount (tone/day)");
+ 	    columnNames.addElement("Industry Type");
+ 	    columnNames.addElement("Distant to Hub (km)");
+ 	    
+ 	    MyTableModel mm = new MyTableModel();
+	    mm.setData(rowData);
+	    mm.setColumnNames(columnNames);
+
+	    JTable table = new JTable(mm)
+	    {
+			 @Override
+			   public TableCellRenderer getCellRenderer(int row, int column) {
+			    // TODO Auto-generated method stub
+			    return new CustomCellRenderer();
+			   }
+		};
+
+	    
+	    table.setAutoCreateRowSorter(true);
+	    table.setRowSelectionAllowed(true);
+	    table.setColumnSelectionAllowed(false);
+	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    
+	    TableColumnModel cm = table.getColumnModel();
+	    
+	    cm.getColumn(0).setPreferredWidth(100);
+
+
+	    
+	    table.getTableHeader().setForeground(Color.white);
+	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+	    
+		
+		JScrollPane scroll = new JScrollPane( table );
+		
+		JPanel m = new JPanel();
+		m.setLayout(new BorderLayout());
+		m.add("Center", scroll);
+		
+		JFrame frame = new JFrame("Source Info Table");
+			    
+		frame.getContentPane().add( m );
+		frame.setVisible(true);
+		frame.setSize( 1024, 500 ); 
+	}
+	
+	public void showHubCandidateData(List<Integer> ccsHubCandidateData){
+		//List<Integer> ccsHubData = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
+		Vector<Vector> rowData = new Vector<Vector>(ccsHubCandidateData.size());
+		
+		for(Integer index : ccsHubCandidateData){
+			CCSSourceData data = UiGlobals.getNode(index);
+			Vector row = new Vector();
+			row.add("Source "+data.getIndex());
+			
+			row.add(data.getCo2_amount());
+			row.add(data.getIndustry_typeString());
+			row.add(data.getDistanceToDst());
+			
+			rowData.add(row);
+		}
+		
+		
+		Vector<String> columnNames = new Vector<String>();
+ 	    columnNames.addElement("Hub Candidate");
+ 	    columnNames.addElement("S_sel");
+ 	    columnNames.addElement("# of connected Source node");
+ 	    columnNames.addElement("accumulate Co2 amount");
+ 	    
+ 	    MyTableModel mm = new MyTableModel();
+	    mm.setData(rowData);
+	    mm.setColumnNames(columnNames);
+
+	    JTable table = new JTable(mm)
+	    {
+			 @Override
+			   public TableCellRenderer getCellRenderer(int row, int column) {
+			    // TODO Auto-generated method stub
+			    return new CustomCellRenderer();
+			   }
+		};
+
+	    
+	    table.setAutoCreateRowSorter(true);
+	    table.setRowSelectionAllowed(true);
+	    table.setColumnSelectionAllowed(false);
+	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    
+	    TableColumnModel cm = table.getColumnModel();
+	    
+	    cm.getColumn(0).setPreferredWidth(100);
+
+
+	    
+	    table.getTableHeader().setForeground(Color.white);
+	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+	    
+		
+		JScrollPane scroll = new JScrollPane( table );
+		
+		JPanel m = new JPanel();
+		m.setLayout(new BorderLayout());
+		m.add("Center", scroll);
+		
+		JFrame frame = new JFrame("Source Info Table");
+			    
+		frame.getContentPane().add( m );
+		frame.setVisible(true);
+		frame.setSize( 1024, 500 ); 
+	}
+	
+	public void selectRandomHubNodes(){
 		Random random = new Random();
 		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
 		List<Integer> hubData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
@@ -275,22 +850,28 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			hubCandidateData.remove((int)hub_cnt);
 			System.out.println("hubCandidateData :"+hubCandidateData);
 		}
-		
-		//UiGlobals.loadNodeSnapshot();
-		
-		UiGlobals.saveNodeSnapshot();
+	}
 	
-		//List<Integer> hubList = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
-		UiGlobals.loadNodeSnapshot();
+	public void selectHubNodes(List<Integer> hubIndexList){
+		for(int hub_cnt : hubIndexList){
+			selectHubNode(hub_cnt);
+		}
+	}
+	
+	public void selectHubNode(Integer hubIndex){
+		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
+		List<Integer> hubData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+		List<Integer> sourceData = UiGlobals.ccsData.get(CCSNodeData.TYPE_SOURCE);
 		
-		
-		System.out.println("Randering!");
-		NodeRenderManager nodeRenderManager = new NodeRenderManager(UiGlobals.ccsData,
-				null, _graph);
-		nodeRenderManager.init(_width, _height);
-		nodeRenderManager.drawNodes(true);
-		UiGlobals.setNodeRenderManager(nodeRenderManager);
-
+		CCSSourceData curSrc = UiGlobals.getNode(hubIndex);
+		int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
+		System.out.println("range : "+(60 / CCSStatics.kilometerToMile));
+		curSrc = new CCSHubData(curSrc, range);
+		UiGlobals.setNode(curSrc);
+		hubData.add(curSrc.getIndex());
+		sourceData.remove(curSrc.getIndex());
+		hubCandidateData.remove((Integer)hubIndex);
+		System.out.println("hubCandidateData :"+hubCandidateData);
 	}
 
 	public int cvtLoc(int loc) {

@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import ac.kaist.ccs.base.DoublePair;
+import ac.kaist.ccs.base.UiGlobals;
 import ac.kaist.ccs.fig.FigCCSNode;
 import ac.kaist.ccs.fig.FigSourceNode;
 import ac.kaist.ccs.fig.FigPlantNode;
@@ -18,6 +19,9 @@ import ac.kaist.ccs.fig.FigJointNode;
 public class CCSHubData extends CCSSourceData {
 		
 	int range;
+	double storageCapitalCost;
+	double S_selection;
+	double S_cost;
 	
 
 	public CCSHubData(CCSSourceData data, int range) {
@@ -27,6 +31,7 @@ public class CCSHubData extends CCSSourceData {
 		this.range = range;
 		int size = 7;
 		node = new FigHubNode(x, y, size, size, range);
+		this.storageCapitalCost = CCSStatics.STORAGE_CAPITAL_COST;
 		//node.setOwner(this);
 		
 	}
@@ -37,6 +42,7 @@ public class CCSHubData extends CCSSourceData {
 		this.range = range;
 		int size = 7;
 		node = new FigHubNode(x, y, size, size, range);
+		this.storageCapitalCost = CCSStatics.STORAGE_CAPITAL_COST;
 		//node.setOwner(this);
 		
 	}
@@ -69,4 +75,6 @@ public class CCSHubData extends CCSSourceData {
 	public String getNodeType(){
 		return "HUB";
 	}
+	
+	
 }
