@@ -49,6 +49,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -58,6 +59,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 //import org.jfree.ui.Spacer;
+
 
 
 import ac.kaist.ccs.domain.CCSStatics;
@@ -127,7 +129,7 @@ public class CCSHubSelectionCo2Coverage extends JFrame {
         final JFreeChart chart = ChartFactory.createXYLineChart(
             title,      // chart title
             "Number of Hubs",                      // x axis label
-            "Percent of CO2 emission amount coverage",               // y axis label
+            "Percent of CO2 emission amount coverage (%)",               // y axis label
             dataset,                  // data
             PlotOrientation.VERTICAL,
             true,                     // include legend
@@ -155,7 +157,7 @@ public class CCSHubSelectionCo2Coverage extends JFrame {
 
         // change the auto tick unit selection to integer units only...
         final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        rangeAxis.setTickUnit(new NumberTickUnit(10));
         // OPTIONAL CUSTOMISATION COMPLETED.
                 
         return chart;

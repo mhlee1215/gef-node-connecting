@@ -368,7 +368,8 @@ public class CCSSourceData extends CCSNodeData {
 	public float computeCo2(){
 		float childCo2 = 0;
 		
-		System.out.println("compute co2 "+this.index+", childSources: "+childSources);
+		if(childSources.size() > 0)
+			System.out.println("compute co2 "+this.index+", childSources("+childSources.size()+"): "+childSources);
 		for(Integer childIdx : childSources){
 			CCSSourceData childNode = UiGlobals.getNode(childIdx);
 			childCo2 += childNode.computeCo2();
@@ -611,7 +612,7 @@ public class CCSSourceData extends CCSNodeData {
 		
 		for(int childIndex : this.getChildSources()){
 			CCSSourceData sData = UiGlobals.getNode(childIndex);
-			System.out.println("outGoing : "+sData.getOutgoingHub());
+			//System.out.println("outGoing : "+sData.getOutgoingHub());
 			s_selection += (sData.getCo2_amount() / CCSUtils.dist(this, sData)) * (1 / (double)sData.getOutgoingHub().size());
 			acc_co2 += sData.getCo2_amount();
 		}

@@ -146,8 +146,8 @@ public class CCSHubSelectionCoverage extends JFrame {
         
         // get a reference to the plot for further customisation...
         final XYPlot plot = chart.getXYPlot();
-        final NumberAxis xAxis = (NumberAxis) plot.getRangeAxis();
-        xAxis.setTickUnit(new NumberTickUnit(10));
+        //final NumberAxis xAxis = (NumberAxis) plot.getRangeAxis();
+        //xAxis.setTickUnit(new NumberTickUnit(10));
         plot.setBackgroundPaint(Color.lightGray);
     //    plot.setAxisOffset(new Spacer(Spacer.ABSOLUTE, 5.0, 5.0, 5.0, 5.0));
         plot.setDomainGridlinePaint(Color.white);
@@ -160,7 +160,7 @@ public class CCSHubSelectionCoverage extends JFrame {
 
         // change the auto tick unit selection to integer units only...
         final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        rangeAxis.setTickUnit(new NumberTickUnit(10));
         // OPTIONAL CUSTOMISATION COMPLETED.
                 
         return chart;
