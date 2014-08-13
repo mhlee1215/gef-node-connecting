@@ -404,6 +404,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		List<Integer> costTypeList = CCSStatics.getCostTypeList();
 		Map<Integer, List<Double> > totalCostList = new HashMap<Integer, List<Double>>();
 		for(Integer hub_cnt : hubIndexList){
+			//Actual hub selection for cost simulation.
 			selectHubNode(hub_cnt);
 			for(int costType : costTypeList){
 				if(totalCostList.get(costType) == null)
@@ -414,18 +415,20 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			}
 		}
 		
+		
+		//SHOW HUB SELECTION COST
 		CCSHubSelectionCost costFrame = new CCSHubSelectionCost("Hub Selection - COST", totalCostList);
         costFrame.pack();
         RefineryUtilities.centerFrameOnScreen(costFrame);
         costFrame.setVisible(true);
-		
-        
-       
+
+        //SHOW HUB SELECTION COVERAGE
         CCSHubSelectionCoverage coverageFrame = new CCSHubSelectionCoverage("Hub Selection - COVERAGE", coverageList);
         coverageFrame.pack();
         RefineryUtilities.centerFrameOnScreen(coverageFrame);
         coverageFrame.setVisible(true);
         
+        //SHOW HUB SELECTION COVERAGE AMOUNT
         CCSHubSelectionCo2Coverage coverageAmountFrame = new CCSHubSelectionCo2Coverage("Hub Selection - COVERAGE AMOUNT", coverageAmountList);
         coverageAmountFrame.pack();
         RefineryUtilities.centerFrameOnScreen(coverageAmountFrame);
@@ -468,11 +471,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		double totalCo2Amount = 0.0;
 		
+		System.out.println("sourceData.size:"+sourceData.size());
 		for(int index : sourceData){
 			CCSSourceData sData = UiGlobals.getNode(index);
 			totalCo2Amount += sData.getCo2_amount();
 		}
 		
+		System.out.println("hubData.size:"+hubData.size());
 		for(int index : hubData){
 			CCSSourceData sData = UiGlobals.getNode(index);
 			totalCo2Amount += sData.getCo2_amount();
@@ -481,11 +486,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		List<Double> coverageCo2Amount = new ArrayList<Double>();
 		
 		double curentCoverCo2Amount = 0;
+		System.out.println("hubIndexList: "+hubIndexList);
 		for(int index : hubIndexList){
 			CCSSourceData sData = UiGlobals.getNode(index);
-			//sData.computeCo2();
+			System.out.println("call computes2 :"+index);
+			sData.computeCo2();
 			curentCoverCo2Amount += sData.getAcc_co2_amount();
-			coverageCo2Amount.add(curentCoverCo2Amount);// / (double) totalCo2Amount );
+			coverageCo2Amount.add((curentCoverCo2Amount*100)/(double) totalCo2Amount );
 		}
 		
 		System.out.println(">>>>>>>>>"+coverageCo2Amount);
@@ -507,14 +514,20 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			hCandidateData.getChildSources().clear();
 		}
 		
+		System.out.println("hubCandidateData: "+hubCandidateData);
 		for(int hubCandidateIndex : hubCandidateData){
 			CCSSourceData hCandidateData = UiGlobals.getNode(hubCandidateIndex);
 			
 			for(int sourceIndex : sourceData){
-				if(hubCandidateData.contains((Integer)sourceIndex)) continue;
+				if(hubCandidateData.contains((Integer)sourceIndex)){
+					//System.out.println("sourceIndex("+sourceIndex+") canceled, "+"hubCandidateData: "+hubCandidateData);
+					continue;
+				}
+				//System.out.println("sourceIndex("+sourceIndex+") okay, "+"hubCandidateData: "+hubCandidateData);
 				CCSSourceData sData = UiGlobals.getNode(sourceIndex);
 				
-				if(sData.isValid() && CCSUtils.dist(sData, hCandidateData) < (CCSStatics.HUB_SELECTION_RANGE / CCSStatics.pixelToDistance)){
+				if(sData.isValid() && !sData.isHubCandidate() && CCSUtils.dist(sData, hCandidateData) < (CCSStatics.HUB_SELECTION_RANGE / CCSStatics.pixelToDistance)){
+					System.out.println("hCandidate("+hCandidateData.getIndex()+") added children ("+sData.getIndex()+")");
 					hCandidateData.addChildSource(sData.getIndex());
 					sData.addOutgoingHub(hCandidateData.getIndex());
 				}
@@ -557,12 +570,13 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	public void createHubNode(int hub_cnt){
 		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
 		
-		CCSSourceData curSrc = UiGlobals.getNode(hub_cnt);
+		CCSSourceData curHubCandidate = UiGlobals.getNode(hub_cnt);
+		//curHubCandidate.setValid(false);
 		hubCandidateData.remove((Integer)hub_cnt);
 		
-		for(int childIndex : curSrc.getChildSources()){
+		for(int childIndex : curHubCandidate.getChildSources()){
 			CCSSourceData sData = UiGlobals.getNode(childIndex);
-			sData.setDistanceToDst((float) CCSUtils.dist(sData, curSrc));
+			sData.setDistanceToDst((float) CCSUtils.dist(sData, curHubCandidate));
 			sData.setDst(hub_cnt);
 			sData.setValid(false);
 		}
