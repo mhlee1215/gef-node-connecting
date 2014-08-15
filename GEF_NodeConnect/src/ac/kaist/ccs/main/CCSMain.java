@@ -26,6 +26,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -36,6 +37,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -43,6 +45,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
@@ -112,6 +116,7 @@ import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
 import ac.kaist.ccs.ui.WestToolBar;
 import ac.kaist.ccs.domain.CCSUtils.*;
+import ac.kaist.ccs.fig.FigCCSNode;
 
 public class CCSMain extends JApplet implements ModeChangeListener {
 
@@ -149,7 +154,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	BufferedImage refImage = null;
 	BufferedImage refTerrainImage = null;
 	
-	JMenuItem showHub = null;
+	JMenu showHub = null;
 	JMenuItem showStorage = null;
 	JMenu showConnection = null;
 	
@@ -278,120 +283,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		UiGlobals.saveNodeSnapshot();
 		
-		List<Integer> hubIndexList = new ArrayList<Integer>();
-		
-		//selectRandomHubNodes();
-		Vector<Vector> tableContentAll = new Vector<Vector>();
-		
-		for(int i = 0 ; i < 10 ; i++){
-			hubClustering();
-			List<SortTuple> s = computeS_selAll();
-			Vector<Vector> tableContent = convertSortTupleToTable(s);
-			
-			Vector separator = new Vector();
-			for(int j = 0 ; j < tableContent.get(0).size(); j++){
-				separator.add("");
-			}
-			tableContent.add(separator);
-			
-			for(Vector row : tableContent){
-				tableContentAll.add(row);	
-			}
-			
-			
-			hubIndexList.add((int) s.get(0).firstId);
-			//hubIndexList.add(10);
-			System.out.println("sort tuple list :"+s.size());
-			createHubNode((int) s.get(0).firstId);
-		}
+		//List<Integer> hubIndexList = new ArrayList<Integer>();
+		List<Integer> hubIndexList = selectHubIndexList();
 		
 		
-		
-		
-		
-		Vector<String> columnNames = new Vector<String>();
- 	    columnNames.addElement("");
- 	    columnNames.addElement("S_sel");
- 	    columnNames.addElement("Connected Node #");
- 	    columnNames.addElement("Acc CO2 amount");
- 	    
- 	    MyTableModel mm = new MyTableModel();
-	    mm.setData(tableContentAll);
-	    mm.setColumnNames(columnNames);
-
-	    JTable table = new JTable(mm)
-	    {
-			 @Override
-			   public TableCellRenderer getCellRenderer(int row, int column) {
-			    // TODO Auto-generated method stub
-			    return new CustomCellRenderer();
-			   }
-		};
-
-	    
-	    table.setAutoCreateRowSorter(true);
-	    table.setRowSelectionAllowed(true);
-	    table.setColumnSelectionAllowed(false);
-	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    //table.getSelectionModel().addListSelectionListener(new RowListener());
-	    
-	    TableColumnModel cm = table.getColumnModel();
-	    
-	    cm.getColumn(0).setPreferredWidth(100);
-
-
-	    
-	    table.getTableHeader().setForeground(Color.white);
-	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
-	    
-		
-		JScrollPane scroll = new JScrollPane( table );
-		
-		JPanel m = new JPanel();
-		m.setLayout(new BorderLayout());
-		m.add("Center", scroll);
-		
-		JPanel buttonPanel = new JPanel();
-		JButton exportButton = new JButton("Export");
-		exportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-            	JFileChooser fileChooser = new JFileChooser();
-            	
-            	 /* Enabling Multiple Selection */
-                //fileChooser.setMultiSelectionEnabled(true);
-
-                /* Setting Current Directory */
-                fileChooser.setCurrentDirectory(new File("E:/ext_work/respace/workspace/CTS_analysis/input"));
-                
-                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
-                
-                //JFrame parent = new MenuMain();
-                
-                
-                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
-            }
-		});
-		buttonPanel.add(exportButton);
-		
-		m.add("South", buttonPanel);
-		
-		JFrame frame = new JFrame("Cost Result Table");
-			    
-		frame.getContentPane().add( m );
-		frame.setVisible(true);
-		frame.setSize( 1024, 500 ); 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		//System.out.println("hubIndexList: "+hubIndexList);
+		System.out.println("Selected hubIndexList: "+hubIndexList);
 		
 		showSourceData();
 		showCombinedData(hubIndexList);
@@ -449,6 +345,110 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		nodeRenderManager.drawNodes(true);
 		UiGlobals.setNodeRenderManager(nodeRenderManager);
 
+	}
+	
+	public List<Integer> selectHubIndexList(){
+		List<Integer> hubIndexList = new ArrayList<Integer>();
+		
+		//selectRandomHubNodes();
+		Vector<Vector> tableContentAll = new Vector<Vector>();
+		
+		for(int i = 0 ; i < 10 ; i++){
+			hubClustering();
+			List<SortTuple> s = computeS_selAll();
+			Vector<Vector> tableContent = convertSortTupleToTable(s);
+			
+			Vector separator = new Vector();
+			for(int j = 0 ; j < tableContent.get(0).size(); j++){
+				separator.add("");
+			}
+			tableContent.add(separator);
+			
+			for(Vector row : tableContent){
+				tableContentAll.add(row);	
+			}
+			
+			
+			hubIndexList.add((int) s.get(0).firstId);
+			//hubIndexList.add(10);
+			System.out.println("sort tuple list :"+s.size());
+			createHubNode((int) s.get(0).firstId);
+		}
+		
+		Vector<String> columnNames = new Vector<String>();
+ 	    columnNames.addElement("ID");
+ 	    columnNames.addElement("S_sel");
+ 	    columnNames.addElement("Connected Node #");
+ 	    columnNames.addElement("Acc CO2 amount");
+ 	    
+ 	    MyTableModel mm = new MyTableModel();
+	    mm.setData(tableContentAll);
+	    mm.setColumnNames(columnNames);
+
+	    JTable table = new JTable(mm)
+	    {
+			 @Override
+			   public TableCellRenderer getCellRenderer(int row, int column) {
+			    // TODO Auto-generated method stub
+			    return new CustomCellRenderer();
+			   }
+		};
+
+	    
+	    table.setAutoCreateRowSorter(true);
+	    table.setRowSelectionAllowed(true);
+	    table.setColumnSelectionAllowed(false);
+	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    table.getSelectionModel().addListSelectionListener(new RowListener().init(table));
+	    
+	    TableColumnModel cm = table.getColumnModel();
+	    
+	    cm.getColumn(0).setPreferredWidth(100);
+
+
+	    
+	    table.getTableHeader().setForeground(Color.white);
+	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+	    
+		
+		JScrollPane scroll = new JScrollPane( table );
+		
+		JPanel m = new JPanel();
+		m.setLayout(new BorderLayout());
+		m.add("Center", scroll);
+		
+		JPanel buttonPanel = new JPanel();
+		JButton exportButton = new JButton("Export");
+		exportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	JFileChooser fileChooser = new JFileChooser();
+            	
+            	 /* Enabling Multiple Selection */
+                //fileChooser.setMultiSelectionEnabled(true);
+
+                /* Setting Current Directory */
+                fileChooser.setCurrentDirectory(new File("E:/ext_work/respace/workspace/CTS_analysis/input"));
+                
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
+                
+                //JFrame parent = new MenuMain();
+                
+                
+                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+            }
+		});
+		buttonPanel.add(exportButton);
+		
+		m.add("South", buttonPanel);
+		
+		JFrame frame = new JFrame("Cost Result Table");
+			    
+		frame.getContentPane().add( m );
+		frame.setVisible(true);
+		frame.setSize( 1024, 500 ); 
+		
+		return hubIndexList;
 	}
 	
 	public List<Double> getCoverage(List<Integer> hubIndexList){
@@ -542,7 +542,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			CCSSourceData hCandidateData = UiGlobals.getNode(hubCandidateIndex);
 			double s_sel = hCandidateData.computeHubSelectionCost();
 			Vector row = new Vector();
-			row.add("hub "+hubCandidateIndex);
+			row.add(hubCandidateIndex);
 			row.add(s_sel);
 			row.add(hCandidateData.getChildSources().size());
 			row.add(hCandidateData.getAcc_co2_amount());
@@ -596,7 +596,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				int sIndex = toBeHub.getChildSources().get(i);
 				CCSSourceData sData = UiGlobals.getNode(sIndex);
 				if(i == 0){
-					row.add("Hub "+index);
+					row.add(index);
 					row.add(toBeHub.getTerrain_typeStringShort());
 					row.add(toBeHub.getCo2_type());
 					row.add(toBeHub.getExpData().getS_selection());
@@ -624,7 +624,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		Vector<String> columnNames = new Vector<String>();
 
-		columnNames.addElement("");
+		columnNames.addElement("Hub ID");
 		columnNames.addElement("terrain");
 		columnNames.addElement("co2 status");
 		columnNames.addElement("S_sel");
@@ -655,7 +655,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	    table.setRowSelectionAllowed(true);
 	    table.setColumnSelectionAllowed(false);
 	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    table.getSelectionModel().addListSelectionListener(new RowListener().init(table));
 	    
 	    TableColumnModel cm = table.getColumnModel();
 	    
@@ -717,7 +717,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		for(Integer index : ccsSourceData){
 			CCSSourceData data = UiGlobals.getNode(index);
 			Vector row = new Vector();
-			row.add("Source "+data.getIndex());
+			row.add(data.getIndex());
 			
 			row.add(data.getCo2_amount());
 			row.add(data.getIndustry_typeString());
@@ -732,7 +732,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		
 		Vector<String> columnNames = new Vector<String>();
- 	    columnNames.addElement("Source");
+ 	    columnNames.addElement("Source ID");
  	    columnNames.addElement("Co2 Amount (tone/day)");
  	    columnNames.addElement("Industry Type");
  	    columnNames.addElement("Distant to Hub (km)");
@@ -740,7 +740,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
  	    MyTableModel mm = new MyTableModel();
 	    mm.setData(rowData);
 	    mm.setColumnNames(columnNames);
-
+	    
 	    JTable table = new JTable(mm)
 	    {
 			 @Override
@@ -755,7 +755,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	    table.setRowSelectionAllowed(true);
 	    table.setColumnSelectionAllowed(false);
 	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    table.getSelectionModel().addListSelectionListener(new RowListener().init(table));
 	    
 	    TableColumnModel cm = table.getColumnModel();
 	    
@@ -779,6 +779,30 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		frame.setVisible(true);
 		frame.setSize( 1024, 500 ); 
 	}
+	
+	public static class RowListener implements ListSelectionListener {
+		JTable table;
+		
+		public RowListener init(JTable table){
+			this.table = table;
+			return this;
+		}
+        public void valueChanged(ListSelectionEvent event) {
+            if (event.getValueIsAdjusting()) {
+                return;
+            }
+            //System.out.println("select:"+table.getValueAt(table.getSelectionModel().getLeadSelectionIndex(), 0));
+            try{
+            	Integer selectedNodeIndex = (Integer) table.getValueAt(table.getSelectionModel().getLeadSelectionIndex(), 0);
+            	if(selectedNodeIndex == null) return;
+            	FigCCSNode fig = UiGlobals.getNode(selectedNodeIndex).getNode();
+            	UiGlobals.graph.getEditor().getSelectionManager().select(fig);
+            }catch(Exception e){
+            	//e.printStackTrace();
+            }
+            
+        }
+    }
 	
 	public void showHubCandidateData(List<Integer> ccsHubCandidateData){
 		//List<Integer> ccsHubData = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
@@ -1300,24 +1324,60 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		JMenu stepByStep = new JMenu(Localizer.localize("GefBase", "Step-By-Step"));
 		_menubar.add(stepByStep);
-		JMenuItem showCo2Source = new JMenuItem("1. Show co2 source");
+		JMenu showCo2Source = new JMenu("1. Show co2 source");
 		stepByStep.add(showCo2Source);
-		showCo2Source.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //JOptionPane.showMessageDialog(jMenuItem, "Successfully pressed a menu item");
-            	//UiGlobals.getNodeRenderManager().computeDiameterExperiment();
-            	int dialogResult = JOptionPane.showConfirmDialog (null, "Currently rendered data will be lost. Would you want to proceed?","Warning",JOptionPane.YES_NO_OPTION);
-            	if(dialogResult == JOptionPane.YES_OPTION){
-            		System.out.println("YES!");
-            	}
-            }
-        });
 		
-		showHub = new JMenuItem("2. Show Hub");
-		showHub.setEnabled(false);
+		ButtonGroup co2SourceGroup = new ButtonGroup();
+		
+		JRadioButtonMenuItem randomRadio = new JRadioButtonMenuItem("Random Data");
+		randomRadio.setSelected(true);
+		co2SourceGroup.add(randomRadio);
+		showCo2Source.add(randomRadio);
+		JRadioButtonMenuItem manualRadio = new JRadioButtonMenuItem("Manual Data");
+		co2SourceGroup.add(manualRadio);
+		showCo2Source.add(manualRadio);
+		
+//		showCo2Source.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                //JOptionPane.showMessageDialog(jMenuItem, "Successfully pressed a menu item");
+//            	//UiGlobals.getNodeRenderManager().computeDiameterExperiment();
+//            	int dialogResult = JOptionPane.showConfirmDialog (null, "Currently rendered data will be lost. Would you want to proceed?","Warning",JOptionPane.YES_NO_OPTION);
+//            	if(dialogResult == JOptionPane.YES_OPTION){
+//            		System.out.println("YES!");
+//            	}
+//            }
+//        });
+		
+		showHub = new JMenu("2. Show Hub");
+		//showHub.setEnabled(false);
 		stepByStep.add(showHub);
+		
+		ButtonGroup hubGroup = new ButtonGroup();
+		
+		JRadioButtonMenuItem cost25Radio = new JRadioButtonMenuItem("cost 25$");
+		hubGroup.add(cost25Radio);
+		showHub.add(cost25Radio);
+		
+		JRadioButtonMenuItem cost50Radio = new JRadioButtonMenuItem("cost 50$");
+		hubGroup.add(cost50Radio);
+		showHub.add(cost50Radio);
+		
+		JRadioButtonMenuItem cost75Radio = new JRadioButtonMenuItem("cost 75$");
+		hubGroup.add(cost75Radio);
+		showHub.add(cost75Radio);
+		
+		JRadioButtonMenuItem cost100Radio = new JRadioButtonMenuItem("cost 100$");
+		hubGroup.add(cost100Radio);
+		showHub.add(cost100Radio);
+		
+		JRadioButtonMenuItem cost125Radio = new JRadioButtonMenuItem("cost 125$");
+		hubGroup.add(cost125Radio);
+		showHub.add(cost125Radio);
+		
+		
+		
 		
 		showStorage = new JMenuItem("3. Show Storage");
 		showStorage.setEnabled(false);

@@ -410,7 +410,7 @@ public class CCSSourceData extends CCSNodeData {
 		
 		//Method 1
 		if(costType == CCSStatics.COST_TYPE_THE_OGDEN_MODELS){
-			double D = Math.pow((5084.5*L *f*m*m) / (co2Data.p_outlet*co2Data.p_outlet-0.01), 0.2);
+			double D = Math.pow((5084.5*L *f*m*m) / (co2Data.p_outlet*co2Data.p_outlet-1), 0.2);
 			D *= CCSStatics.COST_TYPE_1_TEMP_SCALE;
 			this.pipelineCost = childCost + Math.pow((m / 1600), 0.48) * Math.pow((L / 100), 0.24) * 0.15 * L;
 			this.pipe_diameter = D;
@@ -424,14 +424,14 @@ public class CCSSourceData extends CCSNodeData {
 		}
 		//Method 3
 		else if(costType == CCSStatics.COST_TYPE_ECOFYS_MODEL){
-			double D = Math.pow((1.155*m*m*L)/((co2Data.p_outlet - 0.1)*co2Data.lou), 0.2);
+			double D = Math.pow((1.155*m*m*L)/((co2Data.p_outlet - 1)*co2Data.lou), 0.2);
 			D *= CCSStatics.COST_TYPE_3_TEMP_SCALE;
 			this.pipelineCost = childCost + 154.7 * D * L;
 			this.pipe_diameter = D;
 		}
 		//Method 4
 		else if(costType == CCSStatics.COST_TYPE_IEA_GHG_PH4_6){
-			double D = Math.pow((L*co2Data.lou*m*m) / (25041*(co2Data.p_outlet - 0.1)), 0.2);
+			double D = Math.pow((L*co2Data.lou*m*m) / (25041*(co2Data.p_outlet - 1)), 0.2);
 			D *= CCSStatics.COST_TYPE_4_TEMP_SCALE;
 			double capitalCost = Math.pow(10, 6) * ((0.057 * L + 1.8663) + (0.00129 * L)*D + (0.000486 * L + 0.000007) * D*D );
 			double annualPipelineOMCost = 144000 + 0.61*(23213 * D + 899 * L - 259269) + 0.7*(39305 * D + 1694*L - 351355);
@@ -477,7 +477,7 @@ public class CCSSourceData extends CCSNodeData {
 					 Math.pow(
 							 (32*F_f*m*m)*(
 									 (Math.pow((1000 / (double)(24*3600)), 2))/
-									 (Math.PI*Math.PI*lou*((p_outlet - 0.1) / L)*(Math.pow(10, 6)/1000)))
+									 (Math.PI*Math.PI*lou*((p_outlet - 1) / L)*(Math.pow(10, 6)/1000)))
 					 , 0.2);
 			 //System.out.println("D:"+D+", RE:"+Re+", F_f:"+F_f);
 			 //System.out.println((Math.pow((1000 / (double)(24*3600)), 2)));

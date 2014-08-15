@@ -40,6 +40,7 @@ import ac.kaist.ccs.domain.CCSSourceData;
 import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.domain.CCSUtils;
 import ac.kaist.ccs.domain.CCSUtils.*;
+import ac.kaist.ccs.main.CCSMain.*;
 
 public class NodeRenderManager {
 
@@ -257,7 +258,7 @@ public class NodeRenderManager {
 		
 		
 		Vector<String> columnNames = new Vector<String>();
- 	    columnNames.addElement("");
+ 	    columnNames.addElement("ID");
  	    columnNames.addElement("W_total(EX)");
  	    columnNames.addElement("W_total(HI)");
  	    columnNames.addElement("W_total(LOW)");
@@ -295,7 +296,7 @@ public class NodeRenderManager {
 	    table.setRowSelectionAllowed(true);
 	    table.setColumnSelectionAllowed(false);
 	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    table.getSelectionModel().addListSelectionListener(new RowListener().init(table));
 	    
 	    TableColumnModel cm = table.getColumnModel();
 	    
@@ -431,7 +432,7 @@ public class NodeRenderManager {
 		}
 		
 		Vector<String> columnNames = new Vector<String>();
- 	    columnNames.addElement("Source (Index)");
+ 	    columnNames.addElement("ID");
  	    columnNames.addElement("1. The Ogden Models");
  	    columnNames.addElement("2. MIT Model");
  	    columnNames.addElement("3. Ecofys Model");
@@ -457,7 +458,7 @@ public class NodeRenderManager {
 	    table.setRowSelectionAllowed(true);
 	    table.setColumnSelectionAllowed(false);
 	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    //table.getSelectionModel().addListSelectionListener(new RowListener());
+	    table.getSelectionModel().addListSelectionListener(new RowListener().init(table));
 	    
 	    TableColumnModel cm = table.getColumnModel();
 	    
