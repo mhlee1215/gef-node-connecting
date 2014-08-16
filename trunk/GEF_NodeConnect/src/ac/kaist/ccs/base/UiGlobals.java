@@ -106,88 +106,33 @@ public class UiGlobals extends Globals{
 	private static int nodeSizeSnap = 0;
 	private static Map<Integer, CCSEdgeData> edgesSnap = null;//new HashMap<Integer, CCSEdgeData>();
 	private static int edgeSizeSnap = 0;
-	private static Map<Integer, List<Integer>> ccsDataSnap;
+	public static Map<Integer, List<Integer>> ccsDataSnap;
 	private static List<CCSEdgeData> ccsConDataSnap;
 	
 	public static int viewType = CCSSourceData.VIEW_TYPE_CO2;
+	
+	public static void resetNodes(){
+		nodes = new HashMap<Integer, CCSSourceData>();
+		nodeSize = 0;
+		ccsData = new HashMap<Integer, List<Integer>>();
+	}
 	
 	public static void saveNodeSnapshot(){
 		
 		nodesSnap= DeepClone.deepClone(nodes);
 		nodeSizeSnap = nodeSize;
 		
-		edgesSnap=DeepClone.deepClone(edges);
-		edgeSizeSnap = edgeSize;
-		
-		//ccsDataSnap = new HashMap<Integer, List<CCSSourceData> >(ccsData);//cloner.deepClone(ccsData);
-		
+		//edgesSnap=DeepClone.deepClone(edges);
+		//edgeSizeSnap = edgeSize;
 		
 		ccsDataSnap = DeepClone.deepClone(ccsData);
-		//System.out.println("SAVE - ccsDataSnap:"+ccsDataSnap);
 		
-		
-//		{
-//			System.out.println(ccsDataSnap);
-//			List<Integer> hubList = ccsDataSnap.get(CCSNodeData.TYPE_HUB);
-//			for(int i = 0 ; i < hubList.size() ; i++){
-//				CCSHubData hubData1 = (CCSHubData) nodesSnap.get(hubList.get(i));
-//				System.out.println("in save1:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
-//			}
-//		}
-//		
-//		{
-//			System.out.println(ccsDataSnap);
-//			List<Integer> hubList = ccsData.get(CCSNodeData.TYPE_HUB);
-//			for(int i = 0 ; i < hubList.size() ; i++){
-//				CCSHubData hubData1 = (CCSHubData) nodes.get(hubList.get(i));
-//				hubData1.addChildSource(1);
-//				//System.out.println("in save1:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
-//			}
-//		}
-//		
-//		
-//		{
-//			System.out.println(ccsDataSnap);
-//			List<Integer> hubList = ccsDataSnap.get(CCSNodeData.TYPE_HUB);
-//			for(int i = 0 ; i < hubList.size() ; i++){
-//				CCSHubData hubData1 = (CCSHubData) nodesSnap.get(hubList.get(i));
-//				System.out.println("in save2:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
-//			}
-//		}
-		
-		
-//		ccsData.get(CCSSourceData.TYPE_HUB).get(0).getChildSources().add(123123);
-//		
-//		System.out.println("TEST - ccsDataSnap:"+ccsDataSnap.get(CCSSourceData.TYPE_HUB));
-//		System.out.println("TEST - ccsData:"+ccsData.get(CCSSourceData.TYPE_HUB));
-		//ccsConDataSnap = cloner.deepClone(ccsConData);
 	}
 	
 	public static void loadNodeSnapshot(){
 		nodes=DeepClone.deepClone(nodesSnap);
 		nodeSize = nodeSizeSnap;
-//		
-		//edges=DeepClone.deepClone(edgesSnap);
-		//edgeSize = edgeSizeSnap;
-		
-//		{
-//			System.out.println(ccsDataSnap);
-//			List<Integer> hubList = ccsDataSnap.get(CCSNodeData.TYPE_HUB);
-//			for(int i = 0 ; i < hubList.size() ; i++){
-//				CCSHubData hubData1 = (CCSHubData) nodesSnap.get(hubList.get(i));
-//				System.out.println("in load:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
-//			}
-//		}
-		
 		ccsData = DeepClone.deepClone(ccsDataSnap);//cloner.deepClone(ccsData);
-//		for(Integer key : ccsData.keySet()){
-//			for(Integer nodeIndex : ccsData.get(key)){
-//				nodes.put(nodeIndex, nodesSnap.get(nodeIndex));
-//			}
-//		}
-		
-		//System.out.println("LOAD - ccsDataSnap:"+ccsDataSnap.get(CCSSourceData.TYPE_HUB));
-		//System.out.println("LOAD - ccsData:"+ccsData.get(CCSSourceData.TYPE_HUB));
 	}
 	
 	public static void clearAllNode(){

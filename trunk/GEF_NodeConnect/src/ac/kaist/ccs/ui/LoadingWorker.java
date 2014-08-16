@@ -349,7 +349,6 @@ public class LoadingWorker extends JPanel
             	}
                 if(!progressFlag) break;
                 editor.add(fig);
-                editor.getSelectionManager().select(fig);
                 
                 //fig.reorder(func, lay);
                 if(node.getEdge() != null){
