@@ -78,23 +78,23 @@ public class NodeRenderManager {
 		if(costType != null)
 			this.costType = costType;
 		
-		{
-			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
-			for(int i = 0 ; i < hubList.size() ; i++){
-				CCSHubData hubData1 = (CCSHubData) UiGlobals.getNode(hubList.get(i));
-				System.out.println("before laod kkk:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
-			}
-		}
+//		{
+//			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+//			for(int i = 0 ; i < hubList.size() ; i++){
+//				CCSHubData hubData1 = (CCSHubData) UiGlobals.getNode(hubList.get(i));
+//				System.out.println("before laod kkk:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
+//			}
+//		}
 		
 		UiGlobals.loadNodeSnapshot();
 		
-		{
-			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
-			for(int i = 0 ; i < hubList.size() ; i++){
-				CCSHubData hubData1 = (CCSHubData) UiGlobals.getNode(hubList.get(i));
-				System.out.println("21kkk:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
-			}
-		}
+//		{
+//			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
+//			for(int i = 0 ; i < hubList.size() ; i++){
+//				CCSHubData hubData1 = (CCSHubData) UiGlobals.getNode(hubList.get(i));
+//				System.out.println("21kkk:"+hubData1.getIndex()+", children:"+hubData1.getChildSources());
+//			}
+//		}
 		
 		if(this.connectType == CCSStatics.CONNECT_TYPE_STAR)
 			makeStarCon(UiGlobals.ccsData);
@@ -583,6 +583,7 @@ public class NodeRenderManager {
 		for(int i = 0 ; i < hubData.size() ; i++)
 			System.out.println("a::"+(CCSHubData)UiGlobals.getNode(hubData.get(i))+">>");
 		List<Integer> plantData = ccsData.get(CCSSourceData.TYPE_PLANT);
+		if(plantData == null) return null;
 		
 		List<SortTuple> hubSortList = new ArrayList<SortTuple>();
 		for(Integer index : hubData){

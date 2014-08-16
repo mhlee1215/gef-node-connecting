@@ -276,78 +276,198 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			System.out.println("Executed in local!");
 		}
 
+		
+		doMainProcess(1, 0, null);
 
 		// Insert Loading data
-		//UiGlobals.ccsData  = makeRandomData(300, 500, 500);
-		UiGlobals.ccsData = makeRefRandomData(refImage, refTerrainImage);
-		
-		UiGlobals.saveNodeSnapshot();
-		
-		//List<Integer> hubIndexList = new ArrayList<Integer>();
-		List<Integer> hubIndexList = selectHubIndexList();
+//		UiGlobals.resetNodes();
+//		//UiGlobals.ccsData  = makeRandomData(300, 500, 500);
+//		makeRefRandomData(refImage, refTerrainImage, UiGlobals.ccsData);
 		
 		
-		System.out.println("Selected hubIndexList: "+hubIndexList);
 		
-		showSourceData();
-		showCombinedData(hubIndexList);
-		List<Double> coverageList = getCoverage(hubIndexList);
-		List<Double> coverageAmountList = getCoverageAmount(hubIndexList);
-		
-		UiGlobals.loadNodeSnapshot();
-		
-		//selectHubNodes(hubIndexList);
-		List<Integer> costTypeList = CCSStatics.getCostTypeList();
-		Map<Integer, List<Double> > totalCostList = new HashMap<Integer, List<Double>>();
-		for(Integer hub_cnt : hubIndexList){
-			//Actual hub selection for cost simulation.
-			selectHubNode(hub_cnt);
-			for(int costType : costTypeList){
-				if(totalCostList.get(costType) == null)
-					totalCostList.put(costType, new ArrayList<Double>());
-				
-				double totalCost = computeHubCostAll(costType, CCSStatics.CO2_STATE_EXTREME);
-				totalCostList.get(costType).add(totalCost);
-			}
-		}
-		
-		
-		//SHOW HUB SELECTION COST
-		CCSHubSelectionCost costFrame = new CCSHubSelectionCost("Hub Selection - COST", totalCostList);
-        costFrame.pack();
-        RefineryUtilities.centerFrameOnScreen(costFrame);
-        costFrame.setVisible(true);
-
-        //SHOW HUB SELECTION COVERAGE
-        CCSHubSelectionCoverage coverageFrame = new CCSHubSelectionCoverage("Hub Selection - COVERAGE", coverageList);
-        coverageFrame.pack();
-        RefineryUtilities.centerFrameOnScreen(coverageFrame);
-        coverageFrame.setVisible(true);
-        
-        //SHOW HUB SELECTION COVERAGE AMOUNT
-        CCSHubSelectionCo2Coverage coverageAmountFrame = new CCSHubSelectionCo2Coverage("Hub Selection - COVERAGE AMOUNT", coverageAmountList);
-        coverageAmountFrame.pack();
-        RefineryUtilities.centerFrameOnScreen(coverageAmountFrame);
-        coverageAmountFrame.setVisible(true);
-		
-		//System.out.println(">>>>>>>>"+totalCostList);
-		
-		UiGlobals.saveNodeSnapshot();
+//		UiGlobals.saveNodeSnapshot();
+//		//List<Integer> hubIndexList = new ArrayList<Integer>();
+//		List<Integer> hubIndexList = selectHubIndexList();
+//		
+//		
+//		System.out.println("Selected hubIndexList: "+hubIndexList);
+//		
+//		showSourceData();
+//		showCombinedData(hubIndexList);
+//		List<Double> coverageList = getCoverage(hubIndexList);
+//		List<Double> coverageAmountList = getCoverageAmount(hubIndexList);
+//		
+//		UiGlobals.loadNodeSnapshot();
+//		
+//		//selectHubNodes(hubIndexList);
+//		List<Integer> costTypeList = CCSStatics.getCostTypeList();
+//		Map<Integer, List<Double> > totalCostList = new HashMap<Integer, List<Double>>();
+//		for(Integer hub_cnt : hubIndexList){
+//			//Actual hub selection for cost simulation.
+//			selectHubNode(hub_cnt);
+//			for(int costType : costTypeList){
+//				if(totalCostList.get(costType) == null)
+//					totalCostList.put(costType, new ArrayList<Double>());
+//				
+//				double totalCost = computeHubCostAll(costType, CCSStatics.CO2_STATE_EXTREME);
+//				totalCostList.get(costType).add(totalCost);
+//			}
+//		}
+//		
+//		
+//		//SHOW HUB SELECTION COST
+//		CCSHubSelectionCost costFrame = new CCSHubSelectionCost("Hub Selection - COST", totalCostList);
+//        costFrame.pack();
+//        RefineryUtilities.centerFrameOnScreen(costFrame);
+//        costFrame.setVisible(true);
+//
+//        //SHOW HUB SELECTION COVERAGE
+//        CCSHubSelectionCoverage coverageFrame = new CCSHubSelectionCoverage("Hub Selection - COVERAGE", coverageList);
+//        coverageFrame.pack();
+//        RefineryUtilities.centerFrameOnScreen(coverageFrame);
+//        coverageFrame.setVisible(true);
+//        
+//        //SHOW HUB SELECTION COVERAGE AMOUNT
+//        CCSHubSelectionCo2Coverage coverageAmountFrame = new CCSHubSelectionCo2Coverage("Hub Selection - COVERAGE AMOUNT", coverageAmountList);
+//        coverageAmountFrame.pack();
+//        RefineryUtilities.centerFrameOnScreen(coverageAmountFrame);
+//        coverageAmountFrame.setVisible(true);
+//		
+//		
+//        makeRefStorageData(refImage, refTerrainImage, UiGlobals.ccsData);
+//		UiGlobals.saveNodeSnapshot();
 	
 		//List<Integer> hubList = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
-		UiGlobals.loadNodeSnapshot();
+		//UiGlobals.loadNodeSnapshot();
 		
 		
-		System.out.println("Randering!");
-		NodeRenderManager nodeRenderManager = new NodeRenderManager(UiGlobals.ccsData,
-				null, _graph);
-		nodeRenderManager.init(_width, _height);
-		nodeRenderManager.drawNodes(true);
-		UiGlobals.setNodeRenderManager(nodeRenderManager);
+//		System.out.println("Randering!");
+//		NodeRenderManager nodeRenderManager = new NodeRenderManager(UiGlobals.ccsData,
+//				null, _graph);
+//		nodeRenderManager.init(_width, _height);
+//		nodeRenderManager.drawNodes(true);
+//		UiGlobals.setNodeRenderManager(nodeRenderManager);
 
 	}
 	
-	public List<Integer> selectHubIndexList(){
+	public void doMainProcess(int stageUntil, int stageSpecific, Map<String, String> params){
+		
+		//Stage for source allocation
+		if(stageUntil >= 1 || stageSpecific == 1){
+			if(params == null || "true".equals(params.get("isResetNodes"))){
+				UiGlobals.resetNodes();
+				//UiGlobals.ccsData  = makeRandomData(300, 500, 500);
+				makeRefRandomData(refImage, refTerrainImage, UiGlobals.ccsData);
+				UiGlobals.saveNodeSnapshot();
+			}
+			
+		}
+		
+		//Stage for storage
+		if(stageUntil >= 2 || stageSpecific == 2){
+			UiGlobals.loadNodeSnapshot();
+			
+			int isolatedSourceCost = 100;
+			boolean isShowReports = false;
+			
+			if(params != null && params.get("isolatedSourceCost") != null){
+				isolatedSourceCost = Integer.parseInt(params.get("isolatedSourceCost"));
+			}
+			
+			if(params != null && params.get("isShowReports") != null){
+				if("Y".equals(params.get("isShowReports").toString())) isShowReports = true;
+				else if("N".equals(params.get("isShowReports").toString())) isShowReports = false;
+			}
+			
+			
+			
+			//UiGlobals.saveNodeSnapshot();
+			//List<Integer> hubIndexList = new ArrayList<Integer>();
+			List<Integer> hubIndexList = selectHubIndexList(isShowReports);
+			
+			
+			//System.out.println("Selected hubIndexList: "+hubIndexList);
+			if(isShowReports){
+				showSourceData();
+				showCombinedData(hubIndexList);	
+			}
+			
+			List<Double> coverageList = getCoverage(hubIndexList);
+			List<Double> coverageAmountList = getCoverageAmount(hubIndexList);
+			
+			UiGlobals.loadNodeSnapshot();
+			
+			//selectHubNodes(hubIndexList);
+			List<Integer> costTypeList = CCSStatics.getCostTypeList();
+			Map<Integer, List<Double> > totalCostList = new HashMap<Integer, List<Double>>();
+			for(Integer hub_cnt : hubIndexList){
+				//Actual hub selection for cost simulation.
+				selectHubNode(hub_cnt);
+				for(int costType : costTypeList){
+					if(totalCostList.get(costType) == null)
+						totalCostList.put(costType, new ArrayList<Double>());
+					
+					double totalCost = computeHubCostAll(costType, CCSStatics.CO2_STATE_EXTREME, isolatedSourceCost);
+					totalCostList.get(costType).add(totalCost);
+				}
+			}
+			
+			if(isShowReports){
+				//SHOW HUB SELECTION COST
+				CCSHubSelectionCost costFrame = new CCSHubSelectionCost("Hub Selection - COST (isolatedSourceCost="+isolatedSourceCost+")", totalCostList);
+		        costFrame.pack();
+		        RefineryUtilities.centerFrameOnScreen(costFrame);
+		        costFrame.setVisible(true);
+	
+		        //SHOW HUB SELECTION COVERAGE
+		        CCSHubSelectionCoverage coverageFrame = new CCSHubSelectionCoverage("Hub Selection - COVERAGE", coverageList);
+		        coverageFrame.pack();
+		        RefineryUtilities.centerFrameOnScreen(coverageFrame);
+		        coverageFrame.setVisible(true);
+		        
+		        //SHOW HUB SELECTION COVERAGE AMOUNT
+		        CCSHubSelectionCo2Coverage coverageAmountFrame = new CCSHubSelectionCo2Coverage("Hub Selection - COVERAGE AMOUNT", coverageAmountList);
+		        coverageAmountFrame.pack();
+		        RefineryUtilities.centerFrameOnScreen(coverageAmountFrame);
+		        coverageAmountFrame.setVisible(true);
+			}
+	        
+	        UiGlobals.saveNodeSnapshot();
+			
+	        
+		}
+		
+		if(stageUntil >= 3 || stageSpecific == 3){
+			makeRefStorageData(refImage, refTerrainImage, UiGlobals.ccsData);
+			UiGlobals.saveNodeSnapshot();
+		}
+		
+		if(stageUntil >= 4 || stageSpecific == 4){
+			
+			int connectionType = CCSStatics.CONNECT_TYPE_STAR;
+			if("star".equalsIgnoreCase(params.get("connectionType"))) connectionType = CCSStatics.CONNECT_TYPE_STAR;
+			else if("tree".equalsIgnoreCase(params.get("connectionType"))) connectionType = CCSStatics.CONNECT_TYPE_TREE;
+			else if("backbone".equalsIgnoreCase(params.get("connectionType"))) connectionType = CCSStatics.CONNECT_TYPE_BACKBONE;
+			else if("hybrid".equalsIgnoreCase(params.get("connectionType"))) connectionType = CCSStatics.CONNECT_TYPE_HYBRID;
+			
+			System.out.println("Randering!");
+			NodeRenderManager nodeRenderManager = new NodeRenderManager(UiGlobals.ccsData,
+					null, _graph);
+			nodeRenderManager.init(_width, _height);
+			nodeRenderManager.drawNodes(true, connectionType, CCSStatics.COST_TYPE_THE_OGDEN_MODELS);
+			UiGlobals.setNodeRenderManager(nodeRenderManager);
+		}else{
+			System.out.println("Randering without connection!");
+			NodeRenderManager nodeRenderManager = new NodeRenderManager(UiGlobals.ccsData,
+					null, _graph);
+			nodeRenderManager.init(_width, _height);
+			nodeRenderManager.drawNodes(true, 0, 0);
+			UiGlobals.setNodeRenderManager(nodeRenderManager);
+		}
+	}
+	
+	public List<Integer> selectHubIndexList(boolean isShowReports){
 		List<Integer> hubIndexList = new ArrayList<Integer>();
 		
 		//selectRandomHubNodes();
@@ -375,78 +495,82 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			createHubNode((int) s.get(0).firstId);
 		}
 		
-		Vector<String> columnNames = new Vector<String>();
- 	    columnNames.addElement("ID");
- 	    columnNames.addElement("S_sel");
- 	    columnNames.addElement("Connected Node #");
- 	    columnNames.addElement("Acc CO2 amount");
- 	    
- 	    MyTableModel mm = new MyTableModel();
-	    mm.setData(tableContentAll);
-	    mm.setColumnNames(columnNames);
+		if(isShowReports){
+			Vector<String> columnNames = new Vector<String>();
+	 	    columnNames.addElement("ID");
+	 	    columnNames.addElement("S_sel");
+	 	    columnNames.addElement("Connected Node #");
+	 	    columnNames.addElement("Acc CO2 amount");
+	 	    
+	 	    MyTableModel mm = new MyTableModel();
+		    mm.setData(tableContentAll);
+		    mm.setColumnNames(columnNames);
 
-	    JTable table = new JTable(mm)
-	    {
-			 @Override
-			   public TableCellRenderer getCellRenderer(int row, int column) {
-			    // TODO Auto-generated method stub
-			    return new CustomCellRenderer();
-			   }
-		};
+		    JTable table = new JTable(mm)
+		    {
+				 @Override
+				   public TableCellRenderer getCellRenderer(int row, int column) {
+				    // TODO Auto-generated method stub
+				    return new CustomCellRenderer();
+				   }
+			};
 
-	    
-	    table.setAutoCreateRowSorter(true);
-	    table.setRowSelectionAllowed(true);
-	    table.setColumnSelectionAllowed(false);
-	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    table.getSelectionModel().addListSelectionListener(new RowListener().init(table));
-	    
-	    TableColumnModel cm = table.getColumnModel();
-	    
-	    cm.getColumn(0).setPreferredWidth(100);
+		    
+		    table.setAutoCreateRowSorter(true);
+		    table.setRowSelectionAllowed(true);
+		    table.setColumnSelectionAllowed(false);
+		    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		    table.getSelectionModel().addListSelectionListener(new RowListener().init(table));
+		    
+		    TableColumnModel cm = table.getColumnModel();
+		    
+		    cm.getColumn(0).setPreferredWidth(100);
 
 
-	    
-	    table.getTableHeader().setForeground(Color.white);
-	    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
-	    
-		
-		JScrollPane scroll = new JScrollPane( table );
-		
-		JPanel m = new JPanel();
-		m.setLayout(new BorderLayout());
-		m.add("Center", scroll);
-		
-		JPanel buttonPanel = new JPanel();
-		JButton exportButton = new JButton("Export");
-		exportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-            	JFileChooser fileChooser = new JFileChooser();
-            	
-            	 /* Enabling Multiple Selection */
-                //fileChooser.setMultiSelectionEnabled(true);
+		    
+		    table.getTableHeader().setForeground(Color.white);
+		    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+		    
+			
+			JScrollPane scroll = new JScrollPane( table );
+			
+			JPanel m = new JPanel();
+			m.setLayout(new BorderLayout());
+			m.add("Center", scroll);
+			
+			JPanel buttonPanel = new JPanel();
+			JButton exportButton = new JButton("Export");
+			exportButton.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent event) {
+	            	JFileChooser fileChooser = new JFileChooser();
+	            	
+	            	 /* Enabling Multiple Selection */
+	                //fileChooser.setMultiSelectionEnabled(true);
 
-                /* Setting Current Directory */
-                fileChooser.setCurrentDirectory(new File("E:/ext_work/respace/workspace/CTS_analysis/input"));
-                
-                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
-                
-                //JFrame parent = new MenuMain();
-                
-                
-                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
-            }
-		});
-		buttonPanel.add(exportButton);
+	                /* Setting Current Directory */
+	                fileChooser.setCurrentDirectory(new File("E:/ext_work/respace/workspace/CTS_analysis/input"));
+	                
+	                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
+	                
+	                //JFrame parent = new MenuMain();
+	                
+	                
+	                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+	            }
+			});
+			buttonPanel.add(exportButton);
+			
+			m.add("South", buttonPanel);
+
+			
+			JFrame frame = new JFrame("Cost Result Table");
+			frame.getContentPane().add( m );
+			frame.setVisible(true);
+			frame.setSize( 1024, 500 ); 
+		}
 		
-		m.add("South", buttonPanel);
 		
-		JFrame frame = new JFrame("Cost Result Table");
-			    
-		frame.getContentPane().add( m );
-		frame.setVisible(true);
-		frame.setSize( 1024, 500 ); 
 		
 		return hubIndexList;
 	}
@@ -681,7 +805,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 	}
 	
-	public double computeHubCostAll(int costType, int co2Type){
+	public double computeHubCostAll(int costType, int co2Type, int isolatedSourceCost){
 		List<Integer> hubNodes = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
 		
 		double totalCost = 0.0;
@@ -703,7 +827,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		for(Integer index : sourceNodes){
 			CCSSourceData src = UiGlobals.getNode(index);
 			if(src.getDst() == null){
-				totalCost += 100 * src.getCo2_amount() + src.getOpenCost();
+				totalCost += isolatedSourceCost * src.getCo2_amount() + src.getOpenCost();
 			}
 		}
 		
@@ -950,10 +1074,10 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		return resultBin;
 	}
 
-	public Map<Integer, List<Integer>> makeRefRandomData(
-			BufferedImage refImage, BufferedImage refTerrainImage) {
+	public void makeRefRandomData(
+			BufferedImage refImage, BufferedImage refTerrainImage, Map<Integer, List<Integer>> ccsData) {
 
-		Map<Integer, List<Integer>> ccsData = new HashMap<Integer, List<Integer>>();
+		//Map<Integer, List<Integer>> ccsData = new HashMap<Integer, List<Integer>>();
 		Random random = new Random();
 
 		int h = refImage.getHeight();
@@ -1073,19 +1197,31 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		}
 		
 		
+//		for(Integer key : CCSStatics.storageMap.keySet()){
+//			StorageData sData = CCSStatics.storageMap.get(key);
+//			CCSPlantData storage = new CCSPlantData(sData.x, sData.y, key, sData.storagecapacity, sData.geological_information);
+//			UiGlobals.addNode(storage);
+//			storageData.add(storage.getIndex());
+//		}
+	
+		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
+		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
+		//ccsData.put(CCSSourceData.TYPE_PLANT, storageData);
+		ccsData.put(CCSSourceData.TYPE_HUB_CANDIDATE, hubCandidateData);
+
+		//return ccsData;
+	}
+	
+	public void makeRefStorageData(
+			BufferedImage refImage, BufferedImage refTerrainImage, Map<Integer, List<Integer>> ccsData) {
+		List<Integer> storageData = new ArrayList<Integer>();
 		for(Integer key : CCSStatics.storageMap.keySet()){
 			StorageData sData = CCSStatics.storageMap.get(key);
 			CCSPlantData storage = new CCSPlantData(sData.x, sData.y, key, sData.storagecapacity, sData.geological_information);
 			UiGlobals.addNode(storage);
 			storageData.add(storage.getIndex());
 		}
-	
-		ccsData.put(CCSSourceData.TYPE_SOURCE, sourceData);
-		ccsData.put(CCSSourceData.TYPE_HUB, hubData);
 		ccsData.put(CCSSourceData.TYPE_PLANT, storageData);
-		ccsData.put(CCSSourceData.TYPE_HUB_CANDIDATE, hubCandidateData);
-
-		return ccsData;
 	}
 	
 	
@@ -1333,9 +1469,66 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		randomRadio.setSelected(true);
 		co2SourceGroup.add(randomRadio);
 		showCo2Source.add(randomRadio);
+		randomRadio.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	Object[] options = {"Yes", "No"};
+				int n = JOptionPane.showOptionDialog(null,
+				"Would you reset currently rendered sources?",
+				"Reset notification",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,     //do not use a custom Icon
+				options,  //the titles of buttons
+				options[0]); //default button title
+            	
+            	if(n == 0){
+            		//Go reset
+            		doMainProcess(0, 1, null);
+            	}
+            	else if(n == 1){
+            		//Remain
+            		HashMap<String, String> params = new HashMap<String, String>();
+            		params.put("isResetNode", "false");
+            		doMainProcess(0, 1, params);
+            	}
+            }
+		});
+		
+		
 		JRadioButtonMenuItem manualRadio = new JRadioButtonMenuItem("Manual Data");
 		co2SourceGroup.add(manualRadio);
 		showCo2Source.add(manualRadio);
+		manualRadio.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	JOptionPane.showMessageDialog(null,
+            		    "Manual Source rendering is not implemented yet.",
+            		    "Implementation Error",
+            		    JOptionPane.ERROR_MESSAGE);
+            	
+//            	Object[] options = {"Yes", "No"};
+//				int n = JOptionPane.showOptionDialog(null,
+//				"Would you reset currently rendered sources?",
+//				"Reset notification",
+//				JOptionPane.YES_NO_OPTION,
+//				JOptionPane.QUESTION_MESSAGE,
+//				null,     //do not use a custom Icon
+//				options,  //the titles of buttons
+//				options[0]); //default button title
+//            	
+//            	if(n == 0){
+//            		//Go reset
+//            		doMainProcess(0, 1, null);
+//            	}
+//            	else if(n == 1){
+//            		//Remain
+//            		HashMap<String, String> params = new HashMap<String, String>();
+//            		params.put("isResetNode", "false");
+//            		doMainProcess(0, 1, params);
+//            	}
+            }
+		});
 		
 //		showCo2Source.addActionListener(new ActionListener() {
 //
@@ -1357,185 +1550,113 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		ButtonGroup hubGroup = new ButtonGroup();
 		
 		JRadioButtonMenuItem cost25Radio = new JRadioButtonMenuItem("cost 25$");
+		cost25Radio.setName("25");
 		hubGroup.add(cost25Radio);
 		showHub.add(cost25Radio);
+		cost25Radio.addActionListener(new HubRadioAction());
 		
 		JRadioButtonMenuItem cost50Radio = new JRadioButtonMenuItem("cost 50$");
+		cost50Radio.setName("50");
 		hubGroup.add(cost50Radio);
 		showHub.add(cost50Radio);
+		cost50Radio.addActionListener(new HubRadioAction());
 		
 		JRadioButtonMenuItem cost75Radio = new JRadioButtonMenuItem("cost 75$");
+		cost75Radio.setName("75");
 		hubGroup.add(cost75Radio);
 		showHub.add(cost75Radio);
+		cost75Radio.addActionListener(new HubRadioAction());
 		
 		JRadioButtonMenuItem cost100Radio = new JRadioButtonMenuItem("cost 100$");
+		cost100Radio.setName("100");
 		hubGroup.add(cost100Radio);
 		showHub.add(cost100Radio);
+		cost100Radio.addActionListener(new HubRadioAction());
 		
 		JRadioButtonMenuItem cost125Radio = new JRadioButtonMenuItem("cost 125$");
+		cost125Radio.setName("125");
 		hubGroup.add(cost125Radio);
 		showHub.add(cost125Radio);
-		
+		cost125Radio.addActionListener(new HubRadioAction());
 		
 		
 		
 		showStorage = new JMenuItem("3. Show Storage");
-		showStorage.setEnabled(false);
+		//showStorage.setEnabled(false);
 		stepByStep.add(showStorage);
+		showStorage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doMainProcess(0, 3, null);
+			}
+		});
 		
 		showConnection = new JMenu("4. Show Connection");
-		showConnection.setEnabled(false);
+		//showConnection.setEnabled(false);
 		stepByStep.add(showConnection);
 		
 		JMenuItem connectionStar = new JMenuItem("Star connection");
+		connectionStar.setName("star");
 		showConnection.add(connectionStar);
+		connectionStar.addActionListener(new ConnectionRadioAction());
 		
 		JMenuItem connectionTree = new JMenuItem("Tree connection");
+		connectionTree.setName("tree");
 		showConnection.add(connectionTree);
+		connectionTree.addActionListener(new ConnectionRadioAction());
 		
 		JMenuItem connectionBackbone = new JMenuItem("Backbone connection");
+		connectionBackbone.setName("backbone");
 		showConnection.add(connectionBackbone);
+		connectionBackbone.addActionListener(new ConnectionRadioAction());
 		
 		JMenuItem connectionHybrid = new JMenuItem("Hybrid connection");
+		connectionHybrid.setName("hybrid");
 		showConnection.add(connectionHybrid);
+		connectionHybrid.addActionListener(new ConnectionRadioAction());
 		
-//		JMenu edit = new JMenu(Localizer.localize("GefBase", "Edit"));
-//		edit.setMnemonic('E');
-//		// _menubar.add(edit);
-//
-//		JMenuItem undoItem = edit.add(new UndoAction(Localizer.localize(
-//				"GefBase", "Undo")));
-//		undoItem.setMnemonic(Localizer.localize("GefBase", "UndoMnemonic")
-//				.charAt(0));
-//		JMenuItem redoItem = edit.add(new RedoAction(Localizer.localize(
-//				"GefBase", "Redo")));
-//		redoItem.setMnemonic(Localizer.localize("GefBase", "RedoMnemonic")
-//				.charAt(0));
-//
-//		JMenu select = new JMenu(Localizer.localize("GefBase", "Select"));
-//		edit.add(select);
-//		select.add(new CmdSelectAll());
-//		select.add(new CmdSelectNext(false));
-//		select.add(new CmdSelectNext(true));
-//		select.add(new CmdSelectInvert());
-//
-//		edit.addSeparator();
-//
-//		copyItem = edit.add(new CmdCopy());
-//		copyItem.setMnemonic('C');
-//		pasteItem = edit.add(new CmdPaste());
-//		pasteItem.setMnemonic('P');
-//
-//		deleteItem = edit.add(new CmdRemoveFromGraph());
-//		edit.addSeparator();
-//		edit.add(new CmdUseReshape());
-//		edit.add(new CmdUseResize());
-//		edit.add(new CmdUseRotate());
-//
-//		JMenu view = new JMenu(Localizer.localize("GefBase", "View"));
-//		// _menubar.add(view);
-//		view.setMnemonic('V');
-//		view.add(new CmdSpawn());
-//		view.add(new CmdShowProperties());
-//		// view.addSeparator();
-//		// view.add(new CmdZoomIn());
-//		// view.add(new CmdZoomOut());
-//		// view.add(new CmdZoomNormal());
-//		view.addSeparator();
-//		view.add(new CmdAdjustGrid());
-//		view.add(new CmdAdjustGuide());
-//		view.add(new CmdAdjustPageBreaks());
-//
-//		JMenu arrange = new JMenu(Localizer.localize("GefBase", "Arrange"));
-//		// _menubar.add(arrange);
-//		arrange.setMnemonic('A');
-//		groupItem = arrange.add(new CmdGroup());
-//		groupItem.setMnemonic('G');
-//		ungroupItem = arrange.add(new CmdUngroup());
-//		ungroupItem.setMnemonic('U');
-//
-//		JMenu align = new JMenu(Localizer.localize("GefBase", "Align"));
-//		arrange.add(align);
-//		align.add(new AlignAction(AlignAction.ALIGN_TOPS));
-//		align.add(new AlignAction(AlignAction.ALIGN_BOTTOMS));
-//		align.add(new AlignAction(AlignAction.ALIGN_LEFTS));
-//		align.add(new AlignAction(AlignAction.ALIGN_RIGHTS));
-//		align.add(new AlignAction(AlignAction.ALIGN_H_CENTERS));
-//		align.add(new AlignAction(AlignAction.ALIGN_V_CENTERS));
-//		align.add(new AlignAction(AlignAction.ALIGN_TO_GRID));
-//
-//		JMenu distribute = new JMenu(
-//				Localizer.localize("GefBase", "Distribute"));
-//		arrange.add(distribute);
-//		distribute.add(new DistributeAction(DistributeAction.H_SPACING));
-//		distribute.add(new DistributeAction(DistributeAction.H_CENTERS));
-//		distribute.add(new DistributeAction(DistributeAction.V_SPACING));
-//		distribute.add(new DistributeAction(DistributeAction.V_CENTERS));
-//
-//		JMenu reorder = new JMenu(Localizer.localize("GefBase", "Reorder"));
-//		arrange.add(reorder);
-//		toBackItem = reorder.add(new CmdReorder(CmdReorder.SEND_TO_BACK));
-//		toFrontItem = reorder.add(new CmdReorder(CmdReorder.BRING_TO_FRONT));
-//		backwardItem = reorder.add(new CmdReorder(CmdReorder.SEND_BACKWARD));
-//		forwardItem = reorder.add(new CmdReorder(CmdReorder.BRING_FORWARD));
-//
-//		JMenu nudge = new JMenu(Localizer.localize("GefBase", "Nudge"));
-//		arrange.add(nudge);
-//		nudge.add(new NudgeAction(NudgeAction.LEFT));
-//		nudge.add(new NudgeAction(NudgeAction.RIGHT));
-//		nudge.add(new NudgeAction(NudgeAction.UP));
-//		nudge.add(new NudgeAction(NudgeAction.DOWN));
-//
-//		KeyStroke ctrlO = KeyStroke.getKeyStroke(KeyEvent.VK_O,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlP = KeyStroke.getKeyStroke(KeyEvent.VK_P,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke altF4 = KeyStroke.getKeyStroke(KeyEvent.VK_F4,
-//				KeyEvent.ALT_MASK);
-//
-//		KeyStroke delKey = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-//		KeyStroke ctrlZ = KeyStroke.getKeyStroke(KeyEvent.VK_Z,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlY = KeyStroke.getKeyStroke(KeyEvent.VK_Y,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlV = KeyStroke.getKeyStroke(KeyEvent.VK_V,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlG = KeyStroke.getKeyStroke(KeyEvent.VK_G,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlU = KeyStroke.getKeyStroke(KeyEvent.VK_U,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
-//				KeyEvent.CTRL_MASK);
-//		KeyStroke sCtrlB = KeyStroke.getKeyStroke(KeyEvent.VK_B,
-//				KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK);
-//		KeyStroke sCtrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F,
-//				KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK);
-//
-//		openItem.setAccelerator(ctrlO);
-//		saveItem.setAccelerator(ctrlS);
-//		printItem.setAccelerator(ctrlP);
-//		exitItem.setAccelerator(altF4);
-//
-//		deleteItem.setAccelerator(delKey);
-//		undoItem.setAccelerator(ctrlZ);
-//		redoItem.setAccelerator(ctrlY);
-//		copyItem.setAccelerator(ctrlC);
-//		pasteItem.setAccelerator(ctrlV);
-//
-//		groupItem.setAccelerator(ctrlG);
-//		ungroupItem.setAccelerator(ctrlU);
-//
-//		toBackItem.setAccelerator(sCtrlB);
-//		toFrontItem.setAccelerator(sCtrlF);
-//		backwardItem.setAccelerator(ctrlB);
-//		forwardItem.setAccelerator(ctrlF);
 
+	}
+	
+	public class HubRadioAction implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			
+			Object[] options = {"Yes", "No"};
+			int n = JOptionPane.showOptionDialog(null,
+			"Would you see analysis reports?",
+			"Report Notification",
+			JOptionPane.YES_NO_OPTION,
+			JOptionPane.QUESTION_MESSAGE,
+			null,     //do not use a custom Icon
+			options,  //the titles of buttons
+			options[0]); //default button title
+			
+			String isolatedSourceCost = ((JRadioButtonMenuItem)e.getSource()).getName();
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("isolatedSourceCost", isolatedSourceCost);
+			
+        	if(n == 0){
+        		params.put("isShowReports", "Y");
+        	}
+        	else if(n == 1){
+        		params.put("isShowReports", "N");
+        	}
+			
+			doMainProcess(0, 2, params);
+		}
+	}
+	
+	public class ConnectionRadioAction implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			String connectionType = ((JMenuItem)e.getSource()).getName();
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("connectionType", connectionType);
+			doMainProcess(0, 4, params);
+		}
 	}
 
 	@Override
