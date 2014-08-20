@@ -141,6 +141,13 @@ public class CCSStatics {
 	public static Map<Integer, String> plantTypeStringShortMap = null;
 	public static Map<Integer, String> terrainTypeStringMap = null;
 	public static Map<Integer, String> terrainTypeStringShortMap = null;
+	
+	public static String STATE_INITIAL = "STATE_INITIAL";
+	public static String STATE_CO2_ALLOCATED = "STATE_CO2_ALLOCATED";
+	public static String STATE_STORAGE_ALLOCATED = "STATE_STORAGE_ALLOCATED";
+	public static String STATE_HUB_ALLOCATED = "STATE_HUB_ALLOCATED";
+	public static String STATE_BEFORE_CONNECT = "STATE_BEFORE_CONNECT";
+	
 
 	public static void init(){
 		isInitialized = true;

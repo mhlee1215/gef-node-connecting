@@ -102,12 +102,12 @@ public class UiGlobals extends Globals{
 	public static Map<Integer, List<Integer>> ccsData;
 	public static List<CCSEdgeData> ccsConData;
 	
-	private static Map<Integer, CCSSourceData> nodesSnap = null;//new HashMap<Integer, CCSSourceData>();
-	private static int nodeSizeSnap = 0;
-	private static Map<Integer, CCSEdgeData> edgesSnap = null;//new HashMap<Integer, CCSEdgeData>();
-	private static int edgeSizeSnap = 0;
-	public static Map<Integer, List<Integer>> ccsDataSnap;
-	private static List<CCSEdgeData> ccsConDataSnap;
+	private static Map<String, Map<Integer, CCSSourceData>> nodesSnap = new HashMap<String, Map<Integer, CCSSourceData>>();
+	private static Map<String, Integer> nodeSizeSnap = new HashMap<String, Integer>();
+	private static Map<String, Map<Integer, CCSEdgeData>> edgesSnap = new HashMap<String, Map<Integer, CCSEdgeData>>();//new HashMap<Integer, CCSEdgeData>();
+	private static Map<String, Integer> edgeSizeSnap = new HashMap<String, Integer>();
+	public static Map<String, Map<Integer, List<Integer>>> ccsDataSnap = new HashMap<String, Map<Integer, List<Integer>>>();
+	private static Map<String, List<CCSEdgeData>> ccsConDataSnap = new HashMap<String, List<CCSEdgeData>>();
 	
 	public static int viewType = CCSSourceData.VIEW_TYPE_CO2;
 	
@@ -117,22 +117,22 @@ public class UiGlobals extends Globals{
 		ccsData = new HashMap<Integer, List<Integer>>();
 	}
 	
-	public static void saveNodeSnapshot(){
+	public static void saveNodeSnapshot(String stateName){
 		
-		nodesSnap= DeepClone.deepClone(nodes);
-		nodeSizeSnap = nodeSize;
+		nodesSnap.put(stateName, DeepClone.deepClone(nodes));
+		nodeSizeSnap.put(stateName, nodeSize);
 		
 		//edgesSnap=DeepClone.deepClone(edges);
 		//edgeSizeSnap = edgeSize;
 		
-		ccsDataSnap = DeepClone.deepClone(ccsData);
+		ccsDataSnap.put(stateName, DeepClone.deepClone(ccsData));
 		
 	}
 	
-	public static void loadNodeSnapshot(){
-		nodes=DeepClone.deepClone(nodesSnap);
-		nodeSize = nodeSizeSnap;
-		ccsData = DeepClone.deepClone(ccsDataSnap);//cloner.deepClone(ccsData);
+	public static void loadNodeSnapshot(String stateName){
+		nodes=DeepClone.deepClone(nodesSnap.get(stateName));
+		nodeSize = nodeSizeSnap.get(stateName);
+		ccsData = DeepClone.deepClone(ccsDataSnap.get(stateName));//cloner.deepClone(ccsData);
 	}
 	
 	public static void clearAllNode(){
