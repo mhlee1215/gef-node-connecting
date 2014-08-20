@@ -86,7 +86,7 @@ public class NodeRenderManager {
 //			}
 //		}
 		
-		UiGlobals.loadNodeSnapshot();
+		UiGlobals.loadNodeSnapshot(CCSStatics.STATE_BEFORE_CONNECT);
 		
 //		{
 //			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);

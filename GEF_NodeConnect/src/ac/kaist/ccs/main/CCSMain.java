@@ -277,6 +277,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		}
 
 		
+		UiGlobals.saveNodeSnapshot(CCSStatics.STATE_INITIAL);
 		doMainProcess(1, 0, null);
 
 		// Insert Loading data
@@ -359,14 +360,14 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				UiGlobals.resetNodes();
 				//UiGlobals.ccsData  = makeRandomData(300, 500, 500);
 				makeRefRandomData(refImage, refTerrainImage, UiGlobals.ccsData);
-				UiGlobals.saveNodeSnapshot();
+				UiGlobals.saveNodeSnapshot(CCSStatics.STATE_CO2_ALLOCATED);
 			}
 			
 		}
 		
 		//Stage for storage
 		if(stageUntil >= 2 || stageSpecific == 2){
-			UiGlobals.loadNodeSnapshot();
+			UiGlobals.loadNodeSnapshot(CCSStatics.STATE_CO2_ALLOCATED);
 			
 			int isolatedSourceCost = 100;
 			boolean isShowReports = false;
@@ -396,12 +397,29 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			List<Double> coverageList = getCoverage(hubIndexList);
 			List<Double> coverageAmountList = getCoverageAmount(hubIndexList);
 			
-			UiGlobals.loadNodeSnapshot();
+			UiGlobals.loadNodeSnapshot(CCSStatics.STATE_CO2_ALLOCATED);
+			
+			int hubSize = 0;
+			while(hubSize == 0){
+				try{
+					String response = JOptionPane.showInputDialog(null,
+			                "The number of hub size ..",
+			                "Enter hub property",
+			                JOptionPane.QUESTION_MESSAGE);
+					hubSize = Integer.parseInt(response);
+				}catch(Exception e){
+					
+				}
+			}
+			
+	       
 			
 			//selectHubNodes(hubIndexList);
 			List<Integer> costTypeList = CCSStatics.getCostTypeList();
 			Map<Integer, List<Double> > totalCostList = new HashMap<Integer, List<Double>>();
+			int hubCnt = 1;
 			for(Integer hub_cnt : hubIndexList){
+				if(hubCnt > hubSize) break;
 				//Actual hub selection for cost simulation.
 				selectHubNode(hub_cnt);
 				for(int costType : costTypeList){
@@ -411,6 +429,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 					double totalCost = computeHubCostAll(costType, CCSStatics.CO2_STATE_EXTREME, isolatedSourceCost);
 					totalCostList.get(costType).add(totalCost);
 				}
+				hubCnt++;
 			}
 			
 			if(isShowReports){
@@ -433,17 +452,19 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		        coverageAmountFrame.setVisible(true);
 			}
 	        
-	        UiGlobals.saveNodeSnapshot();
+	        UiGlobals.saveNodeSnapshot(CCSStatics.STATE_HUB_ALLOCATED);
 			
 	        
 		}
 		
 		if(stageUntil >= 3 || stageSpecific == 3){
+			UiGlobals.loadNodeSnapshot(CCSStatics.STATE_HUB_ALLOCATED);
 			makeRefStorageData(refImage, refTerrainImage, UiGlobals.ccsData);
-			UiGlobals.saveNodeSnapshot();
+			UiGlobals.saveNodeSnapshot(CCSStatics.STATE_STORAGE_ALLOCATED);
 		}
 		
 		if(stageUntil >= 4 || stageSpecific == 4){
+			UiGlobals.saveNodeSnapshot(CCSStatics.STATE_BEFORE_CONNECT);
 			
 			int connectionType = CCSStatics.CONNECT_TYPE_STAR;
 			if("star".equalsIgnoreCase(params.get("connectionType"))) connectionType = CCSStatics.CONNECT_TYPE_STAR;
@@ -458,6 +479,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			nodeRenderManager.drawNodes(true, connectionType, CCSStatics.COST_TYPE_THE_OGDEN_MODELS);
 			UiGlobals.setNodeRenderManager(nodeRenderManager);
 		}else{
+			UiGlobals.saveNodeSnapshot(CCSStatics.STATE_BEFORE_CONNECT);
+			
 			System.out.println("Randering without connection!");
 			NodeRenderManager nodeRenderManager = new NodeRenderManager(UiGlobals.ccsData,
 					null, _graph);
