@@ -32,6 +32,7 @@ public class CCSHubData extends CCSSourceData {
 		int size = 7;
 		node = new FigHubNode(x, y, size, size, range);
 		this.storageCapitalCost = CCSStatics.STORAGE_CAPITAL_COST;
+		this.hubSelectionSources = new ArrayList<Integer>(data.getHubSelectionSources());
 		//node.setOwner(this);
 		
 	}

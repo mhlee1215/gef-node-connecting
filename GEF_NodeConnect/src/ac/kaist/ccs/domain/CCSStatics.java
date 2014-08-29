@@ -12,6 +12,8 @@ import ac.kaist.ccs.base.UiGlobals;
 public class CCSStatics {
 	static boolean isInitialized = false;
 	
+	public static double p_initial = 0.1;
+	
 	public static BufferedImage refImg;
 	public static BufferedImage refTerrainImg;
 	
@@ -23,7 +25,10 @@ public class CCSStatics {
 	//고밀도
 	public static int CO2_STATE_HIGH = 2;
 	//저온
-	public static int CO2_STATE_LOW = 1;
+	public static int CO2_STATE_LOW = 3;
+	
+	public static Map<Integer, String> co2StateString = null;
+	
 	
 	public static Map<Integer, CO2StateData> co2StateMap = null;
 	
@@ -124,6 +129,8 @@ public class CCSStatics {
 	public static int CONNECT_TYPE_BACKBONE = 3;
 	public static int CONNECT_TYPE_HYBRID = 4;
 	
+	public static Map<Integer, String> connectTypeString = null;
+	
 	public static double UNIT_STORAGE_COST = 0.72;
 	public static double STORAGE_CAPITAL_COST = 752657.0;
 	public static int HUB_SELECTION_RANGE = 100;
@@ -152,13 +159,24 @@ public class CCSStatics {
 	public static void init(){
 		isInitialized = true;
 		
+		connectTypeString = new HashMap<Integer, String>();
+		connectTypeString.put(CONNECT_TYPE_STAR, "STAR");
+		connectTypeString.put(CONNECT_TYPE_TREE, "TREE");
+		connectTypeString.put(CONNECT_TYPE_BACKBONE, "BACKBONE");
+		connectTypeString.put(CONNECT_TYPE_HYBRID, "HYBRID");
+		
+		co2StateString = new HashMap<Integer, String>();
+		co2StateString.put(CO2_STATE_EXTREME, "Super Critical");
+		co2StateString.put(CO2_STATE_HIGH, "High Density");
+		co2StateString.put(CO2_STATE_LOW, "Low Temp");
+		
 		costTypeStringMap = new HashMap<Integer, String>();
 		costTypeStringMap.put(COST_TYPE_1, "THE_OGDEN_MODELS");
-		costTypeStringMap.put(COST_TYPE_2, "COST_TYPE_MIT_MODEL");
-		costTypeStringMap.put(COST_TYPE_3, "COST_TYPE_ECOFYS_MODEL");
-		costTypeStringMap.put(COST_TYPE_4, "COST_TYPE_IEA_GHG_PH4_6");
-		costTypeStringMap.put(COST_TYPE_5, "COST_TYPE_IEA_GHG_2005_2");
-		costTypeStringMap.put(COST_TYPE_6, "COST_TYPE_IEA_GHG_2005_3");
+		costTypeStringMap.put(COST_TYPE_2, "MIT_MODEL");
+		costTypeStringMap.put(COST_TYPE_3, "ECOFYS_MODEL");
+		costTypeStringMap.put(COST_TYPE_4, "IEA_GHG_PH4_6");
+		costTypeStringMap.put(COST_TYPE_5, "IEA_GHG_2005_2");
+		costTypeStringMap.put(COST_TYPE_6, "IEA_GHG_2005_3");
 		
 		storageNameStringMap = new HashMap<Integer, String>();
 		storageNameStringMap.put(STORAGE_ONSHORE_CHUNGNAM, "Onshore Chungnam");

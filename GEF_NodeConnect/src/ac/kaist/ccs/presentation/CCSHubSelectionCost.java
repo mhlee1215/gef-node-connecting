@@ -78,6 +78,7 @@ public class CCSHubSelectionCost extends JFrame {
      * @param title  the frame title.
      */
 	String title;
+	double minVal, maxVal;
     public CCSHubSelectionCost(final String title, Map<Integer, List<Double>> data) {
 
         super(title);
@@ -96,6 +97,8 @@ public class CCSHubSelectionCost extends JFrame {
      * @return a sample dataset.
      */
     private XYDataset createDataset(Map<Integer, List<Double>> dataAll) {
+        minVal = 99999999999.0;
+        maxVal = 0;
         
     	List<Integer> costTypeList = CCSStatics.getCostTypeList();
     	final XYSeriesCollection dataset = new XYSeriesCollection();
@@ -107,6 +110,9 @@ public class CCSHubSelectionCost extends JFrame {
     		for(Double dataSingle : dataPerEachCostType){
     			series.add(x, dataSingle);
     			x+=1.0;
+    			
+    			if(dataSingle < minVal) minVal = dataSingle;
+    			if(dataSingle > maxVal) maxVal = dataSingle;
     		}
     		
     		dataset.addSeries(series);
@@ -194,6 +200,7 @@ public class CCSHubSelectionCost extends JFrame {
         // change the auto tick unit selection to integer units only...
         final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        rangeAxis.setRange(minVal-(maxVal-minVal)*0.05, maxVal+(maxVal-minVal)*0.05);
         // OPTIONAL CUSTOMISATION COMPLETED.
                 
         return chart;

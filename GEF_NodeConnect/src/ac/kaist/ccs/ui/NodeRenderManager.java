@@ -19,6 +19,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
@@ -86,7 +87,7 @@ public class NodeRenderManager {
 //			}
 //		}
 		
-		UiGlobals.loadNodeSnapshot(CCSStatics.STATE_BEFORE_CONNECT);
+		//UiGlobals.loadNodeSnapshot(CCSStatics.STATE_BEFORE_CONNECT);
 		
 //		{
 //			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
@@ -96,14 +97,16 @@ public class NodeRenderManager {
 //			}
 //		}
 		
-		if(this.connectType == CCSStatics.CONNECT_TYPE_STAR)
-			makeStarCon(UiGlobals.ccsData);
-		else if(this.connectType == CCSStatics.CONNECT_TYPE_TREE)
-			makeTreeCon(UiGlobals.ccsData);
-		else if(this.connectType == CCSStatics.CONNECT_TYPE_BACKBONE)
-			makeBackboneCon(UiGlobals.ccsData);
-		else if(this.connectType == CCSStatics.CONNECT_TYPE_HYBRID)
-			makeHybridCon(UiGlobals.ccsData);
+		makeConnection(this.connectType);
+		
+//		if(this.connectType == CCSStatics.CONNECT_TYPE_STAR)
+//			makeStarCon(UiGlobals.ccsData);
+//		else if(this.connectType == CCSStatics.CONNECT_TYPE_TREE)
+//			makeTreeCon(UiGlobals.ccsData);
+//		else if(this.connectType == CCSStatics.CONNECT_TYPE_BACKBONE)
+//			makeBackboneCon(UiGlobals.ccsData);
+//		else if(this.connectType == CCSStatics.CONNECT_TYPE_HYBRID)
+//			makeHybridCon(UiGlobals.ccsData);
 		
 		//System.out.println("UiGlobals.ccsData: "+UiGlobals.ccsData);
 		computeCo2();
@@ -150,12 +153,27 @@ public class NodeRenderManager {
 		
 	}
 	
+	public void makeConnection(int connectType){
+		UiGlobals.loadNodeSnapshot(CCSStatics.STATE_BEFORE_CONNECT);
+		
+		computeCostAll(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_EXTREME);
+		
+		if(connectType == CCSStatics.CONNECT_TYPE_STAR)
+			makeStarCon(UiGlobals.ccsData);
+		else if(connectType == CCSStatics.CONNECT_TYPE_TREE)
+			makeTreeCon(UiGlobals.ccsData);
+		else if(connectType == CCSStatics.CONNECT_TYPE_BACKBONE)
+			makeBackboneCon(UiGlobals.ccsData);
+		else if(connectType == CCSStatics.CONNECT_TYPE_HYBRID)
+			makeHybridCon(UiGlobals.ccsData);
+	}
+	
 	public void computeCostAll(int costType){
 		computeCostAll(costType, 0);
 	}
 	
 	public void computeCostAll(int costType, int co2Type){
-		List<CCSSourceData> hubfNodes = UiGlobals.getPlantNodes();
+		List<CCSSourceData> hubfNodes = UiGlobals.getHubNodes();
 		
 		for(CCSSourceData hub : hubfNodes){
 			if(co2Type == 0){
@@ -483,6 +501,184 @@ public class NodeRenderManager {
 		frame.setSize( 800, 500 ); 
 	}
 	
+	public void computeHubCostExpExperiment(){
+		
+		JTabbedPane hubCostTab = new JTabbedPane();
+		
+		for(int costMeasureType = 1 ; costMeasureType <= 6 ; costMeasureType++){
+			
+			
+			Vector<Vector> tableAll = new Vector<Vector>();
+			Map<Integer, Integer> hubLocationInVectorMap = new HashMap<Integer, Integer>();
+			
+			//Initializing
+			List<Integer> hubList = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
+			
+			for(Integer hubIndex : hubList){
+				CCSHubData hub = (CCSHubData) UiGlobals.getNode(hubIndex);
+				
+				hubLocationInVectorMap.put(hub.getIndex(), tableAll.size());
+				
+				Vector rowEx = new Vector();
+				rowEx.add(hub.getIndex());
+				rowEx.add(CCSStatics.co2StateString.get(CCSStatics.CO2_STATE_EXTREME));
+				rowEx.add("");
+				rowEx.add("");
+				rowEx.add("");
+				rowEx.add("");
+				
+				tableAll.add(rowEx);
+				
+				Vector rowHi = new Vector();
+				rowHi.add("");
+				rowHi.add(CCSStatics.co2StateString.get(CCSStatics.CO2_STATE_HIGH));
+				rowHi.add("");
+				rowHi.add("");
+				rowHi.add("");
+				rowHi.add("");
+				
+				tableAll.add(rowHi);
+				
+				Vector rowLo = new Vector();
+				rowLo.add("");
+				rowLo.add(CCSStatics.co2StateString.get(CCSStatics.CO2_STATE_LOW));
+				rowLo.add("");
+				rowLo.add("");
+				rowLo.add("");
+				rowLo.add("");
+				
+				tableAll.add(rowLo);
+			}
+			
+			//Experiment
+			for(int co2Type = 1 ; co2Type <= 3 ; co2Type++){
+			
+				for(int connType = 1 ; connType <= 1 ; connType++){
+					makeConnection(connType);
+					
+					System.out.println("<<<COMPUTE COST "+CCSStatics.co2StateString.get(co2Type)+", "+CCSStatics.connectTypeString.get(connType));
+					computeCostAll(costMeasureType, co2Type);
+					//Recording
+					
+					for(Integer hubIndex : hubList){
+						CCSHubData hub = (CCSHubData) UiGlobals.getNode(hubIndex);
+						
+						Vector curRow = tableAll.get(hubLocationInVectorMap.get(hub.getIndex())+co2Type-1);
+						curRow.set(connType+1, hub.getCost());
+					}
+				}
+				
+				for(int connType = 2 ; connType <= 2 ; connType++){
+					makeConnection(connType);
+					
+					System.out.println("<<<COMPUTE COST "+CCSStatics.co2StateString.get(co2Type)+", "+CCSStatics.connectTypeString.get(connType));
+					computeCostAll(costMeasureType, co2Type);
+					//Recording
+					
+					for(Integer hubIndex : hubList){
+						CCSHubData hub = (CCSHubData) UiGlobals.getNode(hubIndex);
+						
+						Vector curRow = tableAll.get(hubLocationInVectorMap.get(hub.getIndex())+co2Type-1);
+						curRow.set(connType+1, hub.getCost());
+					}
+				}
+				
+				for(int connType = 3 ; connType <= 3 ; connType++){
+					makeConnection(connType);
+					
+					System.out.println("<<<COMPUTE COST "+CCSStatics.co2StateString.get(co2Type)+", "+CCSStatics.connectTypeString.get(connType));
+					computeCostAll(costMeasureType, co2Type);
+					//Recording
+					
+					for(Integer hubIndex : hubList){
+						CCSHubData hub = (CCSHubData) UiGlobals.getNode(hubIndex);
+						
+						Vector curRow = tableAll.get(hubLocationInVectorMap.get(hub.getIndex())+co2Type-1);
+						curRow.set(connType+1, hub.getCost());
+					}
+				}
+				
+				for(int connType = 4 ; connType <= 4 ; connType++){
+					makeConnection(connType);
+					
+					System.out.println("<<<COMPUTE COST "+CCSStatics.co2StateString.get(co2Type)+", "+CCSStatics.connectTypeString.get(connType));
+					computeCostAll(costMeasureType, co2Type);
+					//Recording
+					
+					for(Integer hubIndex : hubList){
+						CCSHubData hub = (CCSHubData) UiGlobals.getNode(hubIndex);
+						
+						Vector curRow = tableAll.get(hubLocationInVectorMap.get(hub.getIndex())+co2Type-1);
+						curRow.set(connType+1, hub.getCost());
+					}
+				}
+				
+			}
+			
+			
+			
+			Vector<String> columnNames = new Vector<String>();
+	 	    columnNames.addElement("ID");
+	 	    columnNames.addElement("CO2_STATE");
+	 	    columnNames.addElement(CCSStatics.connectTypeString.get(CCSStatics.CONNECT_TYPE_STAR));
+	 	    columnNames.addElement(CCSStatics.connectTypeString.get(CCSStatics.CONNECT_TYPE_TREE));
+	 	    columnNames.addElement(CCSStatics.connectTypeString.get(CCSStatics.CONNECT_TYPE_BACKBONE));
+	 	    columnNames.addElement(CCSStatics.connectTypeString.get(CCSStatics.CONNECT_TYPE_HYBRID));
+	 	    
+	 	    MyTableModel mm = new MyTableModel();
+		    mm.setData(tableAll);
+		    mm.setColumnNames(columnNames);
+
+		    JTable table = new JTable(mm)
+		    {
+				 @Override
+				   public TableCellRenderer getCellRenderer(int row, int column) {
+				    // TODO Auto-generated method stub
+				    return new CustomCellRenderer();
+				   }
+			};
+
+		    
+		    table.setAutoCreateRowSorter(true);
+		    table.setRowSelectionAllowed(true);
+		    table.setColumnSelectionAllowed(false);
+		    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		    table.getSelectionModel().addListSelectionListener(new RowListener().init(table));
+		    
+		    TableColumnModel cm = table.getColumnModel();
+		    
+		    cm.getColumn(0).setPreferredWidth(100);
+
+
+		    
+		    table.getTableHeader().setForeground(Color.white);
+		    table.getTableHeader().setBackground(CustomCellRenderer.headerBG);
+
+		    
+		    JScrollPane costPanel = new JScrollPane(table);
+			
+			
+			hubCostTab.add(CCSStatics.getCostTypeString(costMeasureType), costPanel);
+		}
+		
+		JPanel m = new JPanel();
+		m.setLayout(new BorderLayout());
+		m.add("Center", hubCostTab);
+		
+
+		
+		JFrame frame = new JFrame("Hub Cost Result Table");
+			    
+		frame.getContentPane().add( m );
+		frame.setVisible(true);
+		frame.setSize( 1024, 500 ); 
+		
+	}
+	
+	public void computePlantCostExpExperiment(){
+		
+	}
+	
 	public List<CCSEdgeData> makeNaiveCon(
 			Map<Integer, List<CCSSourceData>> ccsData) {
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
@@ -550,6 +746,7 @@ public class NodeRenderManager {
 			//System.out.println("minDist: "+minDist+",minRankHub.getRange(): "+minRankHub.getRange());
 			if (minDist <= minRankHub.getRange()) {
 				curSrc.setClusterHub(minRankHub);
+				minRankHub.getClusterSources().clear();
 			}
 		}
 
@@ -637,7 +834,7 @@ public class NodeRenderManager {
 			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
 			for(int i = 0 ; i < hubList.size() ; i++){
 				CCSHubData hubData = (CCSHubData) UiGlobals.getNode(hubList.get(i));
-				System.out.println("11kkk:"+hubData.getIndex()+", children:"+hubData.getChildSources());
+				//System.out.println("11kkk:"+hubData.getIndex()+", children:"+hubData.getChildSources());
 			}
 		}
 		
@@ -654,7 +851,7 @@ public class NodeRenderManager {
 			List<Integer> hubList = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
 			for(int i = 0 ; i < hubList.size() ; i++){
 				CCSHubData hubData = (CCSHubData) UiGlobals.getNode(hubList.get(i));
-				System.out.println("22kkk:"+hubData.getIndex()+", children:"+hubData.getChildSources());
+				//System.out.println("22kkk:"+hubData.getIndex()+", children:"+hubData.getChildSources());
 			}
 		}
 
@@ -666,6 +863,7 @@ public class NodeRenderManager {
 
 	public List<CCSEdgeData> makeTreeCon(
 			Map<Integer, List<Integer>> ccsDataParam) {
+		
 		Map<Integer, List<Integer>> ccsData = Clustering(ccsDataParam);
 
 		List<CCSEdgeData> ccsConData = new ArrayList<CCSEdgeData>();
@@ -710,6 +908,8 @@ public class NodeRenderManager {
 				connedtedList.add(minDistSrc.getIndex());
 				
 			}
+			
+			System.out.println("curHub children:"+curHub.getChildSources());
 		}
 		
 		{
