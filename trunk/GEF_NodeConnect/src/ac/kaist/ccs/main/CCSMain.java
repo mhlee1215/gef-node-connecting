@@ -369,11 +369,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		if(stageUntil >= 2 || stageSpecific == 2){
 			UiGlobals.loadNodeSnapshot(CCSStatics.STATE_CO2_ALLOCATED);
 			
-			int isolatedSourceCost = 100;
+			double isolatedSourceCost = 1000000000000.0;
 			boolean isShowReports = false;
 			
 			if(params != null && params.get("isolatedSourceCost") != null){
-				isolatedSourceCost = Integer.parseInt(params.get("isolatedSourceCost"));
+				isolatedSourceCost = Double.parseDouble(params.get("isolatedSourceCost"));
 			}
 			
 			if(params != null && params.get("isShowReports") != null){
@@ -397,15 +397,15 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			List<Double> coverageList = getCoverage(hubIndexList);
 			List<Double> coverageAmountList = getCoverageAmount(hubIndexList);
 			
-			UiGlobals.loadNodeSnapshot(CCSStatics.STATE_CO2_ALLOCATED);
+			//UiGlobals.loadNodeSnapshot(CCSStatics.STATE_CO2_ALLOCATED);
 			
 			int hubSize = 0;
 			while(hubSize == 0){
 				try{
-					String response = JOptionPane.showInputDialog(null,
+					String response = (String) JOptionPane.showInputDialog(null,
 			                "The number of hub size ..",
 			                "Enter hub property",
-			                JOptionPane.QUESTION_MESSAGE);
+			                JOptionPane.QUESTION_MESSAGE, null, null, "10");
 					hubSize = Integer.parseInt(response);
 				}catch(Exception e){
 					
@@ -419,6 +419,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			Map<Integer, List<Double> > totalCostList = new HashMap<Integer, List<Double>>();
 			int hubCnt = 1;
 			for(Integer hub_cnt : hubIndexList){
+				System.out.println("++++getHubSelectionSources: "+UiGlobals.getNode(hub_cnt).getHubSelectionSources());
 				if(hubCnt > hubSize) break;
 				//Actual hub selection for cost simulation.
 				selectHubNode(hub_cnt);
@@ -605,7 +606,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		int curentCoverNodeNum = 0;
 		for(int index : hubIndexList){
 			CCSSourceData sData = UiGlobals.getNode(index);
-			curentCoverNodeNum += sData.getChildSources().size();
+			curentCoverNodeNum += sData.getHubSelectionSources().size();
 			coverage.add(100*curentCoverNodeNum / (double) total );
 		}
 		
@@ -658,7 +659,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		for(int hubCandidateIndex : hubCandidateData){
 			CCSSourceData hCandidateData = UiGlobals.getNode(hubCandidateIndex);
-			hCandidateData.getChildSources().clear();
+			hCandidateData.getHubSelectionSources().clear();
 		}
 		
 		System.out.println("hubCandidateData: "+hubCandidateData);
@@ -675,7 +676,9 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				
 				if(sData.isValid() && !sData.isHubCandidate() && CCSUtils.dist(sData, hCandidateData) < (CCSStatics.HUB_SELECTION_RANGE / CCSStatics.pixelToDistance)){
 					System.out.println("hCandidate("+hCandidateData.getIndex()+") added children ("+sData.getIndex()+")");
-					hCandidateData.addChildSource(sData.getIndex());
+					//hCandidateData.addChildSource(sData.getIndex());
+					hCandidateData.getHubSelectionSources().add(sData.getIndex());
+			
 					sData.addOutgoingHub(hCandidateData.getIndex());
 				}
 			}
@@ -691,7 +694,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			Vector row = new Vector();
 			row.add(hubCandidateIndex);
 			row.add(s_sel);
-			row.add(hCandidateData.getChildSources().size());
+			row.add(hCandidateData.getHubSelectionSources().size());
 			row.add(hCandidateData.getAcc_co2_amount());
 			
 			nodesSortByS_sel.add(new SortTuple(s_sel, hCandidateData.getIndex(), row));
@@ -714,6 +717,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		return tableContent;
 	}
 	
+	//허브 선택을 위한 분석과정의 하나로 선택함. 분석용이며, 실제로 만들어 지는 단계와는 다름
 	public void createHubNode(int hub_cnt){
 		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
 		
@@ -721,10 +725,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		//curHubCandidate.setValid(false);
 		hubCandidateData.remove((Integer)hub_cnt);
 		
-		for(int childIndex : curHubCandidate.getChildSources()){
+		for(int childIndex : curHubCandidate.getHubSelectionSources()){
 			CCSSourceData sData = UiGlobals.getNode(childIndex);
-			sData.setDistanceToDst((float) CCSUtils.dist(sData, curHubCandidate));
-			sData.setDst(hub_cnt);
+			//sData.setDistanceToDst((float) CCSUtils.dist(sData, curHubCandidate));
+			System.out.println("set seelction hub :"+hub_cnt);
+			sData.setSelectionHub(hub_cnt);
 			sData.setValid(false);
 		}
 	}
@@ -735,12 +740,12 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		Vector<Vector> tableContentAll = new Vector<Vector>();
 		for(Integer index : hubIndexList){
 			CCSSourceData toBeHub = UiGlobals.getNode(index);
-			toBeHub.computeHubCost(CCSStatics.COST_TYPE_1, CCSStatics.CO2_STATE_EXTREME);
-			//System.out.println(">>>>>>"+toBeHub.getChildSources());
+			toBeHub.computeHubCost(CCSStatics.COST_TYPE_THE_OGDEN_MODELS, CCSStatics.CO2_STATE_EXTREME);
+			System.out.println(">>>>>>"+toBeHub.getHubSelectionSources());
 			
-			for(int i = 0 ; i < toBeHub.getChildSources().size() ; i++){
+			for(int i = 0 ; i < toBeHub.getHubSelectionSources().size() ; i++){
 				Vector row = new Vector();
-				int sIndex = toBeHub.getChildSources().get(i);
+				int sIndex = toBeHub.getHubSelectionSources().get(i);
 				CCSSourceData sData = UiGlobals.getNode(sIndex);
 				if(i == 0){
 					row.add(index);
@@ -761,7 +766,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 				row.add("Node "+sData.getIndex());
 				row.add(sData.getX()+", "+sData.getY());
 				row.add(sData.getIndustry_typeString());
-				row.add(sData.getDistanceToDstKM());
+				row.add(sData.getDistanceToSelectionHubKM());
 				row.add(sData.getCo2_amount());
 				row.add(sData.getExpData().getPipe_diameter());
 				tableContentAll.add(row);	
@@ -828,10 +833,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 	}
 	
-	public double computeHubCostAll(int costType, int co2Type, int isolatedSourceCost){
+	public double computeHubCostAll(int costType, int co2Type, double isolatedSourceCost){
 		List<Integer> hubNodes = UiGlobals.ccsData.get(CCSSourceData.TYPE_HUB);
 		
 		double totalCost = 0.0;
+		List<Integer> sourceComputed = new ArrayList<Integer>();
 		
 		for(Integer index : hubNodes){
 			//List<CCSSourceData> hubfNodes = UiGlobals.getHubNodes();
@@ -843,16 +849,28 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			}else{
 				totalCost += hubNode.computeCost(costType, co2Type);
 			}
+			
+			sourceComputed.addAll(hubNode.getHubSelectionSources());
+			
+			//System.out.println("sourceComputed: "+sourceComputed);
+			//System.out.println("hubNode.getHubSelectionSources(): "+hubNode.getHubSelectionSources());
 		}
 		
+		System.out.println("sourceComputed("+sourceComputed.size()+"): "+sourceComputed);
 		
 		List<Integer> sourceNodes = UiGlobals.ccsData.get(CCSSourceData.TYPE_SOURCE);
+		int isolatedCnt = 0;
 		for(Integer index : sourceNodes){
-			CCSSourceData src = UiGlobals.getNode(index);
-			if(src.getDst() == null){
+			//어떠한 허브에도 속하지 않은 경우..
+			if(!sourceComputed.contains(index)){
+				CCSSourceData src = UiGlobals.getNode(index);
+			//if(!(UiGlobals.getNode(src.getSelectionHub()) instanceof CCSHubData)){
+			//if(src.isValid()){	
 				totalCost += isolatedSourceCost * src.getCo2_amount() + src.getOpenCost();
+				isolatedCnt++;
 			}
 		}
+		System.out.println("isolatedCnt: "+isolatedCnt);
 		
 		return totalCost;
 	}
@@ -869,8 +887,8 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			row.add(data.getCo2_amount());
 			row.add(data.getIndustry_typeString());
 			
-			if(data.getDst() != null)
-				row.add(data.getDistanceToDstKM());
+			if(data.getSelectionHub() != null)
+				row.add(data.getDistanceToSelectionHubKM());
 			else
 				row.add("Not Connected");
 			
@@ -1043,6 +1061,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		}
 	}
 	
+	//실제로 허브를 만드는 단계. 
 	public void selectHubNode(Integer hubIndex){
 		List<Integer> hubCandidateData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB_CANDIDATE);
 		List<Integer> hubData = UiGlobals.ccsData.get(CCSNodeData.TYPE_HUB);
@@ -1050,13 +1069,22 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		
 		CCSSourceData curSrc = UiGlobals.getNode(hubIndex);
 		int range = (int) (60 / CCSStatics.kilometerToMile / CCSStatics.pixelToDistance);
-		System.out.println("range : "+(60 / CCSStatics.kilometerToMile));
+		//System.out.println("range : "+(60 / CCSStatics.kilometerToMile));
+		//System.out.println("children at hubselection : "+curSrc.getHubSelectionSources());
+		
+		for(Integer hubSelectionSource : curSrc.getHubSelectionSources()){
+			CCSSourceData s = UiGlobals.getNode(hubSelectionSource);
+			s.setSelectionHub(curSrc.getIndex());
+		}
+		
 		curSrc = new CCSHubData(curSrc, range);
 		UiGlobals.setNode(curSrc);
 		hubData.add(curSrc.getIndex());
 		sourceData.remove(curSrc.getIndex());
+		
+		
 		hubCandidateData.remove((Integer)hubIndex);
-		System.out.println("hubCandidateData :"+hubCandidateData);
+		//System.out.println("hubCandidateData :"+hubCandidateData);
 	}
 
 	public int cvtLoc(int loc) {
@@ -1477,6 +1505,28 @@ public class CCSMain extends JApplet implements ModeChangeListener {
             public void actionPerformed(ActionEvent e) {
                 //JOptionPane.showMessageDialog(jMenuItem, "Successfully pressed a menu item");
             	UiGlobals.getNodeRenderManager().computeDiameterExperiment();
+            }
+        });
+		
+		JMenuItem hubCostExp = new JMenuItem("HubCost Experimnet");
+		experiment.add(hubCostExp);
+		hubCostExp.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //JOptionPane.showMessageDialog(jMenuItem, "Successfully pressed a menu item");
+            	UiGlobals.getNodeRenderManager().computeHubCostExpExperiment();
+            }
+        });
+		
+		JMenuItem plantCostExp = new JMenuItem("PlantCost Experimnet");
+		experiment.add(plantCostExp);
+		plantCostExp.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //JOptionPane.showMessageDialog(jMenuItem, "Successfully pressed a menu item");
+            	UiGlobals.getNodeRenderManager().computePlantCostExpExperiment();
             }
         });
 		

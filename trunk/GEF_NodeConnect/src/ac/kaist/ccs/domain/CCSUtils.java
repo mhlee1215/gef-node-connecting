@@ -2,6 +2,8 @@ package ac.kaist.ccs.domain;
 
 import java.util.Comparator;
 
+import ac.kaist.ccs.base.UiGlobals;
+
 public class CCSUtils {
 	public static double dist(CCSSourceData src1, CCSSourceData src2) {
 		double dist = 0;
@@ -11,6 +13,10 @@ public class CCSUtils {
 				* (src1.getY() - src2.getY()));
 
 		return dist;
+	}
+	
+	public static double dist(int src1, int src2) {
+		return dist(UiGlobals.getNode(src1), UiGlobals.getNode(src2));
 	}
 	
 	public static class NodePair {

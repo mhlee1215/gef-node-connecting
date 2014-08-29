@@ -57,6 +57,7 @@ public class CCSPlantData extends CCSSourceData {
 	public CCSPlantData clone(){
 		CCSPlantData clone = new CCSPlantData(x, y, nameKey, capacity, geo_info);
 		clone.setIndex(index);
+		clone.setChildSources(new ArrayList<Integer>(childSources));
 		return clone;
 	}
 	
