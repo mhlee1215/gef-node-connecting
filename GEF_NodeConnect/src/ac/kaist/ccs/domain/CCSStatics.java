@@ -198,9 +198,9 @@ public class CCSStatics {
 		geoInfoStringMap.put(GEO_INFO_EOR, "EOR");
 		
 		co2StateMap = new HashMap<Integer, CO2StateData>();
-		co2StateMap.put(CO2_STATE_EXTREME, new CO2StateData(6.16E-05, 745.5, 14f, 40, 4));
-		co2StateMap.put(CO2_STATE_HIGH, new CO2StateData(9.93E-05, 904.9, 8.5f, 10, 2));
-		co2StateMap.put(CO2_STATE_LOW, new CO2StateData(1.17E-04, 964.5, 6.5f, -20, 1));
+		co2StateMap.put(CO2_STATE_EXTREME, new CO2StateData(6.16E-05, 745.5, 7.3f, 14f, 40, 4));
+		co2StateMap.put(CO2_STATE_HIGH, new CO2StateData(9.93E-05, 904.9, 4.5f, 8.5f, 10, 2));
+		co2StateMap.put(CO2_STATE_LOW, new CO2StateData(1.17E-04, 964.5, 1.9f, 6.5f, -20, 1));
 	
 		storageMap = new HashMap<Integer, StorageData>();
 		storageMap.put(STORAGE_ONSHORE_CHUNGNAM, new StorageData(110, 330, 10, GEO_INFO_COALBED));
@@ -518,13 +518,15 @@ public class CCSStatics {
 	public static class CO2StateData{
 		public double mu;
 		public double lou;
+		public double p_inlet;
 		public double p_outlet;
 		public int num_pumpstation;
 		public double temperature;
 		
-		public CO2StateData(double mu, double lou, double p_outlet, int num_pumpstation, double temperature){
+		public CO2StateData(double mu, double lou, double p_outlet, double p_inlet, int num_pumpstation, double temperature){
 			this.mu = mu;
 			this.lou = lou;
+			this.p_inlet = p_inlet;
 			this.p_outlet = p_outlet;
 			this.num_pumpstation = num_pumpstation;
 			this.temperature = temperature;

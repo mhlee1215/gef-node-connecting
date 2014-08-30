@@ -270,7 +270,8 @@ public class CCSSourceData extends CCSNodeData {
 	}
 
 	public CCSSourceData getClusterHub() {
-		return UiGlobals.getNode(clusterHub);
+		if(clusterHub == null) return null;
+		else return UiGlobals.getNode(clusterHub);
 	}
 
 	public void setClusterHub(CCSSourceData clusterHub) {
@@ -474,9 +475,7 @@ public class CCSSourceData extends CCSNodeData {
 			//double D = Math.pow((5084.5*L *f*m*m) / (co2Data.p_outlet*co2Data.p_outlet-1), 0.2);
 			//System.out.println("denominator : "+(CCSStatics.p_initial*CCSStatics.p_initial-co2Data.p_outlet*co2Data.p_outlet));
 			//System.out.println("all : "+(55661.6*L*m*m) / (CCSStatics.p_initial*CCSStatics.p_initial-co2Data.p_outlet*co2Data.p_outlet));
-			double denom = (CCSStatics.p_initial*CCSStatics.p_initial-co2Data.p_outlet*co2Data.p_outlet);
-			//temporal.
-			denom = Math.abs(denom);
+			double denom = (co2Data.p_inlet*co2Data.p_inlet-co2Data.p_outlet*co2Data.p_outlet);
 			double D = Math.pow((55661.6*L*m*m) / denom, 0.2);
 			D *= CCSStatics.COST_TYPE_1_TEMP_SCALE;
 			//this.pipelineCost = childCost + Math.pow((m / 1600), 0.48) * Math.pow((L / 100), 0.24) * 0.15 * L;
@@ -485,7 +484,7 @@ public class CCSSourceData extends CCSNodeData {
 		}
 		//Method 2
 		else if(costType == CCSStatics.COST_TYPE_MIT_MODEL){
-			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet);
+			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet, co2Data.p_inlet);
 			D *= CCSStatics.COST_TYPE_2_TEMP_SCALE;
 			this.pipelineCost = childCost + (20989 * D * L * 0.15) + 3100*L;
 			this.pipe_diameter = D;
@@ -493,7 +492,7 @@ public class CCSSourceData extends CCSNodeData {
 		//Method 3
 		else if(costType == CCSStatics.COST_TYPE_ECOFYS_MODEL){
 			//double D = Math.pow((1.155*m*m*L)/((co2Data.p_outlet - 1)*co2Data.lou), 0.2);
-			double D = Math.pow((1245*m*m*L)/((CCSStatics.p_initial-co2Data.p_outlet)*co2Data.lou), 0.2);
+			double D = Math.pow((1245*m*m*L)/((co2Data.p_inlet-co2Data.p_outlet)*co2Data.lou), 0.2);
 			D *= CCSStatics.COST_TYPE_3_TEMP_SCALE;
 			this.pipelineCost = childCost + 3294.0 * D * L;
 			this.pipe_diameter = D;
@@ -501,7 +500,7 @@ public class CCSSourceData extends CCSNodeData {
 		//Method 4
 		else if(costType == CCSStatics.COST_TYPE_IEA_GHG_PH4_6){
 			//double D = Math.pow((L*co2Data.lou*m*m) / (25041*(co2Data.p_outlet - 1)), 0.2);
-			double D = Math.pow((L*co2Data.lou*m*m) / (23506*(CCSStatics.p_initial - co2Data.p_outlet)), 0.2);
+			double D = Math.pow((L*co2Data.lou*m*m) / (23506*(co2Data.p_inlet - co2Data.p_outlet)), 0.2);
 			D *= CCSStatics.COST_TYPE_4_TEMP_SCALE;
 			double capitalCost = Math.pow(10, 6) * ((0.057 * L + 1.8663) + (0.00129 * L)*D + (0.000486 * L + 0.000007) * D*D );
 			double annualPipelineOMCost = 144000 + 0.61*(23213 * D + 899 * L - 259269) + 0.7*(39305 * D + 1694*L - 351355);
@@ -533,7 +532,7 @@ public class CCSSourceData extends CCSNodeData {
 		return pipelineCost;
 	}
 	
-	public double getConvergedDiameter(double m, double L, double lou, double mu, double p_outlet){
+	public double getConvergedDiameter(double m, double L, double lou, double mu, double p_outlet, double p_inlet){
 		double Dc = 0;
 		double D = 10;
 //		 float lou = 10;
@@ -549,7 +548,7 @@ public class CCSSourceData extends CCSNodeData {
 					 Math.pow(
 							 (32*F_f*m*m)*(
 									 (Math.pow((1000 / (double)(24*3600)), 2))/
-									 (Math.PI*Math.PI*lou*((p_outlet - 1) / L)*(Math.pow(10, 6)/1000)))
+									 (Math.PI*Math.PI*lou*((p_inlet - p_outlet) / L)*(Math.pow(10, 6)/1000)))
 					 , 0.2);
 			 //System.out.println("D:"+D+", RE:"+Re+", F_f:"+F_f);
 			 //System.out.println((Math.pow((1000 / (double)(24*3600)), 2)));
