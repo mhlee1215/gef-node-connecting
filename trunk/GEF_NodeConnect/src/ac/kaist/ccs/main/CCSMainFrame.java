@@ -121,10 +121,11 @@ import ac.kaist.ccs.ui.NodePaletteFig;
 import ac.kaist.ccs.ui.NodeRenderManager;
 import ac.kaist.ccs.ui.ResizerPaletteFig;
 import ac.kaist.ccs.ui.WestToolBar;
+import ac.kaist.ccs.utils.ExcelExporter;
 import ac.kaist.ccs.domain.CCSUtils.*;
 import ac.kaist.ccs.fig.FigCCSNode;
 
-public class CCSMain extends JApplet implements ModeChangeListener {
+public class CCSMainFrame extends JFrame implements ModeChangeListener {
 
 	
 	public static final int _PADDING = 100;
@@ -165,7 +166,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	JMenu showConnection = null;
 	
 
-	public CCSMain() throws Exception {
+	public CCSMainFrame() throws Exception {
 		Localizer.addResource("GefBase",
 				"org.tigris.gef.base.BaseResourceBundle");
 		Localizer.addResource("GefPres",
@@ -208,51 +209,51 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		}
 
 		// UiGlobals.set_curApplet(this);
-		UiGlobals.setApplet(this);
+		//UiGlobals.setApplet(this);
 
 	}
 
-	private void initParam() {
-		if (getParameter("prescaled") == null)
-			pre_scaled = 1;
-		else
-			pre_scaled = Integer.parseInt(getParameter("prescaled"));
-
-		if (getParameter("isusetargetconversion") == null)
-			UiGlobals.setUseTargetConversion(false);
-		else {
-			if ("Y".equals(getParameter("isusetargetconversion"))
-					|| "1".equals(getParameter("isusetargetconversion")))
-				UiGlobals.setUseTargetConversion(true);
-			else
-				UiGlobals.setUseTargetConversion(false);
-		}
-
-		if (this.getParameter("tocolumn") != null)
-			UiGlobals.setTargetColumnName(this.getParameter("tocolumn"));
-		else
-			UiGlobals.setTargetColumnName("");
-
-		// UiGlobals.setPre_scaled(pre_scaled);
-		UiGlobals.setFileName(this.getParameter("fileName"));
-		UiGlobals
-				.setAnnotationFileName(this.getParameter("annotationFileName"));
-
-		String isExample = this.getParameter("isExample");
-		if (isExample == null)
-			isExample = "N";
-		UiGlobals.setIsExample(isExample);
-		UiGlobals.setExampleType(this.getParameter("type"));
-
-		System.out.println("===PARAMETER INFO===");
-		System.out.println("isUseConversion: "
-				+ UiGlobals.isUseTargetConversion());
-		System.out.println("fileName: " + UiGlobals.getFileName());
-		System.out.println("annotationFileName: "
-				+ UiGlobals.getAnnotationFileName());
-		System.out.println("tocolumn: " + this.getParameter("tocolumn"));
-		System.out.println("===PARAMETER INFO END===");
-	}
+//	private void initParam() {
+//		if (getParameter("prescaled") == null)
+//			pre_scaled = 1;
+//		else
+//			pre_scaled = Integer.parseInt(getParameter("prescaled"));
+//
+//		if (getParameter("isusetargetconversion") == null)
+//			UiGlobals.setUseTargetConversion(false);
+//		else {
+//			if ("Y".equals(getParameter("isusetargetconversion"))
+//					|| "1".equals(getParameter("isusetargetconversion")))
+//				UiGlobals.setUseTargetConversion(true);
+//			else
+//				UiGlobals.setUseTargetConversion(false);
+//		}
+//
+//		if (this.getParameter("tocolumn") != null)
+//			UiGlobals.setTargetColumnName(this.getParameter("tocolumn"));
+//		else
+//			UiGlobals.setTargetColumnName("");
+//
+//		// UiGlobals.setPre_scaled(pre_scaled);
+//		UiGlobals.setFileName(this.getParameter("fileName"));
+//		UiGlobals
+//				.setAnnotationFileName(this.getParameter("annotationFileName"));
+//
+//		String isExample = this.getParameter("isExample");
+//		if (isExample == null)
+//			isExample = "N";
+//		UiGlobals.setIsExample(isExample);
+//		UiGlobals.setExampleType(this.getParameter("type"));
+//
+//		System.out.println("===PARAMETER INFO===");
+//		System.out.println("isUseConversion: "
+//				+ UiGlobals.isUseTargetConversion());
+//		System.out.println("fileName: " + UiGlobals.getFileName());
+//		System.out.println("annotationFileName: "
+//				+ UiGlobals.getAnnotationFileName());
+//		System.out.println("tocolumn: " + this.getParameter("tocolumn"));
+//		System.out.println("===PARAMETER INFO END===");
+//	}
 
 	private void jbInit() throws Exception {
 
@@ -276,11 +277,11 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		System.out.println("heapFreeSize: " + heapFreeSize / mega + "MB");
 		System.out.println("===VM INFO=END===");
 
-		try {
-			System.out.println("this.getCodeBase() : " + this.getCodeBase());
-		} catch (Exception e) {
-			System.out.println("Executed in local!");
-		}
+//		try {
+//			System.out.println("this.getCodeBase() : " + this.getCodeBase());
+//		} catch (Exception e) {
+//			System.out.println("Executed in local!");
+//		}
 
 		
 		UiGlobals.saveNodeSnapshot(CCSStatics.STATE_INITIAL);
@@ -569,77 +570,42 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 			m.add("Center", scroll);
 			
 			JPanel buttonPanel = new JPanel();
+			buttonPanel.setLayout(new BorderLayout());
 			JButton exportButton = new JButton("Export");
 			exportButton.addActionListener(new ActionListener() {
+				JTable table;
+				
+				public ActionListener init(JTable table){
+					this.table = table;
+					return this;
+				}
+				
 	            @Override
 	            public void actionPerformed(ActionEvent event) {
+	            	JFileChooser fileChooser = new JFileChooser();
 	            	
-	            	
-	            	Calendar cal = Calendar.getInstance();
-	                String filename = "cost_result_table";//_"+String.format("%04d%02d%02d%02d%02d%02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
-	                filename += ".csv";
+	                fileChooser.setCurrentDirectory(new File("/Users/mac/Desktop"));
 	                
-	                //String result = gridData.generateData();
-	                String result = "";//gridData.generateDataSquare();
+	                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
 	                
 	                
-	                result = "1, 2, 3, 4, 5";
-	                System.out.println("filename : "+filename);
-	                System.out.println(result);
+	                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
 	                
-	                //Attach Filename on top of reuslt file.
-	                result = filename+"\n"+result;
-	                
-	                byte[] data = result.getBytes();
-	        		
-	        		ByteArrayInputStream bis = new ByteArrayInputStream(data);
-	        		System.out.println(data);
-	        		
-	        		
-	        		
-	        		String url = UiGlobals.getApplet().getCodeBase().toString() + "coordinator/writeGridData.jsp";
-	        		//String url = "http://localhost:8080/coordinator/writeImage.jsp";
-	        		HttpClient httpClient = new HttpClient();
-	        		System.out.println("code base to Write : "+url);
-	        		PostMethod postMethod = new PostMethod(url);
-	        		
-	        		//System.out.println("send filename : "+filename);
-	        		postMethod.setRequestEntity(new InputStreamRequestEntity(bis));
-	        		
-	        		try{
-	        			//Execute
-	        			httpClient.executeMethod(postMethod);
-	        			
-	        			System.out.println(postMethod.getResponseBody());
-	        		}catch(Exception e){
-	        			e.printStackTrace();
-	        		}
-	        		
-	        		String[] params = {filename}; 
-	                CallJSObject jsObject = new CallJSObject("callGridDownloader", params, UiGlobals.getApplet());
-	                Thread thread = new Thread(jsObject);
-	                thread.run();
-	            	
-	            	
-	            	
-	            	
-//	            	JFileChooser fileChooser = new JFileChooser();
-//	            	
-//	            	 /* Enabling Multiple Selection */
-//	                //fileChooser.setMultiSelectionEnabled(true);
-//
-//	                /* Setting Current Directory */
-//	                fileChooser.setCurrentDirectory(new File("E:/ext_work/respace/workspace/CTS_analysis/input"));
-//	                
-//	                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
-//	                
-//	                //JFrame parent = new MenuMain();
-//	                
-//	                
-//	                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+	                if(returnVal == JFileChooser.APPROVE_OPTION) {
+	                    String inputPath = fileChooser.getSelectedFile().getAbsolutePath();
+	                    if(!inputPath.endsWith(".xls"))
+	                    	inputPath = inputPath + ".xls";
+
+	                    if(ExcelExporter.fillData(table, inputPath) == ExcelExporter.SUCCESS){
+	                    	JOptionPane.showMessageDialog(null, "Successfully saved at "+inputPath);
+	                    }else{
+	                    	JOptionPane.showMessageDialog(null, "Fail to save data.");
+	                    }
+	                }
 	            }
-			});
-			buttonPanel.add(exportButton);
+			}.init(table));
+			
+			buttonPanel.add("East", exportButton);
 			
 			m.add("South", buttonPanel);
 
@@ -881,6 +847,49 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		m.setLayout(new BorderLayout());
 		m.add("Center", scroll);
 		
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
+		JButton exportButton = new JButton("Export");
+		exportButton.addActionListener(new ActionListener() {
+			JTable table;
+			
+			public ActionListener init(JTable table){
+				this.table = table;
+				return this;
+			}
+			
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	JFileChooser fileChooser = new JFileChooser();
+            	
+                fileChooser.setCurrentDirectory(new File("/Users/mac/Desktop"));
+                
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
+                
+                
+                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+                
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    String inputPath = fileChooser.getSelectedFile().getAbsolutePath();
+                    if(!inputPath.endsWith(".xls"))
+                    	inputPath = inputPath + ".xls";
+
+                    if(ExcelExporter.fillData(table, inputPath) == ExcelExporter.SUCCESS){
+                    	JOptionPane.showMessageDialog(null, "Successfully saved at "+inputPath);
+                    }else{
+                    	JOptionPane.showMessageDialog(null, "Fail to save data.");
+                    }
+                }
+            }
+		}.init(table));
+		
+		buttonPanel.add("East", exportButton);
+		
+		m.add("South", buttonPanel);
+		
+		
+		
 		JFrame frame = new JFrame("Hub&Source Info Table");
 			    
 		frame.getContentPane().add( m );
@@ -994,6 +1003,46 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		m.setLayout(new BorderLayout());
 		m.add("Center", scroll);
 		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
+		JButton exportButton = new JButton("Export");
+		exportButton.addActionListener(new ActionListener() {
+			JTable table;
+			
+			public ActionListener init(JTable table){
+				this.table = table;
+				return this;
+			}
+			
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	JFileChooser fileChooser = new JFileChooser();
+            	
+                fileChooser.setCurrentDirectory(new File("/Users/mac/Desktop"));
+                
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
+                
+                
+                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+                
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    String inputPath = fileChooser.getSelectedFile().getAbsolutePath();
+                    if(!inputPath.endsWith(".xls"))
+                    	inputPath = inputPath + ".xls";
+
+                    if(ExcelExporter.fillData(table, inputPath) == ExcelExporter.SUCCESS){
+                    	JOptionPane.showMessageDialog(null, "Successfully saved at "+inputPath);
+                    }else{
+                    	JOptionPane.showMessageDialog(null, "Fail to save data.");
+                    }
+                }
+            }
+		}.init(table));
+		
+		buttonPanel.add("East", exportButton);
+		
+		m.add("South", buttonPanel);
+		
 		JFrame frame = new JFrame("Source Info Table");
 			    
 		frame.getContentPane().add( m );
@@ -1083,6 +1132,46 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		JPanel m = new JPanel();
 		m.setLayout(new BorderLayout());
 		m.add("Center", scroll);
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
+		JButton exportButton = new JButton("Export");
+		exportButton.addActionListener(new ActionListener() {
+			JTable table;
+			
+			public ActionListener init(JTable table){
+				this.table = table;
+				return this;
+			}
+			
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	JFileChooser fileChooser = new JFileChooser();
+            	
+                fileChooser.setCurrentDirectory(new File("/Users/mac/Desktop"));
+                
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
+                
+                
+                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+                
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    String inputPath = fileChooser.getSelectedFile().getAbsolutePath();
+                    if(!inputPath.endsWith(".xls"))
+                    	inputPath = inputPath + ".xls";
+
+                    if(ExcelExporter.fillData(table, inputPath) == ExcelExporter.SUCCESS){
+                    	JOptionPane.showMessageDialog(null, "Successfully saved at "+inputPath);
+                    }else{
+                    	JOptionPane.showMessageDialog(null, "Fail to save data.");
+                    }
+                }
+            }
+		}.init(table));
+		
+		buttonPanel.add("East", exportButton);
+		
+		m.add("South", buttonPanel);
 		
 		JFrame frame = new JFrame("Source Info Table");
 			    
@@ -1418,10 +1507,10 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 	
 
-	public void destroy() {
-		// TODO Auto-generated method stub
-		super.destroy();
-	}
+//	public void destroy() {
+//		// TODO Auto-generated method stub
+//		super.destroy();
+//	}
 
 	public void init() {
 
@@ -1430,7 +1519,7 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 	}
 
 	public void init(JGraph jg) {
-		initParam();
+		//initParam();
 		setDefaultFont(UiGlobals.getNormalFont());
 		NodePaletteFig topBar = new NodePaletteFig();
 		this.setToolBar(topBar); // needs-more-work
@@ -1804,15 +1893,15 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 		_mainPanel.add(_westToolbar, BorderLayout.EAST);
 	}
 
-	public void start() {
-		// TODO Auto-generated method stub
-		super.start();
-	}
-
-	public void stop() {
-		// TODO Auto-generated method stub
-		super.stop();
-	}
+//	public void start() {
+//		// TODO Auto-generated method stub
+//		super.start();
+//	}
+//
+//	public void stop() {
+//		// TODO Auto-generated method stub
+//		super.stop();
+//	}
 
 	/**
 	 * Set default font
@@ -1835,39 +1924,45 @@ public class CCSMain extends JApplet implements ModeChangeListener {
 
 	}
 	
-	public static void main(String[] artv){
-		Class<CCSSourceData> a = CCSSourceData.class;
-		for(Method b : a.getMethods()){
-			System.out.println(b.getName());
-		}
+	public static void main(String[] artv) throws Exception{
 		
-		CCSSourceData b = new CCSSourceData();
-		try {
-			int aa = 10;
-			try {
-				Method bbb = CCSSourceData.class.getMethod("setIndex", int.class);
-				bbb.setAccessible(true);
-				try {
-					bbb.invoke(b, aa);
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			System.out.println("b.index :"+b.getIndex());
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		CCSMainFrame frame = new CCSMainFrame();
+		frame.init();
+		frame.setVisible(true);
+		//frame.setSize( 1024, 500 ); 
+		
+//		Class<CCSSourceData> a = CCSSourceData.class;
+//		for(Method b : a.getMethods()){
+//			System.out.println(b.getName());
+//		}
+//		
+//		CCSSourceData b = new CCSSourceData();
+//		try {
+//			int aa = 10;
+//			try {
+//				Method bbb = CCSSourceData.class.getMethod("setIndex", int.class);
+//				bbb.setAccessible(true);
+//				try {
+//					bbb.invoke(b, aa);
+//				} catch (IllegalAccessException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (InvocationTargetException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			} catch (IllegalArgumentException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			System.out.println("b.index :"+b.getIndex());
+//		} catch (NoSuchMethodException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (SecurityException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 }

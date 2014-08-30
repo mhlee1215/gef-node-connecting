@@ -40,10 +40,26 @@ package ac.kaist.ccs.presentation;
 
 
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -62,7 +78,11 @@ import org.jfree.ui.RefineryUtilities;
 
 
 
+
+
+
 import ac.kaist.ccs.domain.CCSStatics;
+import ac.kaist.ccs.utils.ExcelExporter;
 
 /**
  * A simple demonstration application showing how to create a line chart using data from an
@@ -83,9 +103,74 @@ public class CCSHubSelectionCo2Coverage extends JFrame {
         this.title = title;
         final XYDataset dataset = createDataset(coverSourceNum);
         final JFreeChart chart = createChart(dataset);
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
         final ChartPanel chartPanel = new ChartPanel(chart);
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BorderLayout());
+		JButton buttonExport = new JButton("Export");
+		buttonPanel.add("East", buttonExport);
+		buttonExport.addActionListener(new ActionListener(){
+			ChartPanel chartPanel;
+			
+			public ActionListener init(ChartPanel chartPanel){
+				this.chartPanel = chartPanel;
+				return this;
+			}
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				Dimension size = chartPanel.getSize();
+				
+				try {
+					//String outPath = textFieldSelectPath.getText();
+					//String filename = "chromatography.png";
+					//String path = outPath+"/"+filename;
+					JFileChooser fileChooser = new JFileChooser();
+	            	
+	                fileChooser.setCurrentDirectory(new File("/Users/mac/Desktop"));
+	                
+	                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("JPEG","jpeg"));
+	                
+	                
+	                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+	                
+	                if(returnVal == JFileChooser.APPROVE_OPTION) {
+	                    String inputPath = fileChooser.getSelectedFile().getAbsolutePath();
+	                    if(!inputPath.endsWith(".jpeg"))
+	                    	inputPath = inputPath + ".jpeg";
+
+	                    OutputStream os = new FileOutputStream(inputPath);
+						System.out.println(inputPath+"///"+size.width + " " + size.height);
+						BufferedImage chartImage = chartPanel.getChart().createBufferedImage( size.width, size.height, null);
+						ImageIO.write( chartImage, "png", os );
+						os.close();
+						JOptionPane.showMessageDialog(null, "Chart image was saved in "+inputPath);
+	                   
+	                }
+					
+					
+					
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				 
+			}
+		}.init(chartPanel));
+        
+        
+		panel.add("Center", chartPanel);
+        panel.add("South", buttonPanel);
+        
         chartPanel.setPreferredSize(new java.awt.Dimension(700, 500));
-        setContentPane(chartPanel);
+        setContentPane(panel);
 
     }
     

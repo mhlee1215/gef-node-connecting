@@ -1,6 +1,8 @@
+package ac.kaist.ccs.utils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +13,11 @@ import jxl.*;
 import jxl.write.*;
 
 public class ExcelExporter {
+	
+	public static int SUCCESS = 1;
+	public static int FAIL = 0;
 
-    void fillData(JTable table, File file) {
+    static int fillData(JTable table, File file) {
         try {
 
             WritableWorkbook workbook1 = Workbook.createWorkbook(file);
@@ -33,12 +38,40 @@ public class ExcelExporter {
             }
             workbook1.write();
             workbook1.close();
+            return SUCCESS;
         } catch (Exception ex) {
             ex.printStackTrace();
+            return FAIL;
         }
     }
     
-    void fillData(List<JTable> tables, List<String> sheetNames, WritableWorkbook workbook1) {
+    public static int fillData(JTable table, String path) {
+    	List<JTable> tables = new ArrayList<JTable>();
+    	tables.add(table);
+    	List<String> sheetNames = new ArrayList<String>();
+    	sheetNames.add("First Sheet");
+    	
+    	try {
+			ExcelExporter.fillData(tables, sheetNames, Workbook.createWorkbook(new File(path)));
+			return SUCCESS;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return FAIL;
+		}
+    }
+    
+    public static int fillData(List<JTable> tables, List<String> sheetNames, String path) {
+    	try {
+			ExcelExporter.fillData(tables, sheetNames, Workbook.createWorkbook(new File(path)));
+			return SUCCESS;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return FAIL;
+		}
+    }
+    static int fillData(List<JTable> tables, List<String> sheetNames, WritableWorkbook workbook1) {
         try {
 
             //WritableWorkbook workbook1 = Workbook.createWorkbook(file);
@@ -66,8 +99,10 @@ public class ExcelExporter {
             
             workbook1.write();
             workbook1.close();
+            return SUCCESS;
         } catch (Exception ex) {
             ex.printStackTrace();
+            return FAIL;
         }
     }
 
@@ -90,7 +125,7 @@ public class ExcelExporter {
             public void actionPerformed(ActionEvent evt) {
 
                 try {
-                    ExcelExporter exp = new ExcelExporter();
+                    //ExcelExporter exp = new ExcelExporter();
                     List<JTable> test = new ArrayList<JTable>();
                     test.add(table);
                     test.add(table);
@@ -98,9 +133,9 @@ public class ExcelExporter {
                     sheetNames.add("first");
                     sheetNames.add("second");
                     
-                    WritableWorkbook workbook1 = Workbook.createWorkbook(new File("/Users/mac/Desktop/result2.xls"));
+                    //WritableWorkbook workbook1 = Workbook.createWorkbook(new File("/Users/mac/Desktop/result2.xls"));
                     
-                    exp.fillData(test, sheetNames, workbook1);
+                    ExcelExporter.fillData(test, sheetNames, "/Users/mac/Desktop/result2.xls");
                     
                     //exp.fillData(table, new File("/Users/mac/Desktop/result.xls"));
                     JOptionPane.showMessageDialog(null, "Data saved at " +

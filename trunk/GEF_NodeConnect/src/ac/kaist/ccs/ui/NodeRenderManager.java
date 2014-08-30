@@ -17,6 +17,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -42,6 +43,7 @@ import ac.kaist.ccs.domain.CCSStatics;
 import ac.kaist.ccs.domain.CCSUtils;
 import ac.kaist.ccs.domain.CCSUtils.*;
 import ac.kaist.ccs.main.CCSMain.*;
+import ac.kaist.ccs.utils.ExcelExporter;
 
 public class NodeRenderManager {
 
@@ -333,27 +335,42 @@ public class NodeRenderManager {
 		m.add("Center", scroll);
 		
 		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
 		JButton exportButton = new JButton("Export");
 		exportButton.addActionListener(new ActionListener() {
+			JTable table;
+			
+			public ActionListener init(JTable table){
+				this.table = table;
+				return this;
+			}
+			
             @Override
             public void actionPerformed(ActionEvent event) {
             	JFileChooser fileChooser = new JFileChooser();
             	
-            	 /* Enabling Multiple Selection */
-                //fileChooser.setMultiSelectionEnabled(true);
-
-                /* Setting Current Directory */
-                fileChooser.setCurrentDirectory(new File("E:/ext_work/respace/workspace/CTS_analysis/input"));
+                fileChooser.setCurrentDirectory(new File("/Users/mac/Desktop"));
                 
                 fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
                 
-                //JFrame parent = new MenuMain();
-                
                 
                 int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+                
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    String inputPath = fileChooser.getSelectedFile().getAbsolutePath();
+                    if(!inputPath.endsWith(".xls"))
+                    	inputPath = inputPath + ".xls";
+
+                    if(ExcelExporter.fillData(table, inputPath) == ExcelExporter.SUCCESS){
+                    	JOptionPane.showMessageDialog(null, "Successfully saved at "+inputPath);
+                    }else{
+                    	JOptionPane.showMessageDialog(null, "Fail to save data.");
+                    }
+                }
             }
-		});
-		buttonPanel.add(exportButton);
+		}.init(table));
+		
+		buttonPanel.add("East", exportButton);
 		
 		m.add("South", buttonPanel);
 		
@@ -493,6 +510,46 @@ public class NodeRenderManager {
 		JPanel m = new JPanel();
 		m.setLayout(new BorderLayout());
 		m.add("Center", scroll);
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
+		JButton exportButton = new JButton("Export");
+		exportButton.addActionListener(new ActionListener() {
+			JTable table;
+			
+			public ActionListener init(JTable table){
+				this.table = table;
+				return this;
+			}
+			
+            @Override
+            public void actionPerformed(ActionEvent event) {
+            	JFileChooser fileChooser = new JFileChooser();
+            	
+                fileChooser.setCurrentDirectory(new File("/Users/mac/Desktop"));
+                
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel 97 File","xls"));
+                
+                
+                int returnVal = fileChooser.showDialog(new JFrame(), "Open File Path");
+                
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    String inputPath = fileChooser.getSelectedFile().getAbsolutePath();
+                    if(!inputPath.endsWith(".xls"))
+                    	inputPath = inputPath + ".xls";
+
+                    if(ExcelExporter.fillData(table, inputPath) == ExcelExporter.SUCCESS){
+                    	JOptionPane.showMessageDialog(null, "Successfully saved at "+inputPath);
+                    }else{
+                    	JOptionPane.showMessageDialog(null, "Fail to save data.");
+                    }
+                }
+            }
+		}.init(table));
+		
+		buttonPanel.add("East", exportButton);
+		
+		m.add("South", buttonPanel);
 		
 		JFrame frame = new JFrame("Pipe Diameter Result Table");
 			    
@@ -743,8 +800,9 @@ public class NodeRenderManager {
 				}
 			}
 
-			//System.out.println("minDist: "+minDist+",minRankHub.getRange(): "+minRankHub.getRange());
+			System.out.println("minDist: "+minDist+",minRankHub.getRange(): "+minRankHub.getRange());
 			if (minDist <= minRankHub.getRange()) {
+				System.out.println("SET : "+minRankHub.getIndex());
 				curSrc.setClusterHub(minRankHub);
 				minRankHub.getClusterSources().clear();
 			}

@@ -115,7 +115,7 @@ public class CCSJointData extends CCSSourceData {
 		}
 		//Method 2
 		else if(costType == CCSStatics.COST_TYPE_MIT_MODEL){
-			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet);
+			double D = getConvergedDiameter(m, L, co2Data.lou, co2Data.mu, co2Data.p_outlet, co2Data.p_inlet);
 			D *= CCSStatics.COST_TYPE_2_TEMP_SCALE;
 			this.pipelineCost = childCost;// + (20989 * D * L * 0.15) + 3100*L;
 			this.pipe_diameter = D;
